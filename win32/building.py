@@ -111,7 +111,6 @@ def PrepareBuilding(env, root_directory):
         Env['LIBPATH'] = [Rtt_Root + '/win32/SDL/lib']
     Env.Append(CCFLAGS=['/MT', '/ZI', '/Od'])
     Env.Append(LINKFLAGS='/SUBSYSTEM:WINDOWS /NODEFAULTLIB /MACHINE:X86 /DEBUG')
-    Env.Append(ENV = os.environ)
 
     return objs
 
