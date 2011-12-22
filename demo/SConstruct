@@ -1,0 +1,23 @@
+import os
+import sys
+
+RTT_ROOT = os.path.normpath(os.getcwd() + '/..')
+sys.path = sys.path + [os.path.join(RTT_ROOT, 'win32')]
+from building import *
+import rtconfig
+
+TARGET = 'application'
+
+env = Environment()
+
+Export('RTT_ROOT')
+Export('rtconfig')
+
+# prepare building environment
+objs = PrepareBuilding(env, RTT_ROOT)
+
+# build program 
+env.Program(TARGET, objs)
+
+# end building 
+EndBuilding(TARGET)

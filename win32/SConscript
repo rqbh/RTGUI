@@ -1,0 +1,9 @@
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+src = Glob('*.c')
+
+group = DefineGroup('win32', src, depend = ['RT_USING_RTGUI'], CPPPATH = [RTT_ROOT + '/win32'])
+
+Return('group')
