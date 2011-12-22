@@ -381,6 +381,8 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 			if (win->on_close(widget, event) == RT_FALSE) return RT_TRUE;
 		}
 
+		rtgui_win_close(win);
+
 		if (win->style & RTGUI_WIN_STYLE_MODAL)
 		{
 			rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
