@@ -1,4 +1,5 @@
 import os
+import shutil
 import string
 from SCons.Script import *
 
@@ -106,9 +107,10 @@ def PrepareBuilding(env, root_directory):
     Env['LIBS'] = ['SDL', 'SDLmain', 'msvcrt', 'user32', 'kernel32', 'gdi32.lib']
     if Env['MSVC_VERSION'] == '6.0':
         print 'Visual C++ 6.0'
-        Env['LIBPATH'] = [Rtt_Root + '/win32/SDL/lib_vc6']
+        Env['SDL_LIBPATH'] = Rtt_Root + '/win32/SDL/lib_vc6'
     else:
-        Env['LIBPATH'] = [Rtt_Root + '/win32/SDL/lib']
+        Env['SDL_LIBPATH'] = Rtt_Root + '/win32/SDL/lib'
+    Env.Append(LIBPATH=Env['SDL_LIBPATH'])
     Env.Append(CCFLAGS=['/MT', '/ZI', '/Od'])
     Env.Append(LINKFLAGS='/SUBSYSTEM:WINDOWS /NODEFAULTLIB /MACHINE:X86 /DEBUG')
 
@@ -173,7 +175,9 @@ def DefineGroup(name, src, depend, **parameters):
     return objs
 
 def EndBuilding(target):
-    pass
+    # copy SDL.dll to the win32/ so the user can start the application directly
+    shutil.copy(os.path.join(Env['SDL_LIBPATH'], 'SDL.dll'),
+                os.path.join(Rtt_Root, 'win32'))
 
 def GetPackage(url):
     import urllib
