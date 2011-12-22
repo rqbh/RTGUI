@@ -98,12 +98,11 @@ def PrepareBuilding(env, root_directory):
     Env = env
     Rtt_Root = root_directory
 
-    # board build script
-    objs = SConscript('SConscript', variant_dir='build/bsp', duplicate=0)
     Repository(Rtt_Root)
     # include components
-    objs.append(SConscript('components/SConscript', variant_dir='build/components', duplicate=0))
+    objs = SConscript('components/SConscript', variant_dir='build/components', duplicate=0)
     objs.append(SConscript('win32/SConscript', variant_dir='build/win32', duplicate=0))
+    objs.append(SConscript('demo/SConscript', variant_dir='build/demo', duplicate=0))
     Env['LIBS'] = ['SDL', 'SDLmain', 'msvcrt', 'user32', 'kernel32', 'gdi32.lib']
     if Env['MSVC_VERSION'] == '6.0':
         print 'Visual C++ 6.0'
