@@ -219,6 +219,35 @@ static void demo_ntitlewin_onbutton(struct rtgui_widget* widget, rtgui_event_t* 
 	rtgui_win_show(win, RT_FALSE);
 }
 
+static void demo_stdalonewin_onbutton(struct rtgui_widget* widget, rtgui_event_t* event)
+{
+	rtgui_win_t *win;
+	rtgui_label_t *label;
+	rtgui_rect_t rect = {0, 0, 150, 80};
+
+	rtgui_rect_moveto(&rect, delta_x, delta_y);
+	delta_x += 20;
+	delta_y += 20;
+
+	/* 创建一个窗口 */
+	win = rtgui_win_create(RT_NULL,
+		get_win_title(), &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rect.x1 += 20;
+	rect.x2 -= 5;
+	rect.y1 += 5;
+	rect.y2 = rect.y1 + 20;
+
+	label = rtgui_label_create("这是一个独立窗口");
+	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
+	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(label));
+
+	/* 模态显示窗口 */
+	rtgui_win_show(win, RT_TRUE);
+	/* 独立窗口 show 之后会自动销毁，不要重复销毁对象 */
+	/*rtgui_win_destroy(win);*/
+}
+
 rtgui_view_t* demo_view_window(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t  rect;
@@ -275,6 +304,15 @@ rtgui_view_t* demo_view_window(rtgui_workbench_t* workbench)
 	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
 	/* 设置onbutton为demo_ntitlewin_onbutton函数 */
 	rtgui_button_set_onbutton(button, demo_ntitlewin_onbutton);
+
+	rect.y1 += 25;
+	rect.x2 = rect.x1 + 150;
+	rect.y2 = rect.y1 + 20;
+	button = rtgui_button_create("Stand Alone Win");
+	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
+
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	rtgui_button_set_onbutton(button, demo_stdalonewin_onbutton);
 
 	return view;
 }
