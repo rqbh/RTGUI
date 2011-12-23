@@ -103,7 +103,6 @@ def PrepareBuilding(env, root_directory):
     # include components
     objs = SConscript('components/SConscript', variant_dir='build/components', duplicate=0)
     objs.append(SConscript('win32/SConscript', variant_dir='build/win32', duplicate=0))
-    objs.append(SConscript('demo/SConscript', variant_dir='build/demo', duplicate=0))
     Env['LIBS'] = ['SDL', 'SDLmain', 'msvcrt', 'user32', 'kernel32', 'gdi32.lib']
     if Env['MSVC_VERSION'] == '6.0':
         print 'Visual C++ 6.0'
@@ -176,9 +175,7 @@ def DefineGroup(name, src, depend, **parameters):
     return objs
 
 def EndBuilding(target):
-    # copy SDL.dll to the win32/ so the user can start the application directly
-    shutil.copy(os.path.join(Env['SDL_LIBPATH'], 'SDL.dll'),
-                GetCurrentDir())
+    pass
 
 def GetPackage(url):
     import urllib

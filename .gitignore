@@ -3,3 +3,9 @@
 *.bak
 
 *.pyc
+
+.sconsign.dblite
+build/
+executables/
+*.pdb
+*.idb
