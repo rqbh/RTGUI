@@ -1,0 +1,8 @@
+.sconsign.dblite
+build/
+SDL.dll
+application.exe
+application.exe.manifest
+application.ilk
+*.pdb
+*.idb

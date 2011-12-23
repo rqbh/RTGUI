@@ -177,7 +177,7 @@ def DefineGroup(name, src, depend, **parameters):
 def EndBuilding(target):
     # copy SDL.dll to the win32/ so the user can start the application directly
     shutil.copy(os.path.join(Env['SDL_LIBPATH'], 'SDL.dll'),
-                os.path.join(Rtt_Root, 'win32'))
+                GetCurrentDir())
 
 def GetPackage(url):
     import urllib
