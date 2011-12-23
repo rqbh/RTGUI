@@ -6,6 +6,6 @@
 
 .sconsign.dblite
 build/
-executeables/
+executables/
 *.pdb
 *.idb
