@@ -481,7 +481,7 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
 	}
 }
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -490,7 +490,7 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
  */
 static void rtgui_server_entry(void* parameter)
 {
-#ifdef __WIN32__
+#ifdef _WIN32
 	/* set the server thread to highest */
 	HANDLE hCurrentThread = GetCurrentThread();
 	SetThreadPriority(hCurrentThread, THREAD_PRIORITY_HIGHEST);
