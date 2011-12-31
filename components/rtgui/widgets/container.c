@@ -19,11 +19,23 @@ static void _rtgui_container_constructor(rtgui_container_t *container)
 	/* set event handler and init field */
 	rtgui_widget_set_event_handler(RTGUI_WIDGET(container), rtgui_container_event_handler);
 	rtgui_list_init(&(container->children));
-	
-	/* set focused widget to itself */
-	container->focused = RTGUI_WIDGET(container);
-	/* set container as focusable widget */
-	RTGUI_WIDGET(container)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
+
+	/* no focus on start up */
+	container->focused = RT_NULL;
+	/* container is used to 'contain'(show) widgets and dispatch events to
+	 * them, not interact with user. So no need to grab focus. If we did it,
+	 * some widget inherited from container(e.g. notebook) will grab the focus
+	 * annoyingly.
+	 *
+	 * For example, a focusable notebook N has a widget W. When the user press
+	 * W, N will gain the focus and W will lose it at first. Then N will set
+	 * focus to W because it is W that eventually interact with people. N will
+	 * yield focus and W will gain the focus again. This loop will make W
+	 * repaint twice every time user press it.
+	 *
+	 * Just eliminate it.
+	 */
+	RTGUI_WIDGET(container)->flag &= ~RTGUI_WIDGET_FLAG_FOCUSABLE;
 }
 
 static void _rtgui_container_destructor(rtgui_container_t *container)
@@ -171,7 +183,7 @@ void rtgui_container_remove_child(rtgui_container_t *container, rtgui_widget_t* 
 	if (child == container->focused)
 	{
 		/* set focused to itself */
-		container->focused = RTGUI_WIDGET(container);
+		container->focused = RT_NULL;
 
 		rtgui_widget_focus(RTGUI_WIDGET(container));
 	}
@@ -218,7 +230,7 @@ void rtgui_container_destroy_children(rtgui_container_t *container)
 	}
 
 	container->children.next = RT_NULL;
-	container->focused = RTGUI_WIDGET(container);
+	container->focused = RT_NULL;
 	if (RTGUI_WIDGET(container)->parent != RT_NULL)
 		rtgui_widget_focus(RTGUI_WIDGET(container));
 
