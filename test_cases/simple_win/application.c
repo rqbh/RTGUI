@@ -5,7 +5,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/driver.h>
 
-#include "swin.h"
+#include "test_cases.h"
 
 void rt_init_thread_entry(void* parameter)
 {
@@ -37,6 +37,8 @@ void rt_init_thread_entry(void* parameter)
     show_win1();
 
     show_win2();
+
+    window_focus();
 
     end_become_rtgui_thread();
 }
