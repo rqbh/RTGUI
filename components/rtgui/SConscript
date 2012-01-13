@@ -7,6 +7,7 @@ common/color.c
 common/region.c
 common/rtgui_object.c
 common/rtgui_system.c
+common/rtgui_application.c
 common/rtgui_theme.c
 common/rtgui_xml.c
 common/dc.c
