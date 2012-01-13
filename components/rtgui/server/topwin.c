@@ -224,6 +224,9 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* win)
 		rtgui_theme_draw_win(win);
 	}
 
+    if (win->flag & WINTITLE_NOFOCUS)
+        return;
+
 	if ((rtgui_server_focus_topwin != RT_NULL) && (rtgui_server_focus_topwin != win))
 	{
 		/* deactivate the old focus win  */
