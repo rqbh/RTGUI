@@ -237,16 +237,16 @@ rtgui_view_t* demo_view_listctrl(rtgui_workbench_t* workbench)
 	label = rtgui_label_create("List Control: ");
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	rect.y1 = rect.y2 + 3;
 	rect.y2 = 250;
 	box = rtgui_listctrl_create((rt_uint32_t)items, sizeof(items)/sizeof(items[0]), &rect,
 		_rtgui_listctrl_item_draw);
 	rtgui_listctrl_set_onitem(box, on_items);
-	/* view是一个container控件，调用add_child方法添加这个listctrl控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(box));
+	/* view是一个view控件，调用add_child方法添加这个listctrl控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(box));
 
 	return view;
 }

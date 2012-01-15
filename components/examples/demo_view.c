@@ -67,7 +67,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置标签位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 		/* 添加标签到视图中 */
-		rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+		rtgui_view_add_child(view, RTGUI_WIDGET(label));
 
 		rect.y1 += 20;
 		rect.y2 += 20;
@@ -76,7 +76,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置静态线的位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(line), &rect);
 		/* 添加静态线到视图中 */
-		rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(line));
+		rtgui_view_add_child(view, RTGUI_WIDGET(line));
 
 		/* 获得视图的位置信息 */
 		rtgui_widget_get_rect(RTGUI_WIDGET(view), &rect);
@@ -93,7 +93,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置按钮的位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(next_btn), &rect);
 		/* 添加按钮到视图中 */
-		rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(next_btn));
+		rtgui_view_add_child(view, RTGUI_WIDGET(next_btn));
 
 		/* 获得视图的位置信息 */
 		rtgui_widget_get_rect(RTGUI_WIDGET(view), &rect);
@@ -110,7 +110,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置按钮的位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(prev_btn), &rect);
 		/* 添加按钮到视图中 */
-		rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(prev_btn));
+		rtgui_view_add_child(view, RTGUI_WIDGET(prev_btn));
 	}
 
 	/* 返回创建的视图 */
@@ -156,7 +156,7 @@ rtgui_box_t* demo_view_create_box(rtgui_view_t* view, int orient)
 	/* 创建一个自动布局引擎 */
 	box = rtgui_box_create(orient, &rect);
 	/* 添加box控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(box));
+	rtgui_view_add_child(view, RTGUI_WIDGET(box));
 
 	return box;
 }

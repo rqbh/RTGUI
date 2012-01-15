@@ -177,15 +177,15 @@ rtgui_view_t* demo_view_listbox(rtgui_workbench_t* workbench)
 	label = rtgui_label_create("listbox: ");
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	rect.y1 = rect.y2 + 3;
 	rect.y2 = 250;
 	box = rtgui_listbox_create(items, sizeof(items)/sizeof(struct rtgui_listbox_item), &rect);
 	rtgui_listbox_set_onitem(box, on_items);
-	/* view是一个container控件，调用add_child方法添加这个listbox控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(box));
+	/* view是一个view控件，调用add_child方法添加这个listbox控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(box));
 
 	return view;
 }

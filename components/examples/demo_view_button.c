@@ -30,8 +30,8 @@ rtgui_view_t* demo_view_button(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FOREGROUND(RTGUI_WIDGET(button)) = red;
 	/* 设置button的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	/* view是一个container控件，调用add_child方法添加这个button控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	/* view是一个view控件，调用add_child方法添加这个button控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -45,8 +45,8 @@ rtgui_view_t* demo_view_button(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FOREGROUND(RTGUI_WIDGET(button)) = blue;
 	/* 设置button的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	/* view是一个container控件，调用add_child方法添加这个button控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	/* view是一个view控件，调用add_child方法添加这个button控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -61,8 +61,8 @@ rtgui_view_t* demo_view_button(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(button)) = font;
 	/* 设置button的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	/* view是一个container控件，调用add_child方法添加这个button控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	/* view是一个view控件，调用add_child方法添加这个button控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -77,8 +77,8 @@ rtgui_view_t* demo_view_button(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(button)) = font;
 	/* 设置button的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	/* view是一个container控件，调用add_child方法添加这个button控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	/* view是一个view控件，调用add_child方法添加这个button控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
 
 	return view;
 }

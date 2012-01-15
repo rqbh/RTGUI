@@ -28,8 +28,8 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	label = rtgui_label_create("名字: ");
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	/* 让textbox_rect赋值到rect，以计算textbox控件的位置 */
 	textbox_rect = rect;
@@ -40,7 +40,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置textbox控件的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(text), &textbox_rect);
 	/* 添加textbox控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(text));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(text));
 
 	/* 计算下一个label控件的位置 */
 	rect.y1 += 23;
@@ -50,7 +50,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* 添加label控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 	textbox_rect = rect;
 	textbox_rect.x1 = textbox_rect.x2 + 5;
 	textbox_rect.x2 = textbox_rect.x1 + 160;
@@ -59,7 +59,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置textbox控件的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(text), &textbox_rect);
 	/* 添加textbox控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(text));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(text));
 
 	rect.y1 += 23;
 	rect.y2 = rect.y1 + 20;
@@ -68,7 +68,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* 添加label控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 	textbox_rect = rect;
 	textbox_rect.x1 = textbox_rect.x2 + 5;
 	textbox_rect.x2 = textbox_rect.x1 + 160;
@@ -79,7 +79,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置textbox控件的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(text), &textbox_rect);
 	/* 添加textbox控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(text));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(text));
 
 	rect.y1 += 23;
 	rect.y2 = rect.y1 + 20;
@@ -88,7 +88,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* 添加label控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 	textbox_rect = rect;
 	textbox_rect.x1 = textbox_rect.x2 + 5;
 	textbox_rect.x2 = textbox_rect.x1 + 160;
@@ -97,7 +97,7 @@ rtgui_view_t* demo_view_textbox(rtgui_workbench_t* workbench)
 	/* 设置textbox控件的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(text), &textbox_rect);
 	/* 添加textbox控件到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(text));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(text));
 
 	return view;
 }

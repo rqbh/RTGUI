@@ -40,8 +40,8 @@ rtgui_view_t* demo_view_notebook(rtgui_workbench_t* workbench)
 	demo_view_get_rect(view, &rect);
 
 	notebook = rtgui_notebook_create(&rect, RTGUI_NOTEBOOK_BOTTOM);
-	/* view是一个container控件，调用add_child方法添加这个notebook控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(notebook));
+	/* view是一个view控件，调用add_child方法添加这个notebook控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(notebook));
 
 	box = rtgui_listbox_create(items, sizeof(items)/sizeof(struct rtgui_listbox_item), &rect);
 	rtgui_notebook_add(notebook, "Tab 1", RTGUI_WIDGET(box));

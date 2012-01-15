@@ -24,8 +24,8 @@ rtgui_view_t *demo_view_mywidget(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 80;
 	/* 创建一个自定义控件 */
 	mywidget = rtgui_mywidget_create(&rect);
-	/* view是一个container控件，调用add_child方法添加这个自控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(mywidget));
+	/* view是一个view控件，调用add_child方法添加这个自控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(mywidget));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -35,8 +35,8 @@ rtgui_view_t *demo_view_mywidget(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 40;
 	/* 创建一个自定义控件 */
 	mywidget = rtgui_mywidget_create(&rect);
-	/* view是一个container控件，调用add_child方法添加这个自控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(mywidget));
+	/* view是一个view控件，调用add_child方法添加这个自控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(mywidget));
 
 	return view;
 }

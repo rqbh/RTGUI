@@ -33,7 +33,7 @@ static void workbench_entry(void* parameter)
 	rect.x2 = 210; rect.y2 = 30;
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	/* 添加到父workbench中 */
 	rtgui_workbench_add_view(workbench, view);

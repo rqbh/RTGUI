@@ -43,7 +43,7 @@ static void listitem_action(void* parameter)
 	label = rtgui_label_create(label_text);
 
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(win), RTGUI_WIDGET(label));
 
 	/* 非模态显示窗口 */
 	rtgui_win_show(win, RT_FALSE);
@@ -107,7 +107,7 @@ rtgui_view_t* demo_listview_view(rtgui_workbench_t* workbench)
 	rect.y1 += 30;
 	rect.y2 = rect.y1 + 20;
 	open_btn = rtgui_button_create("打开列表");
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(open_btn));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(open_btn));
 	rtgui_widget_set_rect(RTGUI_WIDGET(open_btn), &rect);
 	rtgui_button_set_onbutton(open_btn, open_btn_onbutton);
 

@@ -62,7 +62,7 @@ rt_bool_t window_focus(void)
 	/* 设置标签位置信息 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* 添加标签到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(win),
+	rtgui_view_add_child(RTGUI_VIEW(win),
 			RTGUI_WIDGET(label));
 	/*添加放大按钮*/
 
@@ -79,7 +79,7 @@ rt_bool_t window_focus(void)
 	/* 设置按钮的位置信息 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(start_btn), &rect);
 	/* 添加按钮到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(win),
+	rtgui_view_add_child(RTGUI_VIEW(win),
 			RTGUI_WIDGET(start_btn));
 
 	/* 添加停止按钮*/
@@ -95,7 +95,7 @@ rt_bool_t window_focus(void)
 	/* 设置按钮的位置信息 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(stop_btn), &rect);
 	/* 添加按钮到视图中 */
-	rtgui_container_add_child(RTGUI_CONTAINER(win),
+	rtgui_view_add_child(RTGUI_VIEW(win),
 			RTGUI_WIDGET(stop_btn));
 
 	parent = RTGUI_TOPLEVEL(rtgui_widget_get_toplevel(RTGUI_WIDGET(start_btn)));
@@ -111,8 +111,8 @@ rt_bool_t window_focus(void)
             RTGUI_WIN_STYLE_NO_TITLE|RTGUI_WIN_STYLE_NO_BORDER|RTGUI_WIN_STYLE_NO_FOCUS);
     //创建窗口，没有标题栏，没有最小化窗口，也不能获取焦点
 	/* 添加windows的事件*/
-	rtgui_container_add_child(RTGUI_CONTAINER(win),
-			picture_win);
+	rtgui_view_add_child(RTGUI_VIEW(win),
+			RTGUI_WIDGET(picture_win));
 	rtgui_widget_set_event_handler(RTGUI_WIDGET(picture_win),
 			picture_win_onpaint);
 

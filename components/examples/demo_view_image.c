@@ -122,7 +122,7 @@ rtgui_view_t* demo_view_image(rtgui_workbench_t* workbench)
 	rect.x1 += 5; rect.x2 = rect.x1 + 120;
 	rect.y2 = rect.y1 + 20;
 	open_btn = rtgui_button_create("打开图像文件");
-	rtgui_container_add_child(RTGUI_CONTAINER(_view), RTGUI_WIDGET(open_btn));
+	rtgui_view_add_child(RTGUI_VIEW(_view), RTGUI_WIDGET(open_btn));
 	rtgui_widget_set_rect(RTGUI_WIDGET(open_btn), &rect);
 	rtgui_button_set_onbutton(open_btn, open_btn_onbutton);
 

@@ -31,8 +31,8 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FOREGROUND(RTGUI_WIDGET(label)) = red;
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -48,8 +48,8 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FOREGROUND(RTGUI_WIDGET(label)) = blue;
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -65,8 +65,8 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_TEXTALIGN(RTGUI_WIDGET(label)) = RTGUI_ALIGN_CENTER_HORIZONTAL;
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -81,8 +81,8 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(label)) = font;
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -96,8 +96,8 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(label)) = font;
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	/* view是一个container控件，调用add_child方法添加这个label控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	/* view是一个view控件，调用add_child方法添加这个label控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 
 	return view;
 }

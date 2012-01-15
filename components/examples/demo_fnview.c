@@ -68,7 +68,7 @@ rtgui_view_t* demo_fn_view(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 20;
 	/* 创建显示文件路径用的文本标签 */
 	label = rtgui_label_create("fn: ");
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(label)) = font;
 
@@ -80,7 +80,7 @@ rtgui_view_t* demo_fn_view(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 20;
 	/* 创建按钮以触发一个新的文件列表视图 */
 	open_btn = rtgui_button_create("Open File");
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(open_btn));
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(open_btn));
 	rtgui_widget_set_rect(RTGUI_WIDGET(open_btn), &rect);
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(open_btn)) = font;
 	rtgui_button_set_onbutton(open_btn, open_btn_onbutton);

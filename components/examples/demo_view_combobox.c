@@ -33,8 +33,8 @@ rtgui_view_t* demo_view_combobox(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 20;
 	/* 创建一个label控件 */
 	box = rtgui_combobox_create(items, sizeof(items)/sizeof(items[0]), &rect);
-	/* view是一个container控件，调用add_child方法添加这个box控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(box));
+	/* view是一个view控件，调用add_child方法添加这个box控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(box));
 
 	return view;
 }

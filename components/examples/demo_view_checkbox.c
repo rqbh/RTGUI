@@ -30,8 +30,8 @@ rtgui_view_t* demo_view_checkbox(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FOREGROUND(RTGUI_WIDGET(checkbox)) = red;
 	/* 设置checkbox的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(checkbox), &rect);
-	/* view是一个container控件，调用add_child方法添加这个checkbox控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(checkbox));
+	/* view是一个view控件，调用add_child方法添加这个checkbox控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(checkbox));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -45,8 +45,8 @@ rtgui_view_t* demo_view_checkbox(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FOREGROUND(RTGUI_WIDGET(checkbox)) = blue;
 	/* 设置checkbox的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(checkbox), &rect);
-	/* view是一个container控件，调用add_child方法添加这个checkbox控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(checkbox));
+	/* view是一个view控件，调用add_child方法添加这个checkbox控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(checkbox));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -61,8 +61,8 @@ rtgui_view_t* demo_view_checkbox(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(checkbox)) = font;
 	/* 设置checkbox的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(checkbox), &rect);
-	/* view是一个container控件，调用add_child方法添加这个checkbox控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(checkbox));
+	/* view是一个view控件，调用add_child方法添加这个checkbox控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(checkbox));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -77,8 +77,8 @@ rtgui_view_t* demo_view_checkbox(rtgui_workbench_t* workbench)
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(checkbox)) = font;
 	/* 设置checkbox的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(checkbox), &rect);
-	/* view是一个container控件，调用add_child方法添加这个checkbox控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(checkbox));
+	/* view是一个view控件，调用add_child方法添加这个checkbox控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(checkbox));
 
 	return view;
 }

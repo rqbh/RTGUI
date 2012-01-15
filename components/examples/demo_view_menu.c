@@ -60,8 +60,8 @@ rtgui_view_t* demo_view_menu(rtgui_workbench_t* workbench)
 	button = rtgui_button_create("Pop Menu");
 	/* 设置button的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	/* view是一个container控件，调用add_child方法添加这个button控件 */
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	/* view是一个view控件，调用add_child方法添加这个button控件 */
+	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
 	rtgui_button_set_onbutton(button, _onmenu);
 
 	menu = rtgui_menu_create("Menu Test", RT_NULL, items, sizeof(items)/sizeof(items[0]));

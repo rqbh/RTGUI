@@ -64,7 +64,7 @@ void show_win2(void)
 
 	label = rtgui_label_create("这是一个模式窗口");
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(label));
+	rtgui_view_add_child(RTGUI_VIEW(win), RTGUI_WIDGET(label));
 
 	rtgui_win_set_onclose(win, on_window_close);
 
