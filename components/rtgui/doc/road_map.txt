@@ -1,0 +1,31 @@
+RTGUI for 1.1 路线图(排名不分先后)
+1, 把 rtgui_thread 给去掉，变成 rtgui_application ，消除原来的 rtgui_thread +
+mq 的模式。
+
+2, workbench，window并成一个，其事件主循环并合并到rtgui_application中。
+   2.1, window 作为有标题栏的 workbench
+   2.2, 将其事件主循环移至 application 中。
+
+3, 将 container 合并进 view，所有容器类继承 view。[note1]
+
+4, 事件循环完成后不主动销毁控件，销毁任务交由用户完成。但是有些自动销毁是必要的
+，比如 container 自动销毁其包含的控件
+   4.1 对于 window 的 onclose事件，保证在其回调函数中可以(但不是必须)安全销毁窗
+   口。这个功能不保证能够实现。
+
+5, API 清理。更详细的文档。
+
+6, 使 panel 退化为无窗口标题的 window，这样 server 就只记录 window 一种东西的位
+置。
+
+7, 指定名称的时候不再自己拷贝一份。(我觉得 90% 的情况下名称都是静态的字符串，这
+时用 strdup其实并没有必要。)
+
+8, 添加一些工业控制当中用到的波形、仪表之类的控件。
+
+----
+[note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
+的控件。实现这样的功能有一个就好，view 可以担当这个责任。其他需要放多个控件的控
+件则可以继承/包含这个控件。然后多个容器控件轮换的，notebook 可以来做。notebook
+可以是有标签和无标签的，有标签的对应一般的 tab 控件，无标签的对应 rtgui for RTT
+1.0 的 workbench+view。
