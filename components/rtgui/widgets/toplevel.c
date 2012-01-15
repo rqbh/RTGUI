@@ -42,7 +42,7 @@ static void _rtgui_toplevel_destructor(rtgui_toplevel_t* toplevel)
 }
 
 DEFINE_CLASS_TYPE(toplevel, "toplevel", 
-	RTGUI_CONTAINER_TYPE,
+	RTGUI_VIEW_TYPE,
 	_rtgui_toplevel_constructor,
 	_rtgui_toplevel_destructor,
 	sizeof(struct rtgui_toplevel));
@@ -54,9 +54,9 @@ rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* ev
 	switch (event->type)
 	{
 	case RTGUI_EVENT_KBD:
-		if (RTGUI_CONTAINER(toplevel)->focused != RT_NULL)
+		if (RTGUI_VIEW(toplevel)->focused != RT_NULL)
 		{
-			RTGUI_CONTAINER(toplevel)->focused->event_handler(RTGUI_CONTAINER(toplevel)->focused, event);
+			RTGUI_VIEW(toplevel)->focused->event_handler(RTGUI_VIEW(toplevel)->focused, event);
 		}
 		break;
 
@@ -80,7 +80,7 @@ rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* ev
 		break;
 
 	case RTGUI_EVENT_COMMAND:
-		if (rtgui_container_dispatch_event(RTGUI_CONTAINER(widget), event) != RT_TRUE)
+		if (rtgui_view_dispatch_event(RTGUI_VIEW(widget), event) != RT_TRUE)
 		{
 #ifndef RTGUI_USING_SMALL_SIZE
 			if (widget->on_command != RT_NULL)
@@ -93,7 +93,7 @@ rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* ev
 		break;
 
 	default :
-		return rtgui_container_event_handler(widget, event);
+		return rtgui_view_event_handler(widget, event);
 	}
 
 	return RT_FALSE;
@@ -103,7 +103,7 @@ rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* ev
 
 void rtgui_toplevel_update_clip(rtgui_toplevel_t* top)
 {
-	rtgui_container_t* container;
+	rtgui_view_t* view;
 	struct rtgui_list_node* node;
 	rtgui_rect_t screen_rect;
 
@@ -123,8 +123,8 @@ void rtgui_toplevel_update_clip(rtgui_toplevel_t* top)
 	rtgui_topwin_do_clip(RTGUI_WIDGET(top));
 
 	/* update the clip info of each child */
-	container = RTGUI_CONTAINER(top);
-	rtgui_list_foreach(node, &(container->children))
+	view = RTGUI_VIEW(top);
+	rtgui_list_foreach(node, &(view->children))
 	{
 		rtgui_widget_t* child = rtgui_list_entry(node, rtgui_widget_t, sibling);
 

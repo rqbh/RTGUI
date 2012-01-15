@@ -394,11 +394,11 @@ rt_bool_t rtgui_workbench_event_handler(rtgui_widget_t* widget, rtgui_event_t* e
 				}
 				else
 				{
-					if (RTGUI_CONTAINER(widget)->focused == widget)
+					if (RTGUI_VIEW(widget)->focused == widget)
 					{
 						/* set focused widget to the current view */
 						if (workbench->current_view != RT_NULL)
-							rtgui_widget_focus(RTGUI_WIDGET(RTGUI_CONTAINER(workbench->current_view)->focused));
+							rtgui_widget_focus(RTGUI_WIDGET(RTGUI_VIEW(workbench->current_view)->focused));
 					}
 
 					return rtgui_toplevel_event_handler(widget, event);
@@ -507,7 +507,7 @@ rt_bool_t rtgui_workbench_event_handler(rtgui_widget_t* widget, rtgui_event_t* e
 
 void rtgui_workbench_add_view(rtgui_workbench_t* workbench, rtgui_view_t* view)
 {
-	rtgui_container_add_child(RTGUI_CONTAINER(workbench), RTGUI_WIDGET(view));
+	rtgui_view_add_child(RTGUI_VIEW(workbench), RTGUI_WIDGET(view));
 	/* hide view in default */
 	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(view));
 
@@ -520,7 +520,7 @@ void rtgui_workbench_remove_view(rtgui_workbench_t* workbench, rtgui_view_t* vie
 	if (view == workbench->current_view)
 		rtgui_workbench_hide_view(workbench, view);
 
-	rtgui_container_remove_child(RTGUI_CONTAINER(workbench), RTGUI_WIDGET(view));
+	rtgui_view_remove_child(RTGUI_VIEW(workbench), RTGUI_WIDGET(view));
 }
 
 void rtgui_workbench_show_view(rtgui_workbench_t* workbench, rtgui_view_t* view)

@@ -169,7 +169,7 @@ static rt_bool_t rtgui_combobox_onmouse_button(struct rtgui_combobox* box, struc
 				/* create list box */
 				rtgui_rect_inflate(&rect, -1);
 				list = rtgui_listbox_create(box->items, box->items_count, &rect);
-				rtgui_container_add_child(RTGUI_CONTAINER(box->pd_win), RTGUI_WIDGET(list));
+				rtgui_view_add_child(RTGUI_VIEW(box->pd_win), RTGUI_WIDGET(list));
 				rtgui_widget_focus(RTGUI_WIDGET(list));
 
 				rtgui_listbox_set_onitem(list, rtgui_combobox_pdwin_onitem);

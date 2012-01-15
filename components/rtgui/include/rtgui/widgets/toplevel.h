@@ -14,7 +14,7 @@
 #ifndef __RTGUI_TOPLEVEL_H__
 #define __RTGUI_TOPLEVEL_H__
 
-#include <rtgui/widgets/container.h>
+#include <rtgui/widgets/view.h>
 
 DECLARE_CLASS_TYPE(toplevel);
 /** Gets the type of a toplevel */
@@ -29,8 +29,8 @@ DECLARE_CLASS_TYPE(toplevel);
 
 struct rtgui_toplevel
 {
-	/* inherit from container */
-	rtgui_container_t parent;
+	/* inherit from view */
+	rtgui_view_t parent;
 
 	/* drawing count */
 	rt_base_t drawing;

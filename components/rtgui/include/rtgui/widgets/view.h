@@ -14,12 +14,13 @@
 #ifndef __RTGUI_VIEW_H__
 #define __RTGUI_VIEW_H__
 
-#include <rtgui/widgets/box.h>
-#include <rtgui/widgets/container.h>
+#include <rtgui/widgets/widget.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern struct rtgui_box_t;
 
 DECLARE_CLASS_TYPE(view);
 /** Gets the type of a view */
@@ -34,8 +35,10 @@ DECLARE_CLASS_TYPE(view);
  */
 struct rtgui_view
 {
-	/* inherit from container */
-	struct rtgui_container parent;
+	struct rtgui_widget parent;
+
+	struct rtgui_widget* focused;
+	rtgui_list_t children;
 
 	/* private field */
 	char* title;
@@ -58,6 +61,16 @@ void rtgui_view_end_modal(rtgui_view_t* view, rtgui_modal_code_t modal_code);
 
 char* rtgui_view_get_title(rtgui_view_t* view);
 void rtgui_view_set_title(rtgui_view_t* view, const char* title);
+
+void rtgui_view_add_child(rtgui_view_t *view, rtgui_widget_t* child);
+void rtgui_view_remove_child(rtgui_view_t *view, rtgui_widget_t* child);
+void rtgui_view_destroy_children(rtgui_view_t *view);
+rtgui_widget_t* rtgui_view_get_first_child(rtgui_view_t* view);
+
+rt_bool_t rtgui_view_event_handler(rtgui_widget_t* widget, rtgui_event_t* event);
+
+rt_bool_t rtgui_view_dispatch_event(rtgui_view_t *view, rtgui_event_t* event);
+rt_bool_t rtgui_view_dispatch_mouse_event(rtgui_view_t *view, struct rtgui_event_mouse* event);
 
 #ifdef __cplusplus
 }

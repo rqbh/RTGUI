@@ -46,7 +46,6 @@ widgets_src = Split("""
 widgets/box.c
 widgets/button.c
 widgets/checkbox.c
-widgets/container.c
 widgets/combobox.c
 widgets/iconbox.c
 widgets/label.c

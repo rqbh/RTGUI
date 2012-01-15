@@ -207,7 +207,7 @@ struct rtgui_menu* rtgui_menu_create(const char* title, struct rtgui_menu* paren
 		/* create menu item list */
 		menu->items_list = rtgui_listctrl_create((rt_uint32_t)items, count, &rect, _rtgui_menu_item_ondraw); 
 		RTGUI_WIDGET_BACKGROUND(RTGUI_WIDGET(menu->items_list)) = rtgui_theme_default_bc();
-		rtgui_container_add_child(RTGUI_CONTAINER(menu), RTGUI_WIDGET(menu->items_list));
+		rtgui_view_add_child(RTGUI_VIEW(menu), RTGUI_WIDGET(menu->items_list));
 		rtgui_listctrl_set_onitem(menu->items_list, _rtgui_menu_onitem);
 	}
 

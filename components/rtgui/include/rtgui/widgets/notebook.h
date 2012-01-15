@@ -2,7 +2,7 @@
 #define __RTGUI_NOTEBOOK_H__
 
 #include <rtgui/rtgui.h>
-#include <rtgui/widgets/container.h>
+#include <rtgui/widgets/view.h>
 
 DECLARE_CLASS_TYPE(notebook);
 /** Gets the type of a notebook */
@@ -25,7 +25,7 @@ typedef struct rtgui_notebook_tab rtgui_notebook_tab_t;
 
 struct rtgui_notebook
 {
-	struct rtgui_container parent;
+	struct rtgui_view parent;
 
 	rt_uint8_t flag;
 
