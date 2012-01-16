@@ -62,8 +62,6 @@ struct rtgui_workbench
 	rtgui_view_t* current_view;
 };
 
-rtgui_type_t* rtgui_workbench_type_get(void);
-
 rtgui_workbench_t *rtgui_workbench_create(const char* panel_name, const unsigned char* title);
 void rtgui_workbench_destroy(rtgui_workbench_t* workbench);
 void rtgui_workbench_close(rtgui_workbench_t* workbench);

@@ -52,8 +52,6 @@ typedef struct rtgui_listctrl rtgui_listctrl_t;
 typedef void (*rtgui_onitem_func_t)(struct rtgui_widget* widget, rtgui_event_t *event);
 typedef void (*rtgui_onitem_draw_t)(struct rtgui_listctrl *list, struct rtgui_dc* dc, rtgui_rect_t* rect, rt_uint16_t index);
 
-rtgui_type_t *rtgui_listctrl_type_get(void);
-
 rtgui_listctrl_t* rtgui_listctrl_create(rt_uint32_t items, rt_uint16_t count,
     rtgui_rect_t *rect, rtgui_onitem_draw_t ondraw);
 void rtgui_listctrl_destroy(rtgui_listctrl_t* ctrl);

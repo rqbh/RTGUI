@@ -64,8 +64,6 @@ struct rtgui_menu
 };
 typedef struct rtgui_menu rtgui_menu_t;
 
-rtgui_type_t *rtgui_menu_type_get(void);
-
 struct rtgui_menu* rtgui_menu_create(const char* title, struct rtgui_menu* parent_menu,
 	const struct rtgui_menu_item* items, rt_uint16_t count);
 void rtgui_menu_destroy(struct rtgui_menu* menu);

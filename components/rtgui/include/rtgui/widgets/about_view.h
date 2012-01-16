@@ -38,8 +38,6 @@ struct rtgui_about_view
 };
 typedef struct rtgui_about_view rtgui_about_view_t;
 
-rtgui_type_t *rtgui_about_view_type_get(void);
-
 rtgui_about_view_t* rtgui_about_view_create(rtgui_image_t *logo, const char* description);
 rt_bool_t rtgui_about_view_event_handler(struct rtgui_widget* widget, struct rtgui_event* event);
 

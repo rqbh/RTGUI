@@ -36,8 +36,6 @@ struct rtgui_notebook
 };
 typedef struct rtgui_notebook rtgui_notebook_t;
 
-rtgui_type_t *rtgui_notebook_type_get(void);
-
 rtgui_notebook_t* rtgui_notebook_create(const rtgui_rect_t* rect, rt_uint8_t style);
 void rtgui_notebook_destroy(rtgui_notebook_t* notebook);
 

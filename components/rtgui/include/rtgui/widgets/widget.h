@@ -125,7 +125,6 @@ struct rtgui_widget
 };
 typedef struct rtgui_widget rtgui_widget_t;
 
-rtgui_type_t *rtgui_widget_type_get(void);
 rtgui_widget_t *rtgui_widget_create(rtgui_type_t *widget_type);
 void rtgui_widget_destroy(rtgui_widget_t* widget);
 
