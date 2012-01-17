@@ -5,6 +5,9 @@ mq 的模式。
 2, workbench，window并成一个，其事件主循环并合并到rtgui_application中。
    2.1, window 作为有标题栏的 workbench
    2.2, 将其事件主循环移至 application 中。
+   2.3, 将 window 的父类 toplevel 合并进 window 中。所有直接与服务器打交道的从
+   window 继承。(或者将 toplevel 合并进 application 中，因为只有 application 才
+   会和服务器打交道。)
 
 3, 将 container 合并进 view，所有容器类继承 view。[note1](Done)
 
