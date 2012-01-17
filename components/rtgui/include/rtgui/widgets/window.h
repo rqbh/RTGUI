@@ -29,22 +29,25 @@ DECLARE_CLASS_TYPE(win);
 /** Checks if the object is an rtgui_win */
 #define RTGUI_IS_WIN(obj)    (RTGUI_OBJECT_CHECK_TYPE((obj), RTGUI_WIN_TYPE))
 
-#define RTGUI_WIN_STYLE_MODAL		        0x001	/* modal mode window			*/
-#define RTGUI_WIN_STYLE_CLOSED		        0x002	/* window is closed				*/
-#define RTGUI_WIN_STYLE_ACTIVATE	        0x004	/* window is activated			*/
-#define RTGUI_WIN_STYLE_NO_FOCUS	        0x008	/* non-focused window			*/
+#define RTGUI_WIN_STYLE_NO_FOCUS	        0x001	/* non-focused window			*/
 
-#define RTGUI_WIN_STYLE_NO_TITLE	        0x010	/* no title window				*/
-#define RTGUI_WIN_STYLE_NO_BORDER	        0x020	/* no border window				*/
-#define RTGUI_WIN_STYLE_CLOSEBOX	        0x040	/* window has the close button	*/
-#define RTGUI_WIN_STYLE_MINIBOX		        0x080	/* window has the mini button	*/
+#define RTGUI_WIN_STYLE_NO_TITLE	        0x002	/* no title window				*/
+#define RTGUI_WIN_STYLE_NO_BORDER	        0x004	/* no border window				*/
+#define RTGUI_WIN_STYLE_CLOSEBOX	        0x008	/* window has the close button	*/
+#define RTGUI_WIN_STYLE_MINIBOX		        0x010	/* window has the mini button	*/
 
-#define RTGUI_WIN_STYLE_UNDER_MODAL	        0x100   /* window is under modal show (show
-													 * sub-win as modal window) */
-
-#define RTGUI_WIN_STYLE_DESTROY_ON_CLOSE	0x200   /* window is destroyed when closed */
+#define RTGUI_WIN_STYLE_DESTROY_ON_CLOSE	0x020   /* window is destroyed when closed */
 
 #define RTGUI_WIN_STYLE_DEFAULT		(RTGUI_WIN_STYLE_CLOSEBOX | RTGUI_WIN_STYLE_MINIBOX)
+
+enum rtgui_win_flag
+{
+RTGUI_WIN_FLAG_MODAL		  = 0x01,	/* modal mode window			*/
+RTGUI_WIN_FLAG_CLOSED		  = 0x02,	/* window is closed				*/
+RTGUI_WIN_FLAG_ACTIVATE	  = 0x04,	/* window is activated			*/
+RTGUI_WIN_FLAG_UNDER_MODAL	  = 0x80,   /* window is under modal show (show
+										 * sub-win as modal window) */
+};
 
 struct rtgui_win_title;
 struct rtgui_win_area;
@@ -59,6 +62,9 @@ struct rtgui_win
 
 	/* top window style */
 	rt_uint16_t style;
+
+	/* window state flag */
+	enum rtgui_win_flag flag;
 
 	rtgui_modal_code_t modal_code;
 	rtgui_widget_t* modal_widget;

@@ -136,7 +136,7 @@ rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* tit
 
 void rtgui_win_destroy(struct rtgui_win* win)
 {
-	if (win->style & RTGUI_WIN_STYLE_MODAL)
+	if (win->flag & RTGUI_WIN_FLAG_MODAL)
 	{
 		/* end modal */
 		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
@@ -154,14 +154,14 @@ static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
 			return RT_FALSE;
 	}
 
-	if (win->style & RTGUI_WIN_STYLE_MODAL)
+	if (win->flag & RTGUI_WIN_FLAG_MODAL)
 	{
 		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
 	}
 
 	rtgui_win_hiden(win);
 
-	win->style |= RTGUI_WIN_STYLE_CLOSED;
+	win->flag |= RTGUI_WIN_FLAG_CLOSED;
 
 	/* ugly part here. If the window is a stand alone window, we have to
 	 * destroy is after the event loop. */
@@ -224,7 +224,7 @@ rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 			rtgui_widget_t *parent_widget;
 
 			/* set style */
-			win->style |= RTGUI_WIN_STYLE_MODAL;
+			win->flag |= RTGUI_WIN_FLAG_MODAL;
 
 			/* get root toplevel */
 			parent_widget = RTGUI_WIDGET(win->parent_toplevel);
@@ -244,23 +244,23 @@ rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 			{
 				rtgui_win_t* parent_win;
 				parent_win = RTGUI_WIN(win->parent_toplevel);
-				parent_win->style |= RTGUI_WIN_STYLE_UNDER_MODAL;
+				parent_win->flag |= RTGUI_WIN_FLAG_UNDER_MODAL;
 				parent_win->modal_widget = RTGUI_WIDGET(win);
 
 				rtgui_win_event_loop(parent_win);
 				result = parent_win->modal_code;
-				parent_win->style &= ~RTGUI_WIN_STYLE_UNDER_MODAL;
+				parent_win->flag &= ~RTGUI_WIN_FLAG_UNDER_MODAL;
 				parent_win->modal_widget = RT_NULL;
 			}
 		}
 		else
 		{
 			/* which is a root window */
-			win->style |= RTGUI_WIN_STYLE_MODAL;
+			win->flag |= RTGUI_WIN_FLAG_MODAL;
 			rtgui_win_event_loop(win);
 
 			result = win->modal_code;
-			win->style &= ~RTGUI_WIN_STYLE_MODAL;
+			win->flag &= ~RTGUI_WIN_FLAG_MODAL;
 		}
 	}
 
@@ -287,7 +287,7 @@ void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 			/* which is shown under win */
 			parent_win = RTGUI_WIN(win->parent_toplevel);
 			parent_win->modal_code = modal_code;
-			parent_win->style &= ~RTGUI_WIN_STYLE_UNDER_MODAL;		
+			parent_win->flag &= ~RTGUI_WIN_FLAG_UNDER_MODAL;
 		}
 	}
 	else
@@ -297,7 +297,7 @@ void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 	}
 
 	/* remove modal mode */
-	win->style &= ~RTGUI_WIN_STYLE_MODAL;
+	win->flag &= ~RTGUI_WIN_FLAG_MODAL;
 }
 
 void rtgui_win_hiden(struct rtgui_win* win)
@@ -321,7 +321,7 @@ void rtgui_win_hiden(struct rtgui_win* win)
 
 		/* set window hide and deactivated */
 		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(win));
-		win->style &= ~RTGUI_WIN_STYLE_ACTIVATE;
+		win->flag &= ~RTGUI_WIN_FLAG_ACTIVATE;
 	}
 }
 
@@ -329,7 +329,7 @@ rt_bool_t rtgui_win_is_activated(struct rtgui_win* win)
 {
 	RT_ASSERT(win != RT_NULL);
 
-	if (win->style & RTGUI_WIN_STYLE_ACTIVATE) return RT_TRUE;
+	if (win->flag & RTGUI_WIN_FLAG_ACTIVATE) return RT_TRUE;
 
 	return RT_FALSE;
 }
@@ -428,7 +428,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 			return RT_TRUE;
 		}
 
-		win->style |= RTGUI_WIN_STYLE_ACTIVATE;
+		win->flag |= RTGUI_WIN_FLAG_ACTIVATE;
 #ifndef RTGUI_USING_SMALL_SIZE
 		if (widget->on_draw != RT_NULL) widget->on_draw(widget, event);
 		else 
@@ -442,7 +442,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		break;
 
 	case RTGUI_EVENT_WIN_DEACTIVATE:
-		if (win->style & RTGUI_WIN_STYLE_MODAL)
+		if (win->flag & RTGUI_WIN_FLAG_MODAL)
 		{
 			/* do not deactivate a modal win, re-send win-show event */
 			struct rtgui_event_win_show eshow;
@@ -454,7 +454,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		}
 		else
 		{
-			win->style &= ~RTGUI_WIN_STYLE_ACTIVATE;
+			win->flag &= ~RTGUI_WIN_FLAG_ACTIVATE;
 #ifndef RTGUI_USING_SMALL_SIZE
 			if (widget->on_draw != RT_NULL) widget->on_draw(widget, event);
 			else 
@@ -496,7 +496,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 			RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win) = RT_NULL;
 		}
 
-		if (win->style & RTGUI_WIN_STYLE_UNDER_MODAL)
+		if (win->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
 		{
 			if (win->modal_widget != RT_NULL)
 				return win->modal_widget->event_handler(win->modal_widget, event);
@@ -531,7 +531,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		break;
 
     case RTGUI_EVENT_KBD:
-		if (win->style & RTGUI_WIN_STYLE_UNDER_MODAL)
+		if (win->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
 		{
 			if (win->modal_widget != RT_NULL)
 				return win->modal_widget->event_handler(win->modal_widget, event);
@@ -564,9 +564,9 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 	/* point to event buffer */
 	event = (struct rtgui_event*)tid->event_buffer;
 
-	if (wnd->style & RTGUI_WIN_STYLE_UNDER_MODAL)
+	if (wnd->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
 	{
-		while (wnd->style & RTGUI_WIN_STYLE_UNDER_MODAL)
+		while (wnd->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
 		{
 			if (tid->on_idle != RT_NULL)
 			{
@@ -594,7 +594,7 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 	}
 	else
 	{
-		while (!(wnd->style & RTGUI_WIN_STYLE_CLOSED))
+		while (!(wnd->flag & RTGUI_WIN_FLAG_CLOSED))
 		{
 			if (tid->on_idle != RT_NULL)
 			{
