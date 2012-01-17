@@ -123,6 +123,7 @@ rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* tit
 
 		rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 		win->style = style;
+		win->flag  = 0;
 
 		if (_rtgui_win_create_in_server(win) == RT_FALSE)
 		{
