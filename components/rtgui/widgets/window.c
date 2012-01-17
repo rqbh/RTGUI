@@ -163,6 +163,12 @@ static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
 
 	win->style |= RTGUI_WIN_STYLE_CLOSED;
 
+	/* ugly part here. If the window is a stand alone window, we have to
+	 * destroy is after the event loop. */
+	if (win->parent_toplevel != RT_NULL &&
+		win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
+		rtgui_win_destroy(win);
+
 	return RT_TRUE;
 }
 
@@ -615,7 +621,12 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 		}
 	}
 
+	/* it's expected that the window is shown before the event loop and exit
+	 * the event loop on closed. So do the cleanups here */
 	rtgui_win_hiden(wnd);
+
+	if (wnd->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
+		rtgui_win_destroy(wnd);
 }
 
 void rtgui_win_set_rect(rtgui_win_t* win, rtgui_rect_t* rect)
