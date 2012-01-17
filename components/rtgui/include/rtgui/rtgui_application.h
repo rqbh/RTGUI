@@ -28,8 +28,8 @@ struct rtgui_application
 
 struct rtgui_application* rtgui_application_create(
         rt_thread_t tid,
-        const unsigned char *panel_name,
-        const unsigned char *myname);
+        const char *panel_name,
+        const char *myname);
 void rtgui_application_delete(struct rtgui_application *app);
 rt_bool_t rtgui_application_exec(struct rtgui_application *app);
 #endif /* end of include guard: RTGUI_APPLICATION_H */

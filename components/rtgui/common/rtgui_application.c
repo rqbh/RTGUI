@@ -24,8 +24,8 @@
 
 struct rtgui_application* rtgui_application_create(
         rt_thread_t tid,
-        const unsigned char *panel_name,
-        const unsigned char *myname)
+        const char *panel_name,
+        const char *myname)
 {
     struct rtgui_application *app;
 
@@ -52,7 +52,7 @@ struct rtgui_application* rtgui_application_create(
         return app;
 
 __wb_err:
-    rtgui_thread_deregister(app->gui_thread);
+    rtgui_thread_deregister(app->gui_thread->tid);
 __thread_err:
     rt_mq_delete(app->mq);
 __mq_err:
@@ -72,7 +72,7 @@ static rt_inline _rtgui_application_check(struct rtgui_application *app)
 void rtgui_application_delete(struct rtgui_application *app)
 {
     _rtgui_application_check(app);
-	rtgui_thread_deregister(app->gui_thread);
+	rtgui_thread_deregister(app->gui_thread->tid);
 	rt_mq_delete(app->mq);
     rtgui_workbench_destroy(app->workbench);
 }

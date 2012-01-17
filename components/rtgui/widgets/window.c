@@ -150,7 +150,7 @@ static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
 {
 	if (win->on_close != RT_NULL)
 	{
-		if (win->on_close(win, event) == RT_FALSE)
+		if (win->on_close(RTGUI_WIDGET(win), event) == RT_FALSE)
 			return RT_FALSE;
 	}
 

@@ -213,7 +213,7 @@ rt_bool_t rtgui_workbench_event_loop(rtgui_workbench_t* workbench)
 				else if (result == -RT_ETIMEOUT)
 					tid->on_idle(RTGUI_WIDGET(workbench), RT_NULL);
 			}
-			else 
+			else
 			{
 				result = rtgui_thread_recv(event, RTGUI_EVENT_BUFFER_SIZE);
 				if (result == RT_EOK)
