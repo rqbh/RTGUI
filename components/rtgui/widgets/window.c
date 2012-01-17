@@ -141,15 +141,40 @@ void rtgui_win_destroy(struct rtgui_win* win)
 		/* end modal */
 		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
 	}
-	else
-	{
-		rtgui_widget_destroy(RTGUI_WIDGET(win));
-	}
+
+	rtgui_widget_destroy(RTGUI_WIDGET(win));
 }
 
-void rtgui_win_close(struct rtgui_win* win)
+static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
+									   struct rtgui_event *event)
 {
+	if (win->on_close != RT_NULL)
+	{
+		if (win->on_close(win, event) == RT_FALSE)
+			return RT_FALSE;
+	}
+
+	if (win->style & RTGUI_WIN_STYLE_MODAL)
+	{
+		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
+	}
+
+	rtgui_win_hiden(win);
+
 	win->style |= RTGUI_WIN_STYLE_CLOSED;
+
+	return RT_TRUE;
+}
+
+/* send a close event to myself to get a consistent behavior */
+rt_bool_t rtgui_win_close(struct rtgui_win* win)
+{
+	struct rtgui_event_win_close eclose;
+
+	RTGUI_EVENT_WIN_CLOSE_INIT(&eclose);
+	eclose.wid = win;
+	return _rtgui_win_deal_close(win,
+								 (struct rtgui_event*)&eclose);
 }
 
 rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
@@ -183,7 +208,8 @@ rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 		/* set window unhidden */
 		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
 	}
-	else rtgui_widget_update(RTGUI_WIDGET(win));
+	else
+		rtgui_widget_update(RTGUI_WIDGET(win));
 
 	if (is_modal == RT_TRUE)
 	{
@@ -376,24 +402,8 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		break;
 
 	case RTGUI_EVENT_WIN_CLOSE:
-		if (win->on_close != RT_NULL)
-		{
-			if (win->on_close(widget, event) == RT_FALSE) return RT_TRUE;
-		}
-
-		rtgui_win_close(win);
-
-		if (win->style & RTGUI_WIN_STYLE_MODAL)
-		{
-			rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
-		}
-		else
-		{
-			/* destroy window */
-			rtgui_win_destroy(win);
-		}
-
-		/* exit event loop */
+		_rtgui_win_deal_close(win, event);
+		/* don't broadcast WIN_CLOSE event to others */
 		return RT_TRUE;
 
 	case RTGUI_EVENT_WIN_MOVE:
@@ -605,8 +615,7 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 		}
 	}
 
-	/* destroy window */
-	rtgui_widget_destroy(RTGUI_WIDGET(wnd));
+	rtgui_win_hiden(wnd);
 }
 
 void rtgui_win_set_rect(rtgui_win_t* win, rtgui_rect_t* rect)

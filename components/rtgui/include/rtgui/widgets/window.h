@@ -73,10 +73,20 @@ struct rtgui_win
 	rt_uint32_t user_data;
 };
 
-rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* title, 
+rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* title,
 	rtgui_rect_t *rect, rt_uint8_t flag);
 void rtgui_win_destroy(rtgui_win_t* win);
-void rtgui_win_close(struct rtgui_win* win);
+
+/** Close window.
+ *
+ * @param win the window you want to close
+ *
+ * @return RT_TRUE if the window is closed. RT_FALSE if not. If the onclose
+ * callback returns RT_FALSE, the window won't be closed.
+ *
+ * \sa rtgui_win_set_onclose .
+ */
+rt_bool_t rtgui_win_close(struct rtgui_win* win);
 
 rtgui_modal_code_t rtgui_win_show(rtgui_win_t* win, rt_bool_t is_modal);
 void rtgui_win_hiden(rtgui_win_t* win);

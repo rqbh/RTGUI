@@ -126,15 +126,12 @@ void rtgui_workbench_destroy(rtgui_workbench_t* workbench)
 {
 	RT_ASSERT(workbench != RT_NULL);
 
-	if (workbench->flag & RTGUI_WORKBENCH_FLAG_CLOSED)
+	if (!(workbench->flag & RTGUI_WORKBENCH_FLAG_CLOSED))
 	{
-		rtgui_widget_destroy(RTGUI_WIDGET(workbench));
-	}
-	else
-	{
-		/* just close workbench */
 		rtgui_workbench_close(workbench);
 	}
+
+	rtgui_widget_destroy(RTGUI_WIDGET(workbench));
 }
 
 void rtgui_workbench_close(rtgui_workbench_t* workbench)
