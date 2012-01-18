@@ -12,11 +12,14 @@ mq 的模式。
 3, 将 container 合并进 view，所有容器类继承 view。[note1](Done)
 
 4, 事件循环完成后不主动销毁控件，销毁任务交由用户完成。但是有些自动销毁是必要的
-，比如 container 自动销毁其包含的控件
+，比如 container 自动销毁其包含的控件(Done)
    4.1 对于 window 的 onclose事件，保证在其回调函数中可以(但不是必须)安全销毁窗
    口。这个功能不保证能够实现。(onclose 是在将要关闭窗口的时候触发的，调用它之
    后 RTGUI 还要进行其他的设置和清理工作，所以不能在 onclose 里销毁窗口)(Cannot
    Implement)
+   4.2 对 window 添加 RTGUI_WIN_STYLE_DESTROY_ON_CLOSE 。使得其在被关闭时自动销
+   毁。注意：对同一 window 销毁两次会引起 segfault。同时，如果在创建时设置了
+   RTGUI_WIN_STYLE_DESTROY_ON_CLOSE，close 次窗口之后不要再去销毁窗口。
 
 5, API 清理。更详细的文档。
 
