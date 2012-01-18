@@ -18,6 +18,56 @@ static struct rtgui_win* msgbox = RT_NULL;
 static char label_text[80];
 static rt_uint8_t cnt = 5;
 
+rtgui_win_t *normal_window;
+rtgui_label_t *normal_window_label;
+static char normal_window_label_text[16];
+static unsigned char normal_window_show_count = 1;
+
+static rt_bool_t normal_window_onclose(struct rtgui_win *win,
+                                      struct rtgui_event *event)
+{
+    normal_window_show_count++;
+
+    return RT_TRUE;
+}
+
+static void create_normal_win(struct rtgui_workbench *workbench)
+{
+	rtgui_rect_t rect = {30, 40, 150, 80};
+
+	normal_window = rtgui_win_create(workbench,
+		"普通窗口", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rect.x1 += 20;
+	rect.x2 -= 5;
+	rect.y1 += 5;
+	rect.y2 = rect.y1 + 20;
+
+	/* 添加一个文本标签 */
+    rt_sprintf(normal_window_label_text,
+            "第 %d 次显示", normal_window_show_count);
+	normal_window_label = rtgui_label_create(normal_window_label_text);
+
+	rtgui_widget_set_rect(RTGUI_WIDGET(normal_window_label), &rect);
+
+	rtgui_view_add_child(RTGUI_VIEW(normal_window),
+                         RTGUI_WIDGET(normal_window_label));
+
+    rtgui_win_set_onclose(normal_window,
+                          normal_window_onclose);
+}
+
+/* 触发正常窗口显示 */
+static void demo_normal_window_onbutton(struct rtgui_widget* widget, rtgui_event_t* event)
+{
+    rt_sprintf(normal_window_label_text,
+            "第 %d 次显示", normal_window_show_count);
+    rtgui_label_set_text(normal_window_label,
+                         normal_window_label_text);
+	/* 非模态显示窗口 */
+	rtgui_win_show(normal_window, RT_FALSE);
+}
+
 /* 获取一个递增的窗口标题 */
 static char* get_win_title()
 {
@@ -26,18 +76,6 @@ static char* get_win_title()
 
 	rt_sprintf(win_title, "窗口 %d", ++win_no);
 	return win_title;
-}
-
-/* 窗口关闭时的事件处理 */
-void window_demo_close(struct rtgui_widget* widget, rtgui_event_t *even)
-{
-	rtgui_win_t* win;
-
-	/* 获得最顶层控件 */
-	win = RTGUI_WIN(rtgui_widget_get_toplevel(widget));
-
-	/* 销毁窗口 */
-	rtgui_win_destroy(win);
 }
 
 /* 关闭对话框时的回调函数 */
@@ -79,37 +117,6 @@ rt_bool_t auto_window_close(struct rtgui_widget* widget, struct rtgui_event* eve
 static rt_uint16_t delta_x = 20;
 static rt_uint16_t delta_y = 40;
 
-/* 触发正常窗口显示 */
-static void demo_win_onbutton(struct rtgui_widget* widget, rtgui_event_t* event)
-{
-	rtgui_win_t *win;
-	rtgui_label_t *label;
-	rtgui_toplevel_t *parent;
-	rtgui_rect_t rect = {0, 0, 150, 80};
-
-	parent = RTGUI_TOPLEVEL(rtgui_widget_get_toplevel(widget));
-	rtgui_rect_moveto(&rect, delta_x, delta_y);
-	delta_x += 20;
-	delta_y += 20;
-
-	/* 创建一个窗口 */
-	win = rtgui_win_create(parent,
-		get_win_title(), &rect, RTGUI_WIN_STYLE_DEFAULT);
-
-	rect.x1 += 20;
-	rect.x2 -= 5;
-	rect.y1 += 5;
-	rect.y2 = rect.y1 + 20;
-
-	/* 添加一个文本标签 */
-	label = rtgui_label_create("这是一个普通窗口");
-	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	rtgui_view_add_child(RTGUI_VIEW(win), RTGUI_WIDGET(label));
-
-	/* 非模态显示窗口 */
-	rtgui_win_show(win, RT_FALSE);
-}
-
 /* 触发自动窗口显示 */
 static void demo_autowin_onbutton(struct rtgui_widget* widget, rtgui_event_t* event)
 {
@@ -117,7 +124,8 @@ static void demo_autowin_onbutton(struct rtgui_widget* widget, rtgui_event_t* ev
 	struct rtgui_rect rect ={50, 50, 200, 200};
 
 	parent = RTGUI_TOPLEVEL(rtgui_widget_get_toplevel(widget));
-	msgbox = rtgui_win_create(parent, "Information", &rect, RTGUI_WIN_STYLE_DEFAULT);
+	msgbox = rtgui_win_create(parent, "Information",
+            &rect, RTGUI_WIN_STYLE_DEFAULT | RTGUI_WIN_STYLE_DESTROY_ON_CLOSE);
 	if (msgbox != RT_NULL)
 	{
 		cnt = 5;
@@ -169,7 +177,19 @@ static void demo_modalwin_onbutton(struct rtgui_widget* widget, rtgui_event_t* e
 
 	/* 模态显示窗口 */
 	rtgui_win_show(win, RT_TRUE);
-	/* 采用模态显示窗口，关闭时不会自行删除窗口，需要主动删除窗口 */
+
+    /* 删除非自动删除窗口 */
+	rtgui_win_destroy(win);
+}
+
+static void demo_close_ntitle_window(struct rtgui_widget* widget, rtgui_event_t* event)
+{
+	rtgui_win_t* win;
+
+	/* 获得最顶层控件 */
+	win = RTGUI_WIN(rtgui_widget_get_toplevel(widget));
+
+	/* 销毁窗口 */
 	rtgui_win_destroy(win);
 }
 
@@ -189,7 +209,7 @@ static void demo_ntitlewin_onbutton(struct rtgui_widget* widget, rtgui_event_t* 
 
 	/* 创建一个窗口，风格为无标题及无边框 */
 	win = rtgui_win_create(parent,
-		"no title", &rect, RTGUI_WIN_STYLE_NO_TITLE | RTGUI_WIN_STYLE_NO_BORDER);
+		"no title", &rect, RTGUI_WIN_STYLE_NO_TITLE | RTGUI_WIN_STYLE_NO_BORDER | RTGUI_WIN_STYLE_DESTROY_ON_CLOSE);
 	RTGUI_WIDGET_BACKGROUND(RTGUI_WIDGET(win)) = white;
 
 	/* 创建一个文本标签 */
@@ -213,9 +233,8 @@ static void demo_ntitlewin_onbutton(struct rtgui_widget* widget, rtgui_event_t* 
 	button = rtgui_button_create("关闭");
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &widget_rect);
 	rtgui_view_add_child(RTGUI_VIEW(win), RTGUI_WIDGET(button));
-	rtgui_button_set_onbutton(button, window_demo_close);
+	rtgui_button_set_onbutton(button, demo_close_ntitle_window);
 
-	/* 非模态显示窗口 */
 	rtgui_win_show(win, RT_FALSE);
 }
 
@@ -244,8 +263,9 @@ static void demo_stdalonewin_onbutton(struct rtgui_widget* widget, rtgui_event_t
 
 	/* 模态显示窗口 */
 	rtgui_win_show(win, RT_TRUE);
-	/* 独立窗口 show 之后会自动销毁，不要重复销毁对象 */
-	/*rtgui_win_destroy(win);*/
+
+    /* 删除非自动删除窗口 */
+	rtgui_win_destroy(win);
 }
 
 rtgui_view_t* demo_view_window(rtgui_workbench_t* workbench)
@@ -257,6 +277,8 @@ rtgui_view_t* demo_view_window(rtgui_workbench_t* workbench)
 	/* 创建一个演示用的视图 */
 	view = demo_view(workbench, "Window Demo");
 
+    create_normal_win(workbench);
+
 	demo_view_get_rect(view, &rect);
 	rect.x1 += 5;
 	rect.x2 = rect.x1 + 100;
@@ -267,7 +289,7 @@ rtgui_view_t* demo_view_window(rtgui_workbench_t* workbench)
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
 	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
 	/* 设置onbutton为demo_win_onbutton函数 */
-	rtgui_button_set_onbutton(button, demo_win_onbutton);
+	rtgui_button_set_onbutton(button, demo_normal_window_onbutton);
 
 	demo_view_get_rect(view, &rect);
 	rect.x1 += 5;
