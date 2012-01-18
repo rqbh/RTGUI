@@ -326,16 +326,17 @@ rt_bool_t rtgui_workbench_event_handler(rtgui_widget_t* widget, rtgui_event_t* e
 
 				emouse = (struct rtgui_event_mouse*)event;
 
-				RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench)->event_handler(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench), event);
-				if (rtgui_rect_contains_point(&(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench)->extent), 
-					emouse->x, emouse->y) == RT_EOK)
+				if (rtgui_rect_contains_point(
+							&(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench)->extent),
+							emouse->x, emouse->y) != RT_EOK)
 				{
-					RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench) = RT_NULL;
-					break; /* mouse event is inside of widget, do not handle it anymore */
-				}
+					RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench)->event_handler(
+							RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench),
+							event);
 
-				/* clean last mouse event handled widget */
-				RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench) = RT_NULL;
+					/* clean last mouse event handled widget */
+					RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(workbench) = RT_NULL;
+				}
 			}
 
 			/* check the destination window */
