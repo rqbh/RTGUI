@@ -19,7 +19,7 @@ mq 的模式。
    Implement)
    4.2 对 window 添加 RTGUI_WIN_STYLE_DESTROY_ON_CLOSE 。使得其在被关闭时自动销
    毁。注意：对同一 window 销毁两次会引起 segfault。同时，如果在创建时设置了
-   RTGUI_WIN_STYLE_DESTROY_ON_CLOSE，close 次窗口之后不要再去销毁窗口。
+   RTGUI_WIN_STYLE_DESTROY_ON_CLOSE，close 窗口之后不要再去销毁窗口。
 
 5, API 清理。更详细的文档。
 
@@ -31,8 +31,8 @@ mq 的模式。
 
 8, 添加一些工业控制当中用到的波形、仪表之类的控件。
 
-9, 在 application 中记录焦点控件，键盘事件由服务器直接投送。各个控件不记录焦点
-控件。
+9, 在 application 中记录焦点控件，键盘事件由 application 直接投送。各个控件不记
+录焦点控件。
 
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
