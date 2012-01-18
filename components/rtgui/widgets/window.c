@@ -35,6 +35,9 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 
 	/* set window style */
 	win->style = RTGUI_WIN_STYLE_DEFAULT;
+
+	win->flag  = RTGUI_WIN_FLAG_INIT;
+
 	rtgui_widget_set_event_handler(RTGUI_WIDGET(win), rtgui_win_event_handler);
 
 	/* init user data */
@@ -123,7 +126,6 @@ rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* tit
 
 		rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 		win->style = style;
-		win->flag  = 0;
 
 		if (_rtgui_win_create_in_server(win) == RT_FALSE)
 		{

@@ -42,11 +42,12 @@ DECLARE_CLASS_TYPE(win);
 
 enum rtgui_win_flag
 {
-RTGUI_WIN_FLAG_MODAL		  = 0x01,	/* modal mode window			*/
-RTGUI_WIN_FLAG_CLOSED		  = 0x02,	/* window is closed				*/
-RTGUI_WIN_FLAG_ACTIVATE	      = 0x04,	/* window is activated			*/
-RTGUI_WIN_FLAG_UNDER_MODAL	  = 0x80,   /* window is under modal show(modaled
-										   by other)  */
+	RTGUI_WIN_FLAG_INIT           = 0x00,   /* init state              */
+	RTGUI_WIN_FLAG_MODAL		  = 0x01,	/* modal mode window	   */
+	RTGUI_WIN_FLAG_CLOSED		  = 0x02,	/* window is closed		   */
+	RTGUI_WIN_FLAG_ACTIVATE	      = 0x04,	/* window is activated	   */
+	RTGUI_WIN_FLAG_UNDER_MODAL	  = 0x80,   /* window is under modal
+											   show(modaled by other)  */
 };
 
 struct rtgui_win_title;
