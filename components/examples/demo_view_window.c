@@ -35,7 +35,7 @@ static void create_normal_win(struct rtgui_workbench *workbench)
 {
 	rtgui_rect_t rect = {30, 40, 150, 80};
 
-	normal_window = rtgui_win_create(workbench,
+	normal_window = rtgui_win_create(RTGUI_TOPLEVEL(workbench),
 		"ÆÕÍ¨´°¿Ú", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rect.x1 += 20;

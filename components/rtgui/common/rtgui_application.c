@@ -61,7 +61,7 @@ __mq_err:
     return RT_NULL;
 }
 
-static rt_inline _rtgui_application_check(struct rtgui_application *app)
+rt_inline _rtgui_application_check(struct rtgui_application *app)
 {
     RT_ASSERT(app != RT_NULL);
     RT_ASSERT(app->gui_thread != RT_NULL);
@@ -81,4 +81,6 @@ rt_bool_t rtgui_application_exec(struct rtgui_application *app)
 {
     _rtgui_application_check(app);
 	rtgui_workbench_event_loop(app->workbench);
+
+	return RT_TRUE;
 }

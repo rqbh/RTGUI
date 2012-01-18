@@ -20,8 +20,6 @@
 extern "C" {
 #endif
 
-extern struct rtgui_box_t;
-
 DECLARE_CLASS_TYPE(view);
 /** Gets the type of a view */
 #define RTGUI_VIEW_TYPE       (RTGUI_TYPE(view))
@@ -52,6 +50,7 @@ void rtgui_view_destroy(rtgui_view_t* view);
 rt_bool_t rtgui_view_event_handler(struct rtgui_widget* widget, struct rtgui_event* event);
 
 #ifndef RTGUI_USING_SMALL_SIZE
+struct rtgui_box_t;
 void rtgui_view_set_box(rtgui_view_t* view, rtgui_box_t* box);
 #endif
 
