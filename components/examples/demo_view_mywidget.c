@@ -7,9 +7,9 @@
 #include "mywidget.h"
 
 /* 创建用于演示自定义控件的视图 */
-rtgui_view_t *demo_view_mywidget(rtgui_workbench_t* workbench)
+rtgui_container_t *demo_view_mywidget(rtgui_workbench_t* workbench)
 {
-	rtgui_view_t *view;
+	rtgui_container_t *view;
 	rtgui_rect_t rect;
 	rtgui_mywidget_t *mywidget;
 
@@ -25,7 +25,7 @@ rtgui_view_t *demo_view_mywidget(rtgui_workbench_t* workbench)
 	/* 创建一个自定义控件 */
 	mywidget = rtgui_mywidget_create(&rect);
 	/* view是一个view控件，调用add_child方法添加这个自控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(mywidget));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(mywidget));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -36,7 +36,7 @@ rtgui_view_t *demo_view_mywidget(rtgui_workbench_t* workbench)
 	/* 创建一个自定义控件 */
 	mywidget = rtgui_mywidget_create(&rect);
 	/* view是一个view控件，调用add_child方法添加这个自控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(mywidget));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(mywidget));
 
 	return view;
 }

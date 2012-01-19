@@ -36,7 +36,7 @@ rt_bool_t instrument_panel_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 		 * 因为用的是demo view，上面本身有一部分控件，所以在绘图时先要让demo view
 		 * 先绘图
 		 */
-		rtgui_view_event_handler(widget, event);
+		rtgui_container_event_handler(widget, event);
 
 		/************************************************************************/
 		/* 下面的是DC的操作                                                     */
@@ -49,7 +49,7 @@ rt_bool_t instrument_panel_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 			return RT_FALSE;
 
 		/* 获得demo view允许绘图的区域 */
-		demo_view_get_rect(RTGUI_VIEW(widget), &rect);
+		demo_view_get_rect(RTGUI_CONTAINER(widget), &rect);
 
 		RTGUI_DC_TEXTALIGN(dc) = RTGUI_ALIGN_BOTTOM | RTGUI_ALIGN_CENTER_HORIZONTAL;
 		/* 显示GUI的版本信息 */
@@ -128,16 +128,16 @@ rt_bool_t instrument_panel_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 	else
 	{
 		/* 其他事件，调用默认的事件处理函数 */
-		return rtgui_view_event_handler(widget, event);
+		return rtgui_container_event_handler(widget, event);
 	}
 
 	return RT_FALSE;
 }
 
 /* 创建用于DC操作演示用的视图 */
-rtgui_view_t *demo_view_instrument_panel(rtgui_workbench_t* workbench)
+rtgui_container_t *demo_view_instrument_panel(rtgui_workbench_t* workbench)
 {
-	rtgui_view_t *view;
+	rtgui_container_t *view;
 
 	view = demo_view(workbench, "instrument panel Demo");
 	if (view != RT_NULL)

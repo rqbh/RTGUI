@@ -19,7 +19,7 @@
 #include <rtgui/region.h>
 #include <rtgui/dc.h>
 
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 #include <rtgui/widgets/toplevel.h>
 
 #define RTGUI_WORKBENCH_FLAG_VISIBLE	0x00	/* workbench is visible */
@@ -59,7 +59,7 @@ struct rtgui_workbench
 
 	/* workbench title */
 	unsigned char* title;
-	rtgui_view_t* current_view;
+	rtgui_container_t* current_view;
 };
 
 rtgui_workbench_t *rtgui_workbench_create(const char* panel_name, const unsigned char* title);
@@ -75,11 +75,11 @@ rt_bool_t rtgui_workbench_event_loop(rtgui_workbench_t* workbench);
 rt_err_t rtgui_workbench_show (rtgui_workbench_t* workbench);
 rt_err_t rtgui_workbench_hide (rtgui_workbench_t* workbench);
 
-void rtgui_workbench_add_view(rtgui_workbench_t* workbench, rtgui_view_t* view);
-void rtgui_workbench_remove_view(rtgui_workbench_t* workbench, rtgui_view_t* view);
-void rtgui_workbench_show_view(rtgui_workbench_t* workbench, rtgui_view_t* view);
-void rtgui_workbench_hide_view(rtgui_workbench_t* workbench, rtgui_view_t* view);
+void rtgui_workbench_add_container(rtgui_workbench_t* workbench, rtgui_container_t* view);
+void rtgui_workbench_remove_container(rtgui_workbench_t* workbench, rtgui_container_t* view);
+void rtgui_workbench_show_container(rtgui_workbench_t* workbench, rtgui_container_t* view);
+void rtgui_workbench_hide_container(rtgui_workbench_t* workbench, rtgui_container_t* view);
 
-rtgui_view_t *rtgui_workbench_get_current_view(rtgui_workbench_t * workbench);
+rtgui_container_t *rtgui_workbench_get_current_view(rtgui_workbench_t * workbench);
 
 #endif

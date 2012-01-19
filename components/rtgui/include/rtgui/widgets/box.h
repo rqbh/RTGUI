@@ -16,7 +16,7 @@
 
 #include <rtgui/rtgui.h>
 #include <rtgui/widgets/widget.h>
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ DECLARE_CLASS_TYPE(box);
 
 struct rtgui_box
 {
-	struct rtgui_view parent;
+	struct rtgui_container parent;
 
 	rt_uint16_t orient;
 	rt_uint16_t border_size;

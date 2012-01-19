@@ -212,10 +212,10 @@ static void on_items(rtgui_widget_t* widget, struct rtgui_event* event)
 }
 
 /* 创建用于演示label控件的视图 */
-rtgui_view_t* demo_view_listctrl(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_listctrl(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
-	rtgui_view_t* view;
+	rtgui_container_t* view;
 	rtgui_label_t* label;
 	rtgui_listctrl_t* box;
 
@@ -238,7 +238,7 @@ rtgui_view_t* demo_view_listctrl(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* view是一个view控件，调用add_child方法添加这个label控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 
 	rect.y1 = rect.y2 + 3;
 	rect.y2 = 250;
@@ -246,7 +246,7 @@ rtgui_view_t* demo_view_listctrl(rtgui_workbench_t* workbench)
 		_rtgui_listctrl_item_draw);
 	rtgui_listctrl_set_onitem(box, on_items);
 	/* view是一个view控件，调用add_child方法添加这个listctrl控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(box));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(box));
 
 	return view;
 }

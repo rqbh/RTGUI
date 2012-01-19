@@ -29,7 +29,7 @@ static void _rtgui_box_constructor(rtgui_box_t *box)
 }
 
 DEFINE_CLASS_TYPE(box, "box", 
-	RTGUI_VIEW_TYPE,
+	RTGUI_CONTAINER_TYPE,
 	_rtgui_box_constructor,
 	RT_NULL,
 	sizeof(struct rtgui_box));
@@ -48,7 +48,7 @@ rt_bool_t rtgui_box_event_handler(rtgui_widget_t* widget, rtgui_event_t* event)
 		break;
 
 	default:
-		return rtgui_view_event_handler(RTGUI_WIDGET(box), event);
+		return rtgui_container_event_handler(RTGUI_WIDGET(box), event);
 	}
 
 	return RT_FALSE;
@@ -72,13 +72,13 @@ struct rtgui_box* rtgui_box_create(int orientation, rtgui_rect_t* rect)
 void rtgui_box_append(struct rtgui_box* box, rtgui_widget_t* widget)
 {
 	/* put to box's children list */
-	rtgui_view_add_child(RTGUI_VIEW(box), widget);
+	rtgui_container_add_child(RTGUI_CONTAINER(box), widget);
 }
 
 void rtgui_box_delete(struct rtgui_box* box, rtgui_widget_t* widget)
 {
 	/* remove from box's children list */
-	rtgui_view_remove_child(RTGUI_VIEW(box), widget);
+	rtgui_container_remove_child(RTGUI_CONTAINER(box), widget);
 }
 
 static void rtgui_box_layout_vertical(rtgui_box_t* box)
@@ -98,7 +98,7 @@ static void rtgui_box_layout_vertical(rtgui_box_t* box)
 	total_height = 0;
 	space_height = 0;
 
-	rtgui_list_foreach(node, &(RTGUI_VIEW(box)->children))
+	rtgui_list_foreach(node, &(RTGUI_CONTAINER(box)->children))
 	{
 		rtgui_widget_t* widget = rtgui_list_entry(node, struct rtgui_widget, sibling);
 		if (widget->align & RTGUI_ALIGN_STRETCH) space_count ++;
@@ -117,7 +117,7 @@ static void rtgui_box_layout_vertical(rtgui_box_t* box)
 	box_width = rtgui_rect_width(RTGUI_WIDGET(box)->extent) - (box->border_size << 1);
 
 	/* layout each widget */
-	rtgui_list_foreach(node, &(RTGUI_VIEW(box)->children))
+	rtgui_list_foreach(node, &(RTGUI_CONTAINER(box)->children))
 	{
 		rtgui_rect_t *rect;
 		rtgui_widget_t* widget = rtgui_list_entry(node, struct rtgui_widget, sibling);
@@ -190,7 +190,7 @@ static void rtgui_box_layout_horizontal(rtgui_box_t* box)
 	total_width = 0;
 	space_width = 0;
 
-	rtgui_list_foreach(node, &(RTGUI_VIEW(box)->children))
+	rtgui_list_foreach(node, &(RTGUI_CONTAINER(box)->children))
 	{
 		rtgui_widget_t* widget = rtgui_list_entry(node, struct rtgui_widget, sibling);
 		if (widget->align & RTGUI_ALIGN_STRETCH) space_count ++;
@@ -209,7 +209,7 @@ static void rtgui_box_layout_horizontal(rtgui_box_t* box)
 	box_height = rtgui_rect_height(RTGUI_WIDGET(box)->extent) - (box->border_size << 1);
 
 	/* layout each widget */
-	rtgui_list_foreach(node, &(RTGUI_VIEW(box)->children))
+	rtgui_list_foreach(node, &(RTGUI_CONTAINER(box)->children))
 	{
 		rtgui_rect_t *rect;
 		rtgui_widget_t* widget = rtgui_list_entry(node, struct rtgui_widget, sibling);
@@ -291,7 +291,7 @@ rt_uint32_t rtgui_box_get_width(rtgui_box_t* box)
 	rt_uint32_t width;
 
 	width = 0;
-	rtgui_list_foreach(node, &(RTGUI_VIEW(box)->children))
+	rtgui_list_foreach(node, &(RTGUI_CONTAINER(box)->children))
 	{
 		rtgui_widget_t* widget = rtgui_list_entry(node, struct rtgui_widget, sibling);
 		rt_uint32_t widget_width;
@@ -318,7 +318,7 @@ rt_uint32_t rtgui_box_get_height(rtgui_box_t* box)
 	rt_uint32_t height;
 
 	height = 0;
-	rtgui_list_foreach(node, &(RTGUI_VIEW(box)->children))
+	rtgui_list_foreach(node, &(RTGUI_CONTAINER(box)->children))
 	{
 		rtgui_widget_t* widget = rtgui_list_entry(node, struct rtgui_widget, sibling);
 		rt_uint32_t widget_height;

@@ -7,10 +7,10 @@
 #include <rtgui/widgets/label.h>
 
 /* 创建用于演示label控件的视图 */
-rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_label(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
-	rtgui_view_t* view;
+	rtgui_container_t* view;
 	rtgui_label_t* label;
 	rtgui_font_t* font;
 
@@ -32,7 +32,7 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* view是一个view控件，调用add_child方法添加这个label控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -49,7 +49,7 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* view是一个view控件，调用add_child方法添加这个label控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -66,7 +66,7 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* view是一个view控件，调用add_child方法添加这个label控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -82,7 +82,7 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* view是一个view控件，调用add_child方法添加这个label控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 
 	/* 获得视图的位置信息 */
 	demo_view_get_rect(view, &rect);
@@ -97,7 +97,7 @@ rtgui_view_t* demo_view_label(rtgui_workbench_t* workbench)
 	/* 设置label的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	/* view是一个view控件，调用add_child方法添加这个label控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 
 	return view;
 }

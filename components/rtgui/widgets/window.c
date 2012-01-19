@@ -387,7 +387,7 @@ static rt_bool_t rtgui_win_ondraw(struct rtgui_win* win)
 	/* paint each widget */
 	RTGUI_EVENT_PAINT_INIT(&event);
 	event.wid = RT_NULL;
-	rtgui_view_dispatch_event(RTGUI_VIEW(win), (rtgui_event_t*)&event);
+	rtgui_container_dispatch_event(RTGUI_CONTAINER(win), (rtgui_event_t*)&event);
 
 	rtgui_dc_end_drawing(dc);
 
@@ -505,7 +505,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 			if (win->modal_widget != RT_NULL)
 				return win->modal_widget->event_handler(win->modal_widget, event);
 		}
- 		else if (rtgui_view_dispatch_mouse_event(RTGUI_VIEW(win), 
+ 		else if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win), 
 			(struct rtgui_event_mouse*)event) == RT_FALSE)
 		{
 #ifndef RTGUI_USING_SMALL_SIZE
@@ -540,10 +540,10 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 			if (win->modal_widget != RT_NULL)
 				return win->modal_widget->event_handler(win->modal_widget, event);
 		}
-		else if (RTGUI_VIEW(win)->focused != widget &&
-				 RTGUI_VIEW(win)->focused != RT_NULL)
+		else if (RTGUI_CONTAINER(win)->focused != widget &&
+				 RTGUI_CONTAINER(win)->focused != RT_NULL)
 		{
-			RTGUI_VIEW(win)->focused->event_handler(RTGUI_VIEW(win)->focused, event);
+			RTGUI_CONTAINER(win)->focused->event_handler(RTGUI_CONTAINER(win)->focused, event);
 		}
         break;
 
@@ -657,7 +657,7 @@ void rtgui_win_set_box(rtgui_win_t* win, rtgui_box_t* box)
 {
 	if (win == RT_NULL || box == RT_NULL) return;
 
-	rtgui_view_add_child(RTGUI_VIEW(win), RTGUI_WIDGET(box));
+	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(box));
 	rtgui_widget_set_rect(RTGUI_WIDGET(box), &(RTGUI_WIDGET(win)->extent));
 }
 #endif

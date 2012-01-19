@@ -16,7 +16,7 @@
 #include <rtgui/dc_client.h>
 #include <rtgui/widgets/widget.h>
 #include <rtgui/widgets/window.h>
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 extern void rtgui_topwin_do_clip(rtgui_widget_t* widget);
 
 static void _rtgui_widget_constructor(rtgui_widget_t *widget)
@@ -76,7 +76,7 @@ static void _rtgui_widget_destructor(rtgui_widget_t *widget)
 	if (widget->parent != RT_NULL)
 	{
 		/* remove widget from parent's children list */
-		rtgui_list_remove(&(RTGUI_VIEW(widget->parent)->children), &(widget->sibling));
+		rtgui_list_remove(&(RTGUI_CONTAINER(widget->parent)->children), &(widget->sibling));
 
 		widget->parent = RT_NULL;
 	}
@@ -192,9 +192,9 @@ void rtgui_widget_move_to_logic(rtgui_widget_t* widget, int dx, int dy)
 	rtgui_rect_moveto(&(widget->extent), dx, dy);
 
 	/* move each child */
-	if (RTGUI_IS_VIEW(widget))
+	if (RTGUI_IS_CONTAINER(widget))
 	{
-		rtgui_list_foreach(node, &(RTGUI_VIEW(widget)->children))
+		rtgui_list_foreach(node, &(RTGUI_CONTAINER(widget)->children))
 		{
 			child = rtgui_list_entry(node, rtgui_widget_t, sibling);
 
@@ -280,7 +280,7 @@ void rtgui_widget_set_oncommand(rtgui_widget_t* widget, rtgui_event_handler_ptr 
  */
 void rtgui_widget_focus(rtgui_widget_t *widget)
 {
-	rtgui_view_t *parent;
+	rtgui_container_t *parent;
 
 	RT_ASSERT(widget != RT_NULL);
 
@@ -292,18 +292,18 @@ void rtgui_widget_focus(rtgui_widget_t *widget)
 	widget->flag |= RTGUI_WIDGET_FLAG_FOCUS;
 
 	/* get root parent view and old focused widget */
-	parent = RTGUI_VIEW(widget->toplevel);
+	parent = RTGUI_CONTAINER(widget->toplevel);
 	if (parent->focused == widget) return ; /* it's the same focused widget */
 
 	/* unfocused the old widget */
 	if (parent->focused != RT_NULL)	rtgui_widget_unfocus(parent->focused);
 
 	/* set widget as focused widget in parent link */
-	parent = RTGUI_VIEW(widget->parent);
+	parent = RTGUI_CONTAINER(widget->parent);
 	do 
 	{
 		parent->focused = widget;
-		parent = RTGUI_VIEW(RTGUI_WIDGET(parent)->parent);
+		parent = RTGUI_CONTAINER(RTGUI_WIDGET(parent)->parent);
 	} while ((parent != RT_NULL) && !RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(parent)));
 
 	/* invoke on focus in call back */
@@ -480,10 +480,10 @@ void rtgui_widget_update_clip(rtgui_widget_t* widget)
 	 */
 
 	/* if it's a view object, update the clip info of children */
-	if (RTGUI_IS_VIEW(widget))
+	if (RTGUI_IS_CONTAINER(widget))
 	{
 		rtgui_widget_t* child;
-		rtgui_list_foreach(node, &(RTGUI_VIEW(widget)->children))
+		rtgui_list_foreach(node, &(RTGUI_CONTAINER(widget)->children))
 		{
 			child = rtgui_list_entry(node, rtgui_widget_t, sibling);
 
@@ -594,7 +594,7 @@ rtgui_widget_t* rtgui_widget_get_prev_sibling(rtgui_widget_t* widget)
 	parent = widget->parent;
 	if (parent != RT_NULL)
 	{
-		rtgui_list_foreach(node, &(RTGUI_VIEW(parent)->children))
+		rtgui_list_foreach(node, &(RTGUI_CONTAINER(parent)->children))
 		{
 			if (node->next == &(widget->sibling))
 				break;
@@ -617,8 +617,8 @@ void rtgui_widget_dump(rtgui_widget_t* widget)
 	obj = RTGUI_OBJECT(widget);
 	rt_kprintf("widget type: %s ", obj->type->name);
 
-	if (RTGUI_IS_VIEW(widget) == RT_TRUE)
-		rt_kprintf(":%s ", RTGUI_VIEW(widget)->title);
+	if (RTGUI_IS_CONTAINER(widget) == RT_TRUE)
+		rt_kprintf(":%s ", RTGUI_CONTAINER(widget)->title);
 	if (RTGUI_IS_WIN(widget) == RT_TRUE)
 		rt_kprintf(":%s ", RTGUI_WIN(widget)->title);
 	if ((RTGUI_IS_LABEL(widget) == RT_TRUE) || (RTGUI_IS_BUTTON(widget) == RT_TRUE))

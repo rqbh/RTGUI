@@ -24,10 +24,10 @@ static char* radio_item_h[3] =
 	};
 
 /* 创建用于演示radiobox控件的视图 */
-rtgui_view_t* demo_view_radiobox(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_radiobox(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
-	rtgui_view_t* view;
+	rtgui_container_t* view;
 	rtgui_radiobox_t* radiobox;
 
 	/* 先创建一个演示用的视图 */
@@ -45,7 +45,7 @@ rtgui_view_t* demo_view_radiobox(rtgui_workbench_t* workbench)
 	/* 设置当前选择的数组是第0项 */
 	rtgui_radiobox_set_selection(radiobox, 0);
 	/* 添加radiobox控件到视图中 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(radiobox));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(radiobox));
 	/* 设置radiobox控件的位置信息 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(radiobox), &rect);
 
@@ -61,7 +61,7 @@ rtgui_view_t* demo_view_radiobox(rtgui_workbench_t* workbench)
 	/* 设置当前选择的数组是第0项 */
 	rtgui_radiobox_set_selection(radiobox, 0);
 	/* 添加radiobox控件到视图中 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(radiobox));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(radiobox));
 	/* 设置radiobox控件的位置信息 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(radiobox), &rect);
 

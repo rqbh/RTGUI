@@ -1,11 +1,11 @@
 #include <rtgui/rtgui.h>
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 #include <rtgui/widgets/button.h>
 #include <rtgui/widgets/workbench.h>
 #include <rtgui/widgets/staticline.h>
 
 /* 用于存放演示视图的数组，最多可创建32个演示视图 */
-static rtgui_view_t* demo_view_list[32];
+static rtgui_container_t* demo_view_list[32];
 /* 当前演示视图索引 */
 static rt_uint16_t demo_view_current = 0;
 /* 总共包括的演示视图数目 */
@@ -17,7 +17,7 @@ void demo_view_next(struct rtgui_widget* widget, rtgui_event_t *event)
 	if (demo_view_current + 1< demo_view_number)
 	{
 		demo_view_current ++;
-		rtgui_view_show(demo_view_list[demo_view_current], RT_FALSE);
+		rtgui_container_show(demo_view_list[demo_view_current], RT_FALSE);
 	}
 }
 
@@ -27,17 +27,17 @@ void demo_view_prev(struct rtgui_widget* widget, rtgui_event_t *event)
 	if (demo_view_current != 0)
 	{
 		demo_view_current --;
-		rtgui_view_show(demo_view_list[demo_view_current], RT_FALSE);
+		rtgui_container_show(demo_view_list[demo_view_current], RT_FALSE);
 	}
 }
 
 /* 创建一个演示视图，需提供父workbench和演示用的标题 */
-rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
+rtgui_container_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 {
-	struct rtgui_view* view;
+	struct rtgui_container* view;
 
 	/* 设置视图的名称 */
-	view = rtgui_view_create(title);
+	view = rtgui_container_create(title);
 	if (view == RT_NULL) return RT_NULL;
 
 	/* 创建成功后，添加到数组中 */
@@ -45,7 +45,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 	demo_view_number ++;
 
 	/* 添加到父workbench中 */
-	rtgui_workbench_add_view(workbench, view);
+	rtgui_workbench_add_container(workbench, view);
 
 	/* 添加下一个视图和前一个视图按钮 */
 	{
@@ -67,7 +67,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置标签位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 		/* 添加标签到视图中 */
-		rtgui_view_add_child(view, RTGUI_WIDGET(label));
+		rtgui_container_add_child(view, RTGUI_WIDGET(label));
 
 		rect.y1 += 20;
 		rect.y2 += 20;
@@ -76,7 +76,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置静态线的位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(line), &rect);
 		/* 添加静态线到视图中 */
-		rtgui_view_add_child(view, RTGUI_WIDGET(line));
+		rtgui_container_add_child(view, RTGUI_WIDGET(line));
 
 		/* 获得视图的位置信息 */
 		rtgui_widget_get_rect(RTGUI_WIDGET(view), &rect);
@@ -93,7 +93,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置按钮的位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(next_btn), &rect);
 		/* 添加按钮到视图中 */
-		rtgui_view_add_child(view, RTGUI_WIDGET(next_btn));
+		rtgui_container_add_child(view, RTGUI_WIDGET(next_btn));
 
 		/* 获得视图的位置信息 */
 		rtgui_widget_get_rect(RTGUI_WIDGET(view), &rect);
@@ -110,7 +110,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		/* 设置按钮的位置信息 */
 		rtgui_widget_set_rect(RTGUI_WIDGET(prev_btn), &rect);
 		/* 添加按钮到视图中 */
-		rtgui_view_add_child(view, RTGUI_WIDGET(prev_btn));
+		rtgui_container_add_child(view, RTGUI_WIDGET(prev_btn));
 	}
 
 	/* 返回创建的视图 */
@@ -118,7 +118,7 @@ rtgui_view_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 }
 
 /* 这个函数用于返回演示视图的对外可用区域 */
-void demo_view_get_rect(rtgui_view_t* view, rtgui_rect_t *rect)
+void demo_view_get_rect(rtgui_container_t* view, rtgui_rect_t *rect)
 {
 	RT_ASSERT(view != RT_NULL);
 	RT_ASSERT(rect != RT_NULL);
@@ -130,7 +130,7 @@ void demo_view_get_rect(rtgui_view_t* view, rtgui_rect_t *rect)
 	rect->y2 -= 35;
 }
 
-void demo_view_get_logic_rect(rtgui_view_t* view, rtgui_rect_t *rect)
+void demo_view_get_logic_rect(rtgui_container_t* view, rtgui_rect_t *rect)
 {
 	RT_ASSERT(view != RT_NULL);
 	RT_ASSERT(rect != RT_NULL);
@@ -143,7 +143,7 @@ void demo_view_get_logic_rect(rtgui_view_t* view, rtgui_rect_t *rect)
 
 /* 当是标准版本时，这个函数用于返回自动布局引擎box控件 */
 #ifndef RTGUI_USING_SMALL_SIZE
-rtgui_box_t* demo_view_create_box(rtgui_view_t* view, int orient)
+rtgui_box_t* demo_view_create_box(rtgui_container_t* view, int orient)
 {
 	rtgui_rect_t rect;
 	rtgui_box_t* box;
@@ -156,7 +156,7 @@ rtgui_box_t* demo_view_create_box(rtgui_view_t* view, int orient)
 	/* 创建一个自动布局引擎 */
 	box = rtgui_box_create(orient, &rect);
 	/* 添加box控件到视图中 */
-	rtgui_view_add_child(view, RTGUI_WIDGET(box));
+	rtgui_container_add_child(view, RTGUI_WIDGET(box));
 
 	return box;
 }
@@ -167,6 +167,6 @@ void demo_view_show()
 {
 	if (demo_view_number != 0)
 	{
-		rtgui_view_show(demo_view_list[demo_view_current], RT_FALSE);
+		rtgui_container_show(demo_view_list[demo_view_current], RT_FALSE);
 	}
 }

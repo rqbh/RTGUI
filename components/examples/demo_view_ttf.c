@@ -28,7 +28,7 @@ rt_bool_t ttf_event_handler(rtgui_widget_t* widget, rtgui_event_t *event)
 		 * 因为用的是demo view，上面本身有一部分控件，所以在绘图时先要让demo view
 		 * 先绘图
 		 */
-		rtgui_view_event_handler(widget, event);
+		rtgui_container_event_handler(widget, event);
 
 		/************************************************************************/
 		/* 下面的是DC的操作                                                     */
@@ -41,7 +41,7 @@ rt_bool_t ttf_event_handler(rtgui_widget_t* widget, rtgui_event_t *event)
 			return RT_FALSE;
 
 		/* 获得demo view允许绘图的区域 */
-		demo_view_get_rect(RTGUI_VIEW(widget), &rect);
+		demo_view_get_rect(RTGUI_CONTAINER(widget), &rect);
 
 		saved = RTGUI_WIDGET_FONT(widget);
 
@@ -67,16 +67,16 @@ rt_bool_t ttf_event_handler(rtgui_widget_t* widget, rtgui_event_t *event)
 	else
 	{
 		/* 其他事件，调用默认的事件处理函数 */
-		return rtgui_view_event_handler(widget, event);
+		return rtgui_container_event_handler(widget, event);
 	}
 
 	return RT_FALSE;
 }
 
 /* 创建用于TTF字体显示演示用的视图 */
-rtgui_view_t *demo_view_ttf(rtgui_workbench_t* workbench)
+rtgui_container_t *demo_view_ttf(rtgui_workbench_t* workbench)
 {
-	rtgui_view_t *view;
+	rtgui_container_t *view;
 
 	font_16 = rtgui_freetype_font_create("d:/simsun.ttf", 0, 0, 16);
 	font_24 = rtgui_freetype_font_create("d:/simsun.ttf", 0, 0, 24);

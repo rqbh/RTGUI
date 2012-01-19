@@ -18,7 +18,7 @@
 
 #include <rtgui/list.h>
 #include <rtgui/image.h>
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 #include <rtgui/widgets/workbench.h>
 #include <rtgui/widgets/filelist_view.h>
 #include <rtgui/widgets/listbox.h>
@@ -266,9 +266,9 @@ static void rtgui_filelist_view_on_folder_item(rtgui_widget_t* widget, struct rt
 	case 1:
 		/* destroy menu window */
 		rtgui_win_destroy(menu);
-		if (RTGUI_VIEW(view)->modal_show == RT_TRUE)
+		if (RTGUI_CONTAINER(view)->modal_show == RT_TRUE)
 		{
-			rtgui_view_end_modal(RTGUI_VIEW(view), RTGUI_MODAL_OK);
+			rtgui_container_end_modal(RTGUI_CONTAINER(view), RTGUI_MODAL_OK);
 		}
 		break;
 
@@ -310,7 +310,7 @@ static void rtgui_filelist_view_menu_pop(rtgui_widget_t *parent)
 
 		listbox = rtgui_listbox_create(items, sizeof(items)/sizeof(items[0]), &rect);
 		rtgui_listbox_set_onitem(listbox, rtgui_filelist_view_on_folder_item);
-		rtgui_view_add_child(RTGUI_VIEW(menu), RTGUI_WIDGET(listbox));
+		rtgui_container_add_child(RTGUI_CONTAINER(menu), RTGUI_WIDGET(listbox));
 		rtgui_win_show(menu, RT_FALSE);
 		rtgui_widget_focus(RTGUI_WIDGET(listbox));
 		rtgui_listbox_set_current_item(listbox, 0);
@@ -357,7 +357,7 @@ static void _rtgui_filelist_view_destructor(struct rtgui_filelist_view *view)
 }
 
 DEFINE_CLASS_TYPE(filelist, "filelist", 
-	RTGUI_VIEW_TYPE,
+	RTGUI_CONTAINER_TYPE,
 	_rtgui_filelist_view_constructor,
 	_rtgui_filelist_view_destructor,
 	sizeof(struct rtgui_filelist_view));
@@ -524,9 +524,9 @@ static void rtgui_filelist_view_onenturn(struct rtgui_filelist_view* view)
 			(view->current_directory[0] == '/') && (view->current_directory[1] == '\0'))
 #endif
 		{
-			if (RTGUI_VIEW(view)->modal_show == RT_TRUE)
+			if (RTGUI_CONTAINER(view)->modal_show == RT_TRUE)
 			{
-				rtgui_view_end_modal(RTGUI_VIEW(view), RTGUI_MODAL_CANCEL);
+				rtgui_container_end_modal(RTGUI_CONTAINER(view), RTGUI_MODAL_CANCEL);
 			}
 			else
 			{
@@ -544,9 +544,9 @@ static void rtgui_filelist_view_onenturn(struct rtgui_filelist_view* view)
 	}
 	else
 	{
-		if (RTGUI_VIEW(view)->modal_show == RT_TRUE)
+		if (RTGUI_CONTAINER(view)->modal_show == RT_TRUE)
 		{
-			rtgui_view_end_modal(RTGUI_VIEW(view), RTGUI_MODAL_OK);
+			rtgui_container_end_modal(RTGUI_CONTAINER(view), RTGUI_MODAL_OK);
 		}
 	}
 }
@@ -668,7 +668,7 @@ rt_bool_t rtgui_filelist_view_event_handler(struct rtgui_widget* widget, struct 
 	}
 
     /* use view event handler */
-    return rtgui_view_event_handler(widget, event);
+    return rtgui_container_event_handler(widget, event);
 }
 
 rtgui_filelist_view_t* rtgui_filelist_view_create(rtgui_workbench_t* workbench, 
@@ -685,7 +685,7 @@ rtgui_filelist_view_t* rtgui_filelist_view_create(rtgui_workbench_t* workbench,
 		view->page_items = rtgui_rect_height(*rect) / (1 + rtgui_theme_get_selected_height());
 		rtgui_filelist_view_set_directory(view, directory);
 		
-		rtgui_workbench_add_view(workbench, RTGUI_VIEW(view));
+		rtgui_workbench_add_container(workbench, RTGUI_CONTAINER(view));
 	}
 
 	return view;

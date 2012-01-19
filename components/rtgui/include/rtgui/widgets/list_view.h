@@ -19,7 +19,7 @@
 #include <rtgui/image.h>
 #include <rtgui/rtgui_system.h>
 
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 
 typedef void (*item_action)(struct rtgui_widget* widget, void* parameter);
 struct rtgui_list_item
@@ -45,7 +45,7 @@ DECLARE_CLASS_TYPE(listview);
 
 struct rtgui_list_view
 {
-	struct rtgui_view parent;
+	struct rtgui_container parent;
 
 	/* widget private data */
 	/* list item */

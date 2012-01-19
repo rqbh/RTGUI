@@ -15,7 +15,7 @@
 #include <rtgui/dc_hw.h>
 #include <rtgui/driver.h>
 #include <rtgui/rtgui_system.h>
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/workbench.h>
 #include <rtgui/widgets/title.h>

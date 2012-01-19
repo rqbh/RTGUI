@@ -33,7 +33,7 @@ static void _rtgui_about_view_constructor(struct rtgui_about_view *view)
 }
 
 DEFINE_CLASS_TYPE(aboutview, "aboutview", 
-	RTGUI_VIEW_TYPE,
+	RTGUI_CONTAINER_TYPE,
 	_rtgui_about_view_constructor,
 	RT_NULL,
 	sizeof(struct rtgui_about_view));
@@ -77,7 +77,7 @@ rt_bool_t rtgui_about_view_event_handler(struct rtgui_widget* widget, struct rtg
 	}
 
     /* use view event handler */
-    return rtgui_view_event_handler(widget, event);
+    return rtgui_container_event_handler(widget, event);
 }
 
 rtgui_about_view_t* rtgui_about_view_create(rtgui_image_t *logo, const char* description)

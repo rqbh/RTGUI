@@ -16,10 +16,10 @@ struct rtgui_listbox_item items[] =
 };
 
 /* 创建用于演示combobox控件的视图 */
-rtgui_view_t* demo_view_combobox(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_combobox(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
-	rtgui_view_t* view;
+	rtgui_container_t* view;
 	rtgui_combobox_t* box;
 
 	/* 先创建一个演示用的视图 */
@@ -34,7 +34,7 @@ rtgui_view_t* demo_view_combobox(rtgui_workbench_t* workbench)
 	/* 创建一个label控件 */
 	box = rtgui_combobox_create(items, sizeof(items)/sizeof(items[0]), &rect);
 	/* view是一个view控件，调用add_child方法添加这个box控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(box));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(box));
 
 	return view;
 }

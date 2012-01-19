@@ -156,7 +156,7 @@ static void _rtgui_notebook_get_bar_rect(rtgui_notebook_t *notebook, struct rtgu
 }
 
 DEFINE_CLASS_TYPE(notebook, "notebook", 
-	RTGUI_VIEW_TYPE,
+	RTGUI_CONTAINER_TYPE,
 	_rtgui_notebook_constructor,
 	_rtgui_notebook_destructor,
 	sizeof(struct rtgui_notebook));

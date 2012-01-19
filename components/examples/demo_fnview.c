@@ -31,7 +31,7 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 #endif
 
 	/* 采用模式形式显示文件列表视图 */
-	if (rtgui_view_show(RTGUI_VIEW(view), RT_TRUE) == RTGUI_MODAL_OK)
+	if (rtgui_container_show(RTGUI_CONTAINER(view), RT_TRUE) == RTGUI_MODAL_OK)
 	{
 		char path[32];
 
@@ -43,14 +43,14 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 	}
 
 	/* 删除 文件列表 视图 */
-	rtgui_view_destroy(RTGUI_VIEW(view));
+	rtgui_container_destroy(RTGUI_CONTAINER(view));
 }
 
 /* 创建用于演示文件列表视图的视图 */
-rtgui_view_t* demo_fn_view(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_fn_view(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
-	rtgui_view_t* view;
+	rtgui_container_t* view;
 	rtgui_button_t* open_btn;
 	rtgui_font_t* font;
 
@@ -68,7 +68,7 @@ rtgui_view_t* demo_fn_view(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 20;
 	/* 创建显示文件路径用的文本标签 */
 	label = rtgui_label_create("fn: ");
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(label));
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(label)) = font;
 
@@ -80,7 +80,7 @@ rtgui_view_t* demo_fn_view(rtgui_workbench_t* workbench)
 	rect.y2 = rect.y1 + 20;
 	/* 创建按钮以触发一个新的文件列表视图 */
 	open_btn = rtgui_button_create("Open File");
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(open_btn));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(open_btn));
 	rtgui_widget_set_rect(RTGUI_WIDGET(open_btn), &rect);
 	RTGUI_WIDGET_FONT(RTGUI_WIDGET(open_btn)) = font;
 	rtgui_button_set_onbutton(open_btn, open_btn_onbutton);

@@ -10,7 +10,7 @@
 #include <string.h>
 
 static rtgui_image_t* image = RT_NULL;
-static rtgui_view_t* _view = RT_NULL;
+static rtgui_container_t* _view = RT_NULL;
 
 #if defined(RTGUI_USING_DFS_FILERW) || defined(RTGUI_USING_STDIO_FILERW)
 /* 打开按钮的回调函数 */
@@ -31,7 +31,7 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 	view = rtgui_filelist_view_create(workbench, "/", "*.*", &rect);
 #endif
 	/* 模态显示一个文件列表视图，以提供给用户选择图像文件 */
-	if (rtgui_view_show(RTGUI_VIEW(view), RT_TRUE) == RTGUI_MODAL_OK)
+	if (rtgui_container_show(RTGUI_CONTAINER(view), RT_TRUE) == RTGUI_MODAL_OK)
 	{
 		char path[32], image_type[8];
 
@@ -65,8 +65,8 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 	}
 
 	/* 删除 文件列表 视图 */
-	rtgui_view_destroy(RTGUI_VIEW(view));
-	rtgui_view_show(_view, RT_FALSE);
+	rtgui_container_destroy(RTGUI_CONTAINER(view));
+	rtgui_container_show(_view, RT_FALSE);
 }
 
 /* 演示视图的事件处理函数 */
@@ -75,7 +75,7 @@ static rt_bool_t demo_view_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 	rt_bool_t result;
 
 	/* 先调用默认的事件处理函数(这里只关心PAINT事件，但演示视图还有本身的一些控件) */
-	result = rtgui_view_event_handler(widget, event);
+	result = rtgui_container_event_handler(widget, event);
 
 	if (event->type == RTGUI_EVENT_PAINT)
 	{
@@ -89,7 +89,7 @@ static rt_bool_t demo_view_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 			return RT_FALSE;
 
 		/* 获得demo view允许绘图的区域 */
-		demo_view_get_rect(RTGUI_VIEW(widget), &rect);
+		demo_view_get_rect(RTGUI_CONTAINER(widget), &rect);
 
 		/* 获得图像显示区域 */
 		rect.x1 += 5; rect.x2 -= 5;
@@ -106,7 +106,7 @@ static rt_bool_t demo_view_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 }
 
 /* 创建用于显示图像的演示视图 */
-rtgui_view_t* demo_view_image(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_image(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
 	rtgui_button_t* open_btn;
@@ -122,7 +122,7 @@ rtgui_view_t* demo_view_image(rtgui_workbench_t* workbench)
 	rect.x1 += 5; rect.x2 = rect.x1 + 120;
 	rect.y2 = rect.y1 + 20;
 	open_btn = rtgui_button_create("打开图像文件");
-	rtgui_view_add_child(RTGUI_VIEW(_view), RTGUI_WIDGET(open_btn));
+	rtgui_container_add_child(RTGUI_CONTAINER(_view), RTGUI_WIDGET(open_btn));
 	rtgui_widget_set_rect(RTGUI_WIDGET(open_btn), &rect);
 	rtgui_button_set_onbutton(open_btn, open_btn_onbutton);
 

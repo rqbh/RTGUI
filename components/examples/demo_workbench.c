@@ -2,7 +2,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/rtgui_application.h>
 
-#include <rtgui/widgets/view.h>
+#include <rtgui/widgets/container.h>
 
 static rt_bool_t demo_workbench_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
 {

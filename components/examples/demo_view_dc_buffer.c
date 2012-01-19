@@ -29,7 +29,7 @@ static rt_bool_t dc_buffer_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 		 * 因为用的是demo view，上面本身有一部分控件，所以在绘图时先要让demo view
 		 * 先绘图
 		 */
-		rtgui_view_event_handler(widget, event);
+		rtgui_container_event_handler(widget, event);
 
 		/* 获得控件所属的DC */
 		dc = rtgui_dc_begin_drawing(widget);
@@ -38,7 +38,7 @@ static rt_bool_t dc_buffer_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 			return RT_FALSE;
 
 		/* 获得demo view允许绘图的区域 */
-		demo_view_get_logic_rect(RTGUI_VIEW(widget), &rect);
+		demo_view_get_logic_rect(RTGUI_CONTAINER(widget), &rect);
 
 		rect.x1 += 10;
 		rect.y1 += 10;
@@ -50,16 +50,16 @@ static rt_bool_t dc_buffer_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 	else
 	{
 		/* 其他事件，调用默认的事件处理函数 */
-		return rtgui_view_event_handler(widget, event);
+		return rtgui_container_event_handler(widget, event);
 	}
 
 	return RT_FALSE;
 }
 
 /* 创建用于DC Buffer操作演示用的视图 */
-rtgui_view_t *demo_view_dc_buffer(rtgui_workbench_t* workbench)
+rtgui_container_t *demo_view_dc_buffer(rtgui_workbench_t* workbench)
 {
-	rtgui_view_t *view;
+	rtgui_container_t *view;
 
 	if (dc_buffer == RT_NULL)
 	{

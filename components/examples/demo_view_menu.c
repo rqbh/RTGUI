@@ -41,10 +41,10 @@ static _onmenu(struct rtgui_widget* widget, struct rtgui_event* event)
 }
 
 /* 创建用于演示menu控件的视图 */
-rtgui_view_t* demo_view_menu(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_menu(rtgui_workbench_t* workbench)
 {
 	rtgui_rect_t rect;
-	rtgui_view_t* view;
+	rtgui_container_t* view;
 	rtgui_button_t* button;
 
 	/* 先创建一个演示用的视图 */
@@ -61,7 +61,7 @@ rtgui_view_t* demo_view_menu(rtgui_workbench_t* workbench)
 	/* 设置button的位置 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
 	/* view是一个view控件，调用add_child方法添加这个button控件 */
-	rtgui_view_add_child(RTGUI_VIEW(view), RTGUI_WIDGET(button));
+	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
 	rtgui_button_set_onbutton(button, _onmenu);
 
 	menu = rtgui_menu_create("Menu Test", RT_NULL, items, sizeof(items)/sizeof(items[0]));
