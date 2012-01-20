@@ -9,7 +9,7 @@ mq 的模式。
    window 继承。(或者将 toplevel 合并进 application 中，因为只有 application 才
    会和服务器打交道。)
 
-3, 将 container 合并进 view，所有容器类继承 view。[note1](Done)
+3, 将 view 合并进 container，所有容器类继承 container。[note1](Done)
 
 4, 事件循环完成后不主动销毁控件，销毁任务交由用户完成。但是有些自动销毁是必要的
 ，比如 container 自动销毁其包含的控件(Done)
@@ -36,7 +36,7 @@ mq 的模式。
 
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
-的控件。实现这样的功能有一个就好，view 可以担当这个责任。其他需要放多个控件的控
-件则可以继承/包含这个控件。然后多个容器控件轮换的，notebook 可以来做。notebook
-可以是有标签和无标签的，有标签的对应一般的 tab 控件，无标签的对应 rtgui for RTT
-1.0 的 workbench+view。
+的控件。实现这样的功能有一个就好，container 可以担当这个责任。其他需要放多个控
+件的控件则可以继承/包含这个控件。然后多个容器控件轮换的，notebook 可以来做。
+notebook可以是有标签和无标签的，有标签的对应一般的 tab 控件，无标签的对应 rtgui
+for RTT 1.0 的 workbench+view。
