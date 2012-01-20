@@ -38,6 +38,7 @@ struct rtgui_container
 	struct rtgui_widget* focused;
 	rtgui_list_t children;
 
+	// TODO: remove this stuff that we don't need
 	/* private field */
 	char* title;
 	rt_bool_t modal_show;
