@@ -15,9 +15,10 @@
 #include <rtgui/dc_hw.h>
 #include <rtgui/driver.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_application.h>
+
 #include <rtgui/widgets/container.h>
 #include <rtgui/widgets/window.h>
-#include <rtgui/widgets/workbench.h>
 #include <rtgui/widgets/title.h>
 
 static void rtgui_dc_hw_draw_point(struct rtgui_dc* dc, int x, int y);
@@ -115,7 +116,7 @@ struct rtgui_dc* rtgui_dc_hw_create(rtgui_widget_t* owner)
 #endif
 		}
 	}
-	else if (RTGUI_IS_WORKBENCH(owner->toplevel) ||
+	else if (RTGUI_IS_APPLICATION(owner->toplevel) ||
 		RTGUI_IS_WIN(owner->toplevel))
 	{
 		rtgui_toplevel_t* top = RTGUI_TOPLEVEL(owner->toplevel);
@@ -182,7 +183,7 @@ static rt_bool_t rtgui_dc_hw_fini(struct rtgui_dc* dc)
 #endif
 		}
 	}
-	else if (RTGUI_IS_WORKBENCH(owner->toplevel) ||
+	else if (RTGUI_IS_APPLICATION(owner->toplevel) ||
 		RTGUI_IS_WIN(owner->toplevel))
 	{
 		rtgui_toplevel_t* top = RTGUI_TOPLEVEL(owner->toplevel);

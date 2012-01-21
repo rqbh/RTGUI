@@ -10,7 +10,7 @@
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/list_view.h>
 
-static rtgui_workbench_t* workbench = RT_NULL;
+static struct rtgui_application *application = RT_NULL;
 static rtgui_list_view_t* _view = RT_NULL;
 // static rtgui_image_t* return_image = RT_NULL;
 
@@ -30,7 +30,7 @@ static void listitem_action(void* parameter)
 	rtgui_rect_moveto(&rect, 20, 50);
 
 	/* 显示消息窗口 */
-	win = rtgui_win_create(RTGUI_TOPLEVEL(workbench),
+	win = rtgui_win_create(RTGUI_TOPLEVEL(application),
 		"窗口", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rect.x1 += 20;
@@ -75,15 +75,15 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 {
 	rtgui_rect_t rect;
 
-	/* 获得顶层的workbench */
-	workbench = RTGUI_WORKBENCH(rtgui_widget_get_toplevel(widget));
-	rtgui_widget_get_rect(RTGUI_WIDGET(workbench), &rect);
+	/* 获得顶层的application */
+	application = RTGUI_APPLICATION(rtgui_widget_get_toplevel(widget));
+	rtgui_widget_get_rect(RTGUI_WIDGET(application), &rect);
 
 	/* 创建一个列表视图， 项指定为items */
 	_view = rtgui_list_view_create(items, sizeof(items)/sizeof(struct rtgui_list_item),
 		&rect, RTGUI_LIST_VIEW_LIST);
-	/* 在workbench中添加相应的视图 */
-	rtgui_workbench_add_container(workbench, RTGUI_CONTAINER(_view));
+
+	rtgui_application_add_container(application, RTGUI_CONTAINER(_view));
 
 	/* 模式显示视图 */
 	rtgui_container_show(RTGUI_CONTAINER(_view), RT_TRUE);
@@ -92,13 +92,13 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 }
 
 /* 创建用于演示列表视图的视图 */
-rtgui_container_t* demo_listview_view(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_listview_view(struct rtgui_application *app)
 {
 	rtgui_rect_t rect;
 	rtgui_container_t *view;
 	rtgui_button_t* open_btn;
 
-	view = demo_view(workbench, "列表视图演示");
+	view = demo_view(app, "列表视图演示");
 
 	/* 添加动作按钮 */
 	demo_view_get_rect(view, &rect);

@@ -21,7 +21,7 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 	rtgui_rect_t rect;
 
 	/* 获得顶层的workbench */
-	workbench = RTGUI_WORKBENCH(rtgui_widget_get_toplevel(widget));
+	workbench = RTGUI_APPLICATION(rtgui_widget_get_toplevel(widget));
 	rtgui_widget_get_rect(RTGUI_WIDGET(workbench), &rect);
 
 	/* WIN32平台上和真实设备上的初始路径处理 */

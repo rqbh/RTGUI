@@ -68,7 +68,6 @@ widgets/about_view.c
 widgets/filelist_view.c
 widgets/widget.c
 widgets/window.c
-widgets/workbench.c
 """)
 
 # The set of source files associated with this SConscript file.

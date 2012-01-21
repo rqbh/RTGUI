@@ -14,8 +14,8 @@
  */
 #include <rtgui/dc.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_application.h>
 #include <rtgui/widgets/container.h>
-#include <rtgui/widgets/workbench.h>
 
 static void _rtgui_container_constructor(rtgui_container_t *container)
 {
@@ -48,16 +48,16 @@ static void _rtgui_container_constructor(rtgui_container_t *container)
 
 static void _rtgui_container_destructor(rtgui_container_t *container)
 {
-	/* remove container from workbench */
+	/* remove container from application */
 	if (RTGUI_WIDGET(container)->parent != RT_NULL)
 	{
-		rtgui_workbench_t *workbench;
+		struct rtgui_application *app;
 
 		if (container->modal_show == RT_TRUE)
 			rtgui_container_end_modal(container, RTGUI_MODAL_CANCEL);
 
-		workbench = RTGUI_WORKBENCH(RTGUI_WIDGET(container)->parent);
-		rtgui_workbench_remove_container(workbench, container);
+		app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
+		rtgui_application_remove_container(app, container);
 	}
 
 	if (container->title != RT_NULL)
@@ -330,10 +330,11 @@ void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box)
 
 rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
 {
-	rtgui_workbench_t* workbench;
+	struct rtgui_application *app;
 
 	/* parameter check */
-	if (container == RT_NULL) return RTGUI_MODAL_CANCEL;
+	if (container == RT_NULL)
+		return RTGUI_MODAL_CANCEL;
 
 	if (RTGUI_WIDGET(container)->parent == RT_NULL)
 	{
@@ -341,8 +342,8 @@ rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t 
 		return RTGUI_MODAL_CANCEL;
 	}
 
-	workbench = RTGUI_WORKBENCH(RTGUI_WIDGET(container)->parent);
-	rtgui_workbench_show_container(workbench, container);
+	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
+	rtgui_application_show_container(app, container);
 	if (RTGUI_CONTAINER(container)->focused != RT_NULL)
 		rtgui_widget_focus(RTGUI_CONTAINER(container)->focused);
 	else
@@ -355,14 +356,14 @@ rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t 
 	if (is_modal == RT_TRUE)
 	{
 		/* set modal mode */
-		workbench->flag |= RTGUI_WORKBENCH_FLAG_MODAL_MODE;
-		workbench->modal_widget = RTGUI_WIDGET(container);
+		app->state_flag |= RTGUI_APPLICATION_FLAG_MODALED;
+		app->modal_widget = RTGUI_WIDGET(container);
 
-		/* perform workbench event loop */
-		rtgui_workbench_event_loop(workbench);
+		/* perform app event loop */
+		_rtgui_application_event_loop(app);
 
-		workbench->modal_widget = RT_NULL;
-		return workbench->modal_code;
+		app->modal_widget = RT_NULL;
+		return app->modal_code;
 	}
 
 	/* no modal mode, always return modal_ok */
@@ -371,14 +372,14 @@ rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t 
 
 void rtgui_container_end_modal(rtgui_container_t* container, rtgui_modal_code_t modal_code)
 {
-	rtgui_workbench_t* workbench;
+	struct rtgui_application *app;
 
 	/* parameter check */
 	if ((container == RT_NULL) || (RTGUI_WIDGET(container)->parent == RT_NULL))return ;
 
-	workbench = RTGUI_WORKBENCH(RTGUI_WIDGET(container)->parent);
-	workbench->modal_code = modal_code;
-	workbench->flag &= ~RTGUI_WORKBENCH_FLAG_MODAL_MODE;
+	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
+	app->modal_code = modal_code;
+	app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
 
 	/* remove modal mode */
 	container->modal_show = RT_FALSE;
@@ -394,7 +395,9 @@ void rtgui_container_hide(rtgui_container_t* container)
 		return;
 	}
 
-	rtgui_workbench_hide_container((rtgui_workbench_t*)(RTGUI_WIDGET(container)->parent), container);
+	rtgui_application_hide_container(
+			(struct rtgui_application*)(RTGUI_WIDGET(container)->parent),
+			container);
 }
 
 char* rtgui_container_get_title(rtgui_container_t* container)

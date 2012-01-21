@@ -20,7 +20,7 @@ static void open_btn_onbutton(rtgui_widget_t* widget, struct rtgui_event* event)
 	rtgui_rect_t rect;
 
 	/* 获得顶层的workbench对象 */
-	workbench = RTGUI_WORKBENCH(rtgui_widget_get_toplevel(widget));
+	workbench = RTGUI_APPLICATION(rtgui_widget_get_toplevel(widget));
 	rtgui_widget_get_rect(RTGUI_WIDGET(workbench), &rect);
 
 	/* 针对Win32平台和其他平台做的不同的其实目录位置 */

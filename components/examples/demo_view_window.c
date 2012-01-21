@@ -31,11 +31,11 @@ static rt_bool_t normal_window_onclose(struct rtgui_win *win,
     return RT_TRUE;
 }
 
-static void create_normal_win(struct rtgui_workbench *workbench)
+static void create_normal_win(struct rtgui_application *app)
 {
 	rtgui_rect_t rect = {30, 40, 150, 80};
 
-	normal_window = rtgui_win_create(RTGUI_TOPLEVEL(workbench),
+	normal_window = rtgui_win_create(RTGUI_TOPLEVEL(app),
 		"普通窗口", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rect.x1 += 20;
@@ -268,16 +268,16 @@ static void demo_stdalonewin_onbutton(struct rtgui_widget* widget, rtgui_event_t
 	rtgui_win_destroy(win);
 }
 
-rtgui_container_t* demo_view_window(rtgui_workbench_t* workbench)
+rtgui_container_t* demo_view_window(struct rtgui_application *app)
 {
 	rtgui_rect_t  rect;
 	rtgui_container_t* view;
 	rtgui_button_t *button;
 
 	/* 创建一个演示用的视图 */
-	view = demo_view(workbench, "Window Demo");
+	view = demo_view(app, "Window Demo");
 
-    create_normal_win(workbench);
+    create_normal_win(app);
 
 	demo_view_get_rect(view, &rect);
 	rect.x1 += 5;

@@ -196,7 +196,7 @@ void rtgui_panel_set_active_thread(rtgui_panel_t* panel, rt_thread_t tid)
 		RTGUI_EVENT_PANEL_HIDE_INIT(&ehide);
 
 		ehide.panel = panel;
-		ehide.workbench = RT_NULL;
+		ehide.application = RT_NULL;
 		rtgui_thread_send_urgent(prev_actived, &(ehide.parent), sizeof (ehide));
 	}
 

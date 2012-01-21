@@ -108,8 +108,7 @@ struct rtgui_event_panel_attach
 	/* the panel name to be attached */
 	char panel_name[RTGUI_NAME_MAX];
 
-	/* workbench, wm field */
-	rtgui_workbench_t* workbench;
+	struct rtgui_application *application;
 };
 
 struct rtgui_event_panel_detach
@@ -119,8 +118,7 @@ struct rtgui_event_panel_detach
 	/* the panel which thread belong to */
 	rtgui_panel_t* panel;
 
-	/* workbench, wm field */
-	rtgui_workbench_t* workbench;
+	struct rtgui_application *application;
 };
 
 struct rtgui_event_panel_show
@@ -130,8 +128,7 @@ struct rtgui_event_panel_show
 	/* the panel which thread belong to */
 	rtgui_panel_t* panel;
 
-	/* workbench, wm field */
-	rtgui_workbench_t* workbench;
+	struct rtgui_application *application;
 };
 
 struct rtgui_event_panel_hide
@@ -141,8 +138,7 @@ struct rtgui_event_panel_hide
 	/* the panel which thread belong to */
 	rtgui_panel_t* panel;
 
-	/* workbench, wm field */
-	rtgui_workbench_t* workbench;
+	struct rtgui_application *application;
 };
 
 struct rtgui_event_panel_info

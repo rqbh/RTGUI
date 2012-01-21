@@ -1,7 +1,8 @@
 #include <rtgui/rtgui.h>
+#include <rtgui/rtgui_application.h>
+
 #include <rtgui/widgets/container.h>
 #include <rtgui/widgets/button.h>
-#include <rtgui/widgets/workbench.h>
 #include <rtgui/widgets/staticline.h>
 
 /* 用于存放演示视图的数组，最多可创建32个演示视图 */
@@ -31,8 +32,8 @@ void demo_view_prev(struct rtgui_widget* widget, rtgui_event_t *event)
 	}
 }
 
-/* 创建一个演示视图，需提供父workbench和演示用的标题 */
-rtgui_container_t* demo_view(rtgui_workbench_t* workbench, const char* title)
+/* 创建一个演示视图，需提供父app和演示用的标题 */
+rtgui_container_t* demo_view(struct rtgui_application* app, const char* title)
 {
 	struct rtgui_container* view;
 
@@ -44,8 +45,8 @@ rtgui_container_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 	demo_view_list[demo_view_number] = view;
 	demo_view_number ++;
 
-	/* 添加到父workbench中 */
-	rtgui_workbench_add_container(workbench, view);
+	/* 添加到父app中 */
+	rtgui_application_add_container(app, view);
 
 	/* 添加下一个视图和前一个视图按钮 */
 	{
@@ -54,7 +55,7 @@ rtgui_container_t* demo_view(rtgui_workbench_t* workbench, const char* title)
 		struct rtgui_label *label;
 		struct rtgui_staticline *line;
 
-		/* 获得视图的位置信息(在加入到workbench中时，workbench会自动调整视图的大小) */
+		/* 获得视图的位置信息(在加入到app中时，app会自动调整视图的大小) */
 		rtgui_widget_get_rect(RTGUI_WIDGET(view), &rect);
 		rtgui_widget_rect_to_device(RTGUI_WIDGET(view), &rect);
 		rect.x1 += 5;

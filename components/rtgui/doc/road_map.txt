@@ -10,7 +10,7 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
    window 继承。(或者将 toplevel 合并进 application 中，因为只有 application 才
    会和服务器打交道。)
    2.4 在创建 window 的时候需要指定 parent，如果为 RT_NULL，则此 window 为 root
-   窗口，parent 为当前 rtgui_application。
+   窗口，parent 为当前 rtgui_application。每一个 application 只能有一个根窗口。
    2.5 添加一个 FULL_PANEL 的 STYLE。指定此 STYLE 之后会自动填满整个 panel。其
    与 NO_TITLE 之类的合用可以达到之前 workbench 的效果。
    2.6 添加 rtgui_win_exec 方法，用来执行事件循环。(?)

@@ -15,10 +15,10 @@
 #include <rtgui/color.h>
 #include <rtgui/image.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_application.h>
 
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/button.h>
-#include <rtgui/widgets/workbench.h>
 
 static void _rtgui_win_constructor(rtgui_win_t *win)
 {
@@ -231,17 +231,17 @@ rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 			/* get root toplevel */
 			parent_widget = RTGUI_WIDGET(win->parent_toplevel);
-			if (RTGUI_IS_WORKBENCH(parent_widget))
+			if (RTGUI_IS_APPLICATION(parent_widget))
 			{
-				rtgui_workbench_t* workbench;
-				workbench = RTGUI_WORKBENCH(win->parent_toplevel);
-				workbench->flag |= RTGUI_WORKBENCH_FLAG_MODAL_MODE;
-				workbench->modal_widget = RTGUI_WIDGET(win);
+				struct rtgui_application *app;
+				app = RTGUI_APPLICATION(win->parent_toplevel);
+				app->state_flag |= RTGUI_APPLICATION_FLAG_MODALED;
+				app->modal_widget = RTGUI_WIDGET(win);
 
-				rtgui_workbench_event_loop(workbench);
-				result = workbench->modal_code;
-				workbench->flag &= ~RTGUI_WORKBENCH_FLAG_MODAL_MODE;
-				workbench->modal_widget = RT_NULL;
+				_rtgui_application_event_loop(app);
+				result = app->modal_code;
+				app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
+				app->modal_widget = RT_NULL;
 			}
 			else if (RTGUI_IS_WIN(parent_widget))
 			{
@@ -274,14 +274,14 @@ void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 {
 	if (win->parent_toplevel != RT_NULL)
 	{
-		if (RTGUI_IS_WORKBENCH(win->parent_toplevel))
+		if (RTGUI_IS_APPLICATION(win->parent_toplevel))
 		{
-			rtgui_workbench_t* workbench;
+			struct rtgui_application *app;
 
-			/* which is shown under workbench */
-			workbench = RTGUI_WORKBENCH(win->parent_toplevel);
-			workbench->modal_code = modal_code;
-			workbench->flag &= ~RTGUI_WORKBENCH_FLAG_MODAL_MODE;
+			/* which is shown under app */
+			app = RTGUI_APPLICATION(win->parent_toplevel);
+			app->modal_code = modal_code;
+			app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
 		}
 		else if (RTGUI_IS_WIN(win->parent_toplevel))
 		{

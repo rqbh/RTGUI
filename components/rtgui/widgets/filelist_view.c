@@ -15,11 +15,11 @@
 #include <rtgui/rtgui_object.h>
 #include <rtgui/rtgui_system.h>
 #include <rtgui/rtgui_theme.h>
+#include <rtgui/rtgui_application.h>
 
 #include <rtgui/list.h>
 #include <rtgui/image.h>
 #include <rtgui/widgets/container.h>
-#include <rtgui/widgets/workbench.h>
 #include <rtgui/widgets/filelist_view.h>
 #include <rtgui/widgets/listbox.h>
 #include <rtgui/widgets/window.h>
@@ -671,7 +671,7 @@ rt_bool_t rtgui_filelist_view_event_handler(struct rtgui_widget* widget, struct 
     return rtgui_container_event_handler(widget, event);
 }
 
-rtgui_filelist_view_t* rtgui_filelist_view_create(rtgui_workbench_t* workbench, 
+rtgui_filelist_view_t* rtgui_filelist_view_create(struct rtgui_application *app,
 	const char* directory, const char* pattern, const rtgui_rect_t* rect)
 {
 	struct rtgui_filelist_view* view = RT_NULL;
@@ -684,8 +684,8 @@ rtgui_filelist_view_t* rtgui_filelist_view_create(rtgui_workbench_t* workbench,
 		view->pattern = rt_strdup(pattern);
 		view->page_items = rtgui_rect_height(*rect) / (1 + rtgui_theme_get_selected_height());
 		rtgui_filelist_view_set_directory(view, directory);
-		
-		rtgui_workbench_add_container(workbench, RTGUI_CONTAINER(view));
+
+		rtgui_application_add_container(app, RTGUI_CONTAINER(view));
 	}
 
 	return view;
