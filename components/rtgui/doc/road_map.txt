@@ -1,6 +1,7 @@
 RTGUI for 1.1 路线图(排名不分先后)
 1, 把 rtgui_thread 给去掉，变成 rtgui_application ，消除原来的 rtgui_thread +
-mq 的模式。
+mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 extent(这个或许
+不用，用时再取也好。)
 
 2, workbench，window并成一个，其事件主循环并合并到rtgui_application中。
    2.1, window 作为有标题栏的 workbench
@@ -8,6 +9,11 @@ mq 的模式。
    2.3, 将 window 的父类 toplevel 合并进 window 中。所有直接与服务器打交道的从
    window 继承。(或者将 toplevel 合并进 application 中，因为只有 application 才
    会和服务器打交道。)
+   2.4 在创建 window 的时候需要指定 parent，如果为 RT_NULL，则此 window 为 root
+   窗口，parent 为当前 rtgui_application。
+   2.5 添加一个 FULL_PANEL 的 STYLE。指定此 STYLE 之后会自动填满整个 panel。其
+   与 NO_TITLE 之类的合用可以达到之前 workbench 的效果。
+   2.6 添加 rtgui_win_exec 方法，用来执行事件循环。(?)
 
 3, 将 view 合并进 container，所有容器类继承 container。[note1](Done)
 
