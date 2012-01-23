@@ -77,7 +77,7 @@ rtgui_container_t *demo_view_dc_buffer(rtgui_workbench_t* workbench)
 	view = demo_view(workbench, "缓冲DC演示");
 	if (view != RT_NULL)
 		/* 设置成自己的事件处理函数 */
-		rtgui_widget_set_event_handler(RTGUI_WIDGET(view), dc_buffer_event_handler);
+		rtgui_object_set_event_handler(RTGUI_WIDGET(view), dc_buffer_event_handler);
 
 	return view;
 }

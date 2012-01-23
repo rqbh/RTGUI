@@ -184,7 +184,7 @@ rtgui_container_t *demo_view_dc(rtgui_workbench_t* workbench)
 	view = demo_view(workbench, "DC Demo");
 	if (view != RT_NULL)
 		/* 设置成自己的事件处理函数 */
-		rtgui_widget_set_event_handler(RTGUI_WIDGET(view), dc_event_handler);
+		rtgui_object_set_event_handler(RTGUI_WIDGET(view), dc_event_handler);
 
 	return view;
 }

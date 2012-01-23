@@ -88,7 +88,7 @@ rtgui_container_t *demo_view_ttf(rtgui_workbench_t* workbench)
 	{
 		RTGUI_WIDGET_BACKGROUND(RTGUI_WIDGET(view)) = white;
 		/* 设置成自己的事件处理函数 */
-		rtgui_widget_set_event_handler(RTGUI_WIDGET(view), ttf_event_handler);
+		rtgui_object_set_event_handler(RTGUI_WIDGET(view), ttf_event_handler);
 	}
 
 	return view;

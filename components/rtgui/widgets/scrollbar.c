@@ -20,7 +20,7 @@ static void _rtgui_scrollbar_constructor(rtgui_scrollbar_t *bar)
 	struct rtgui_rect rect = {0, 0, RTGUI_DEFAULT_SB_WIDTH, RTGUI_DEFAULT_SB_HEIGHT};
 
 	/* set event handler */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(bar), rtgui_scrollbar_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(bar), rtgui_scrollbar_event_handler);
 
 	rtgui_scrollbar_set_range(bar, 0, 100);
 	rtgui_scrollbar_set_page_step(bar, 20);

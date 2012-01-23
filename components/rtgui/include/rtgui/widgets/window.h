@@ -74,9 +74,9 @@ struct rtgui_win
 	char* title;
 
 	/* call back */
-	rt_bool_t (*on_activate)	(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_deactivate)	(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_close)		(struct rtgui_widget* widget, struct rtgui_event* event);
+	rt_bool_t (*on_activate)	(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_deactivate)	(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_close)		(struct rtgui_object* widget, struct rtgui_event* event);
 
 	/* reserved user data */
 	rt_uint32_t user_data;
@@ -116,7 +116,7 @@ void rtgui_win_set_onactivate(rtgui_win_t* win, rtgui_event_handler_ptr handler)
 void rtgui_win_set_ondeactivate(rtgui_win_t* win, rtgui_event_handler_ptr handler);
 void rtgui_win_set_onclose(rtgui_win_t* win, rtgui_event_handler_ptr handler);
 
-rt_bool_t rtgui_win_event_handler(rtgui_widget_t* win, struct rtgui_event* event);
+rt_bool_t rtgui_win_event_handler(struct rtgui_object* win, struct rtgui_event* event);
 
 void rtgui_win_event_loop(rtgui_win_t* wnd);
 

@@ -20,7 +20,7 @@
 static void _rtgui_container_constructor(rtgui_container_t *container)
 {
 	/* init container */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(container),
+	rtgui_object_set_event_handler(RTGUI_OBJECT(container),
 		rtgui_container_event_handler);
 
 	rtgui_list_init(&(container->children));
@@ -102,7 +102,7 @@ rt_bool_t rtgui_container_dispatch_event(rtgui_container_t *container, rtgui_eve
 		struct rtgui_widget* w;
 		w = rtgui_list_entry(node, struct rtgui_widget, sibling);
 
-		if (w->event_handler(w, event) == RT_TRUE)
+		if (RTGUI_OBJECT(w)->event_handler(RTGUI_OBJECT(w), event) == RT_TRUE)
 			return RT_TRUE;
 	}
 
@@ -121,21 +121,30 @@ rt_bool_t rtgui_container_dispatch_mouse_event(rtgui_container_t *container, str
 	{
 		struct rtgui_widget* w;
 		w = rtgui_list_entry(node, struct rtgui_widget, sibling);
-		if (rtgui_rect_contains_point(&(w->extent), event->x, event->y) == RT_EOK)
+		if (rtgui_rect_contains_point(&(w->extent),
+					                  event->x, event->y) == RT_EOK)
 		{
 			if ((focus != w) && RTGUI_WIDGET_IS_FOCUSABLE(w))
 				rtgui_widget_focus(w);
-			if (w->event_handler(w, (rtgui_event_t*)event) == RT_TRUE) return RT_TRUE;
+			if (RTGUI_OBJECT(w)->event_handler(RTGUI_OBJECT(w),
+											   (rtgui_event_t*)event) == RT_TRUE)
+				return RT_TRUE;
 		}
 	}
 
 	return RT_FALSE;
 }
 
-rt_bool_t rtgui_container_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_container_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_container* container = RTGUI_CONTAINER(widget);
-	RT_ASSERT(widget != RT_NULL);
+	struct rtgui_container *container;
+	struct rtgui_widget    *widget;
+
+	RT_ASSERT(object != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	container = RTGUI_CONTAINER(object);
+	widget    = RTGUI_WIDGET(object);
 
 	switch (event->type)
 	{
@@ -163,7 +172,9 @@ rt_bool_t rtgui_container_event_handler(struct rtgui_widget* widget, struct rtgu
 		/* let parent to handle keyboard event */
 		if (widget->parent != RT_NULL && widget->parent != widget->toplevel)
 		{
-			return widget->parent->event_handler(widget->parent, event);
+			return RTGUI_OBJECT(widget->parent)->event_handler(
+					RTGUI_OBJECT(widget->parent),
+					event);
 		}
 		break;
 

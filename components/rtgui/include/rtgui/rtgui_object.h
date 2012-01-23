@@ -16,6 +16,7 @@
 
 
 #include <rtthread.h>
+#include <rtgui/rtgui.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,15 +96,22 @@ struct rtgui_object
 	/* object type */
 	const rtgui_type_t* type;
 
+	/* the event handler */
+	rtgui_event_handler_ptr event_handler;
+
 	rt_bool_t is_static;
 };
-rtgui_type_t *rtgui_object_type_get(void);
 
 rtgui_object_t *rtgui_object_create(rtgui_type_t *object_type);
 void         rtgui_object_destroy(rtgui_object_t *object);
 
-void         rtgui_object_name_set(rtgui_object_t *object, const char *name);
-const char   *rtgui_object_name_get(rtgui_object_t *object);
+/* set the event handler of object */
+void rtgui_object_set_event_handler(struct rtgui_object *widget, rtgui_event_handler_ptr handler);
+/* object default event handler */
+rt_bool_t rtgui_object_event_handler(struct rtgui_object *widget, struct rtgui_event* event);
+
+void       rtgui_object_name_set(rtgui_object_t *object, const char *name);
+const char *rtgui_object_name_get(rtgui_object_t *object);
 
 rtgui_object_t *rtgui_object_check_cast(rtgui_object_t *object, rtgui_type_t *type);
 rtgui_type_t   *rtk_object_object_type_get(rtgui_object_t *object);

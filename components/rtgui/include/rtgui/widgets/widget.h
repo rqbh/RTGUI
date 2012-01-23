@@ -106,18 +106,15 @@ struct rtgui_widget
 	/* the rect clip */
 	rtgui_region_t clip;
 
-	/* the event handler */
-	rt_bool_t (*event_handler)	(struct rtgui_widget* widget, struct rtgui_event* event);
-
 	/* call back */
-	rt_bool_t (*on_focus_in)	(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_focus_out)	(struct rtgui_widget* widget, struct rtgui_event* event);
+	rt_bool_t (*on_focus_in)	(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_focus_out)	(struct rtgui_object* widget, struct rtgui_event* event);
 #ifndef RTGUI_USING_SMALL_SIZE
-	rt_bool_t (*on_draw)		(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_mouseclick)	(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_key)			(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_size)		(struct rtgui_widget* widget, struct rtgui_event* event);
-	rt_bool_t (*on_command)		(struct rtgui_widget* widget, struct rtgui_event* event);
+	rt_bool_t (*on_draw)		(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_mouseclick)	(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_key)			(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_size)		(struct rtgui_object* widget, struct rtgui_event* event);
+	rt_bool_t (*on_command)		(struct rtgui_object* widget, struct rtgui_event* event);
 #endif
 
 	/* user private data */
@@ -128,10 +125,7 @@ typedef struct rtgui_widget rtgui_widget_t;
 rtgui_widget_t *rtgui_widget_create(rtgui_type_t *widget_type);
 void rtgui_widget_destroy(rtgui_widget_t* widget);
 
-/* set the event handler of widget */
-void rtgui_widget_set_event_handler(rtgui_widget_t* widget, rtgui_event_handler_ptr handler);
-/* widget default event handler */
-rt_bool_t rtgui_widget_event_handler(rtgui_widget_t* widget, rtgui_event_t* event);
+rt_bool_t rtgui_widget_event_handler(struct rtgui_object* object, rtgui_event_t* event);
 
 /* focus and unfocus */
 void rtgui_widget_focus(rtgui_widget_t * widget);

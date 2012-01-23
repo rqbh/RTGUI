@@ -19,7 +19,7 @@
 static void _rtgui_label_constructor(rtgui_label_t *label)
 {
 	/* init widget and set event handler */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(label), rtgui_label_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(label), rtgui_label_event_handler);
 
 	/* set field */
 	label->text = RT_NULL;

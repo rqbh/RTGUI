@@ -18,7 +18,7 @@ extern void rtgui_topwin_do_clip(rtgui_widget_t* widget);
 static void _rtgui_toplevel_constructor(rtgui_toplevel_t *toplevel)
 {
 	/* set event handler */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(toplevel), rtgui_toplevel_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(toplevel), rtgui_toplevel_event_handler);
 
 	/* set toplevel to self */
 	RTGUI_WIDGET(toplevel)->toplevel = RTGUI_WIDGET(toplevel);
@@ -41,22 +41,30 @@ static void _rtgui_toplevel_destructor(rtgui_toplevel_t* toplevel)
 	toplevel->drawing = 0;
 }
 
-DEFINE_CLASS_TYPE(toplevel, "toplevel", 
+DEFINE_CLASS_TYPE(toplevel, "toplevel",
 	RTGUI_CONTAINER_TYPE,
 	_rtgui_toplevel_constructor,
 	_rtgui_toplevel_destructor,
 	sizeof(struct rtgui_toplevel));
 
-rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* event)
+rt_bool_t rtgui_toplevel_event_handler(struct rtgui_object* object, rtgui_event_t* event)
 {
-	rtgui_toplevel_t* toplevel = (rtgui_toplevel_t*)widget;
+	struct rtgui_toplevel* toplevel;
+
+	RT_ASSERT(object != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	toplevel = RTGUI_OBJECT(object);
 
 	switch (event->type)
 	{
 	case RTGUI_EVENT_KBD:
 		if (RTGUI_CONTAINER(toplevel)->focused != RT_NULL)
 		{
-			RTGUI_CONTAINER(toplevel)->focused->event_handler(RTGUI_CONTAINER(toplevel)->focused, event);
+			RTGUI_OBJECT(RTGUI_CONTAINER(toplevel)->focused
+					)->event_handler(
+						RTGUI_OBJECT(RTGUI_CONTAINER(toplevel)->focused),
+						event);
 		}
 		break;
 
@@ -80,12 +88,12 @@ rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* ev
 		break;
 
 	case RTGUI_EVENT_COMMAND:
-		if (rtgui_container_dispatch_event(RTGUI_CONTAINER(widget), event) != RT_TRUE)
+		if (rtgui_container_dispatch_event(RTGUI_CONTAINER(object), event) != RT_TRUE)
 		{
 #ifndef RTGUI_USING_SMALL_SIZE
-			if (widget->on_command != RT_NULL)
+			if (RTGUI_WIDGET(object)->on_command != RT_NULL)
 			{
-				widget->on_command(widget, event);
+				RTGUI_WIDGET(object)->on_command(object, event);
 			}
 #endif
 		}
@@ -93,7 +101,7 @@ rt_bool_t rtgui_toplevel_event_handler(rtgui_widget_t* widget, rtgui_event_t* ev
 		break;
 
 	default :
-		return rtgui_container_event_handler(widget, event);
+		return rtgui_container_event_handler(object, event);
 	}
 
 	return RT_FALSE;

@@ -101,7 +101,7 @@ rtgui_container_t *demo_view_animation(rtgui_workbench_t* workbench)
 
 	view = demo_view(workbench, "DC ¶¯»­");
 	if (view != RT_NULL)
-		rtgui_widget_set_event_handler(RTGUI_WIDGET(view), animation_event_handler);
+		rtgui_object_set_event_handler(RTGUI_WIDGET(view), animation_event_handler);
 
 	rtgui_font_get_metrics(RTGUI_WIDGET_FONT(RTGUI_WIDGET(view)), "·ÉÏßÂÒ·É", &text_rect);
 	rtgui_rect_moveto(&text_rect, 0, 45);

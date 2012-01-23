@@ -38,7 +38,7 @@ static void workbench_entry(void* parameter)
             "main", "guiapplication");
 	if (app == RT_NULL) return;
 
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(app), demo_workbench_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(app), demo_workbench_event_handler);
 
 	/* 初始化各个例子的视图 */
 #if RT_VERSION == 4

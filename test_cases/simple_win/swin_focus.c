@@ -113,7 +113,7 @@ rt_bool_t window_focus(void)
 	/* 添加windows的事件*/
 	rtgui_container_add_child(RTGUI_CONTAINER(win),
 			RTGUI_WIDGET(picture_win));
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(picture_win),
+	rtgui_object_set_event_handler(RTGUI_WIDGET(picture_win),
 			picture_win_onpaint);
 
 	/* 非模态显示窗口 */

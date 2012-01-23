@@ -16,7 +16,7 @@ static void _rtgui_notebook_constructor(rtgui_notebook_t *notebook)
 	notebook->current = RTGUI_NOT_FOUND;
 
 	RTGUI_WIDGET(notebook)->gc.textalign = RTGUI_ALIGN_CENTER_HORIZONTAL | RTGUI_ALIGN_CENTER_VERTICAL;
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(notebook), rtgui_notebook_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(notebook), rtgui_notebook_event_handler);
 }
 
 static void _rtgui_notebook_destructor(rtgui_notebook_t *notebook)
@@ -120,10 +120,10 @@ static void _rtgui_notebook_onmouse(rtgui_notebook_t *notebook, struct rtgui_eve
 	}
 	else
 	{
-	/* handle on page */
-		if (notebook->childs[notebook->current].widget->event_handler != RT_NULL)
-			notebook->childs[notebook->current].widget->event_handler(
-					notebook->childs[notebook->current].widget,
+		/* handle on page */
+		if (RTGUI_OBJECT(notebook->childs[notebook->current].widget)->event_handler != RT_NULL)
+			RTGUI_OBJECT(notebook->childs[notebook->current].widget)->event_handler(
+					RTGUI_OBJECT(notebook->childs[notebook->current].widget),
 					&(emouse->parent));
 	}
 }
@@ -298,11 +298,15 @@ rtgui_widget_t* rtgui_notebook_get_index(rtgui_notebook_t* notebook, rt_uint16_t
 	return RT_NULL;
 }
 
-rt_bool_t rtgui_notebook_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_notebook_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
 	struct rtgui_notebook* notebook;
 
-	notebook = RTGUI_NOTEBOOK(widget);
+	RT_ASSERT(object != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	notebook = RTGUI_NOTEBOOK(object);
+
 	if (event->type == RTGUI_EVENT_PAINT)
 	{
 		_rtgui_notebook_ondraw(notebook);
@@ -315,15 +319,18 @@ rt_bool_t rtgui_notebook_event_handler(struct rtgui_widget* widget, struct rtgui
 	{
 		if (notebook->current != RTGUI_NOT_FOUND)
 		{
-			if (notebook->childs[notebook->current].widget->event_handler != RT_NULL)
-				return notebook->childs[notebook->current].widget->event_handler(notebook->childs[notebook->current].widget,
-					event);
+			if (RTGUI_OBJECT(notebook->childs[notebook->current].widget
+						)->event_handler != RT_NULL)
+				return RTGUI_OBJECT(notebook->childs[notebook->current].widget
+						)->event_handler(
+							notebook->childs[notebook->current].widget,
+							event);
 		}
 	}
 	else
 	{
 		/* use parent event handler */
-		return rtgui_widget_event_handler(widget, event);
+		return rtgui_widget_event_handler(object, event);
 	}
 
 	return RT_FALSE;

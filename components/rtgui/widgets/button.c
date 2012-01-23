@@ -20,7 +20,7 @@ static void _rtgui_button_constructor(rtgui_button_t *button)
 {
 	/* init widget and set event handler */
 	RTGUI_WIDGET(button)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(button), rtgui_button_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(button), rtgui_button_event_handler);
 
 	/* un-press button */
 	button->flag = 0;

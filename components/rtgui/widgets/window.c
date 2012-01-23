@@ -38,7 +38,7 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 
 	win->flag  = RTGUI_WIN_FLAG_INIT;
 
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(win), rtgui_win_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(win), rtgui_win_event_handler);
 
 	/* init user data */
 	win->user_data = 0;
@@ -394,11 +394,14 @@ static rt_bool_t rtgui_win_ondraw(struct rtgui_win* win)
 	return RT_FALSE;
 }
 
-rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_win* win = (struct rtgui_win*)widget;
+	struct rtgui_win* win;
 
-	RT_ASSERT((win != RT_NULL) && (event != RT_NULL));
+	RT_ASSERT(win != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	win = RTGUI_WIN(object);
 
 	switch (event->type)
 	{
@@ -433,14 +436,15 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 
 		win->flag |= RTGUI_WIN_FLAG_ACTIVATE;
 #ifndef RTGUI_USING_SMALL_SIZE
-		if (widget->on_draw != RT_NULL) widget->on_draw(widget, event);
-		else 
+		if (RTGUI_WIDGET(object)->on_draw != RT_NULL)
+			RTGUI_WIDGET(object)->on_draw(object, event);
+		else
 #endif
 		rtgui_widget_update(RTGUI_WIDGET(win));
 
 		if (win->on_activate != RT_NULL)
 		{
-			win->on_activate(widget, event);
+			win->on_activate(RTGUI_WIDGET(object), event);
 		}
 		break;
 
@@ -459,21 +463,23 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		{
 			win->flag &= ~RTGUI_WIN_FLAG_ACTIVATE;
 #ifndef RTGUI_USING_SMALL_SIZE
-			if (widget->on_draw != RT_NULL) widget->on_draw(widget, event);
-			else 
+			if (RTGUI_WIDGET(object)->on_draw != RT_NULL)
+				RTGUI_WIDGET(object)->on_draw(object, event);
+			else
 #endif
 				rtgui_win_ondraw(win);
 
 			if (win->on_deactivate != RT_NULL)
 			{
-				win->on_deactivate(widget, event);
+				win->on_deactivate(RTGUI_WIDGET(object), event);
 			}
 		}
 		break;
 
 	case RTGUI_EVENT_PAINT:
 #ifndef RTGUI_USING_SMALL_SIZE
-		if (widget->on_draw != RT_NULL) widget->on_draw(widget, event);
+		if (RTGUI_WIDGET(object)->on_draw != RT_NULL)
+			RTGUI_WIDGET(object)->on_draw(object, event);
 		else
 #endif
 			rtgui_win_ondraw(win);
@@ -491,9 +497,10 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 						&(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)->extent),
 						emouse->x, emouse->y) == RT_EOK)
 			{
-				RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)->event_handler(
-						RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win),
-						event);
+				RTGUI_OBJECT(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)
+						)->event_handler(
+							RTGUI_OBJECT(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)),
+							event);
 
 				/* clean last mouse event handled widget */
 				RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win) = RT_NULL;
@@ -503,15 +510,17 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		if (win->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
 		{
 			if (win->modal_widget != RT_NULL)
-				return win->modal_widget->event_handler(win->modal_widget, event);
+				return RTGUI_OBJECT(win->modal_widget)->event_handler(
+						RTGUI_OBJECT(win->modal_widget),
+						event);
 		}
- 		else if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win), 
+		else if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win),
 			(struct rtgui_event_mouse*)event) == RT_FALSE)
 		{
 #ifndef RTGUI_USING_SMALL_SIZE
-			if (widget->on_mouseclick != RT_NULL)
+			if (RTGUI_WIDGET(object)->on_mouseclick != RT_NULL)
 			{
-				return widget->on_mouseclick(widget, event);
+				return RTGUI_WIDGET(object)->on_mouseclick(object, event);
 			}
 #endif
 		}
@@ -538,18 +547,23 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_widget* widget, struct rtgui_even
 		if (win->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
 		{
 			if (win->modal_widget != RT_NULL)
-				return win->modal_widget->event_handler(win->modal_widget, event);
+				return RTGUI_OBJECT(win->modal_widget
+						)->event_handler(RTGUI_OBJECT(win->modal_widget),
+										 event);
 		}
-		else if (RTGUI_CONTAINER(win)->focused != widget &&
+		else if (RTGUI_CONTAINER(win)->focused != object &&
 				 RTGUI_CONTAINER(win)->focused != RT_NULL)
 		{
-			RTGUI_CONTAINER(win)->focused->event_handler(RTGUI_CONTAINER(win)->focused, event);
+			RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused
+					)->event_handler(
+						RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused),
+						event);
 		}
         break;
 
 	default:
 		/* call parent event handler */
-		return rtgui_toplevel_event_handler(widget, event);
+		return rtgui_toplevel_event_handler(object, event);
 	}
 
 	return RT_FALSE;
@@ -578,7 +592,9 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 				if (result == RT_EOK)
 				{
 					/* perform event handler */
-					RTGUI_WIDGET(wnd)->event_handler(RTGUI_WIDGET(wnd), event);
+					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
+							RTGUI_OBJECT(wnd),
+							event);
 				}
 				else if (result == -RT_ETIMEOUT)
 				{
@@ -591,7 +607,9 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 				if (result == RT_EOK)
 				{
 					/* perform event handler */
-					RTGUI_WIDGET(wnd)->event_handler(RTGUI_WIDGET(wnd), event);
+					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
+							RTGUI_OBJECT(wnd),
+							event);
 				}
 			}
 		}
@@ -606,7 +624,9 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 				if (result == RT_EOK)
 				{
 					/* perform event handler */
-					RTGUI_WIDGET(wnd)->event_handler(RTGUI_WIDGET(wnd), event);
+					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
+							RTGUI_OBJECT(wnd),
+							event);
 				}
 				else if (result == -RT_ETIMEOUT)
 				{
@@ -619,7 +639,9 @@ void rtgui_win_event_loop(rtgui_win_t* wnd)
 				if (result == RT_EOK)
 				{
 					/* perform event handler */
-					RTGUI_WIDGET(wnd)->event_handler(RTGUI_WIDGET(wnd), event);
+					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
+							RTGUI_OBJECT(wnd),
+							event);
 				}
 			}
 		}

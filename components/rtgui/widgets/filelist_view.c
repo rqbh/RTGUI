@@ -323,7 +323,7 @@ static void _rtgui_filelist_view_constructor(struct rtgui_filelist_view *view)
 	struct rtgui_rect rect = {0, 0, 200, 200};
 
 	/* set default widget rect and set event handler */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(view), rtgui_filelist_view_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(view), rtgui_filelist_view_event_handler);
 	rtgui_widget_set_rect(RTGUI_WIDGET(view), &rect);
 
 	RTGUI_WIDGET(view)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;

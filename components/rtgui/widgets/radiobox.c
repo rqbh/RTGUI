@@ -13,7 +13,7 @@ static void _rtgui_radiobox_constructor(rtgui_radiobox_t *radiobox)
 	RTGUI_WIDGET(radiobox)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 	RTGUI_WIDGET_TEXTALIGN(RTGUI_WIDGET(radiobox)) = RTGUI_ALIGN_LEFT | RTGUI_ALIGN_CENTER_VERTICAL;
 	rtgui_widget_set_rect(RTGUI_WIDGET(radiobox), &rect);
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(radiobox), rtgui_radiobox_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(radiobox), rtgui_radiobox_event_handler);
 
 	/* set proper of control */
 	radiobox->items = RT_NULL;

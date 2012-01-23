@@ -56,7 +56,7 @@ static void _rtgui_widget_constructor(rtgui_widget_t *widget)
 #endif
 
 	/* set default event handler */
-	rtgui_widget_set_event_handler(widget,rtgui_widget_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(widget), rtgui_widget_event_handler);
 
 	/* init user data private to 0 */
 	widget->user_data = 0;
@@ -203,13 +203,6 @@ void rtgui_widget_move_to_logic(rtgui_widget_t* widget, int dx, int dy)
 	}
 }
 
-void rtgui_widget_set_event_handler(rtgui_widget_t* widget, rtgui_event_handler_ptr handler)
-{
-	RT_ASSERT(widget != RT_NULL);
-
-	widget->event_handler = handler;
-}
-
 void rtgui_widget_get_rect(rtgui_widget_t* widget, rtgui_rect_t *rect)
 {
 	RT_ASSERT(widget != RT_NULL);
@@ -300,7 +293,7 @@ void rtgui_widget_focus(rtgui_widget_t *widget)
 
 	/* set widget as focused widget in parent link */
 	parent = RTGUI_CONTAINER(widget->parent);
-	do 
+	do
 	{
 		parent->focused = widget;
 		parent = RTGUI_CONTAINER(RTGUI_WIDGET(parent)->parent);
@@ -387,7 +380,8 @@ rtgui_widget_t* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
 
 	RT_ASSERT(widget != RT_NULL);
 
-	if (widget->toplevel) return widget->toplevel;
+	if (widget->toplevel)
+		return widget->toplevel;
 
 	r = widget;
 	/* get the toplevel widget */
@@ -399,29 +393,41 @@ rtgui_widget_t* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
 	return r;
 }
 
-rt_bool_t rtgui_widget_event_handler(rtgui_widget_t* widget, rtgui_event_t* event)
+rt_bool_t rtgui_widget_event_handler(struct rtgui_object* object, rtgui_event_t* event)
 {
 #ifndef RTGUI_USING_SMALL_SIZE
+	struct rtgui_widget widget;
+
+	RT_ASSERT(object != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	widget = RTGUI_WIDGET(object);
+
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:
-		if (widget->on_draw != RT_NULL) return widget->on_draw(widget, event);
+		if (widget->on_draw != RT_NULL)
+			return widget->on_draw(RTGUI_OBJECT(widget), event);
 		break;
 
 	case RTGUI_EVENT_KBD:
-		if (widget->on_key != RT_NULL) return widget->on_key(widget, event);
+		if (widget->on_key != RT_NULL)
+			return widget->on_key(RTGUI_OBJECT(widget), event);
 		break;
 
 	case RTGUI_EVENT_MOUSE_BUTTON:
-		if (widget->on_mouseclick != RT_NULL) return widget->on_mouseclick(widget, event);
+		if (widget->on_mouseclick != RT_NULL)
+			return widget->on_mouseclick(RTGUI_OBJECT(widget), event);
 		break;
 
 	case RTGUI_EVENT_COMMAND:
-		if (widget->on_command != RT_NULL) return widget->on_command(widget, event);
+		if (widget->on_command != RT_NULL)
+			return widget->on_command(RTGUI_OBJECT(widget), event);
 		break;
 
 	case RTGUI_EVENT_RESIZE:
-		if (widget->on_size != RT_NULL) return widget->on_size(widget, event);
+		if (widget->on_size != RT_NULL)
+			return widget->on_size(RTGUI_OBJECT(widget), event);
 		break;
 	}
 #endif
@@ -567,9 +573,11 @@ void rtgui_widget_update(rtgui_widget_t* widget)
 
 	RT_ASSERT(widget != RT_NULL);
 
-	if (widget->event_handler != RT_NULL)
+	if (RTGUI_OBJECT(widget)->event_handler != RT_NULL)
 	{
-		widget->event_handler(widget, &paint.parent);
+		RTGUI_OBJECT(widget)->event_handler(
+				RTGUI_OBJECT(widget),
+				&paint.parent);
 	}
 }
 

@@ -20,7 +20,7 @@
 static void _rtgui_listbox_constructor(struct rtgui_listbox *box)
 {
 	/* set default widget rect and set event handler */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(box),rtgui_listbox_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(box),rtgui_listbox_event_handler);
 
 	RTGUI_WIDGET(box)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 

@@ -494,9 +494,11 @@ rt_err_t rtgui_thread_recv_filter(rt_uint32_t type, rtgui_event_t* event, rt_siz
 		{
 			/* let widget to handle event */
 			if (thread->widget != RT_NULL &&
-				thread->widget->event_handler != RT_NULL)
+				RTGUI_OBJECT(thread->widget)->event_handler != RT_NULL)
 			{
-				thread->widget->event_handler(thread->widget, event);
+				RTGUI_OBJECT(thread->widget)->event_handler(
+                        RTGUI_OBJECT(thread->widget),
+                        event);
 			}
 		}
 	}

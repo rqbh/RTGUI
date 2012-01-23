@@ -51,7 +51,7 @@ static void _rtgui_textbox_constructor(rtgui_textbox_t *box)
 	rtgui_widget_set_rect(RTGUI_WIDGET(box), &rect);
 
 	RTGUI_WIDGET(box)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(box), rtgui_textbox_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(box), rtgui_textbox_event_handler);
 	rtgui_widget_set_onfocus(RTGUI_WIDGET(box), rtgui_textbox_onfocus);
 	rtgui_widget_set_onunfocus(RTGUI_WIDGET(box), rtgui_textbox_onunfocus);
 

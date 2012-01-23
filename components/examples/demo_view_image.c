@@ -115,7 +115,7 @@ rtgui_container_t* demo_view_image(rtgui_workbench_t* workbench)
 	_view = demo_view(workbench, "图像演示");
 	if (_view != RT_NULL)
 		/* 设置默认的事件处理函数到demo_view_event_handler函数 */
-		rtgui_widget_set_event_handler(RTGUI_WIDGET(_view), demo_view_event_handler);
+		rtgui_object_set_event_handler(RTGUI_WIDGET(_view), demo_view_event_handler);
 
 	/* 添加一个按钮 */
 	demo_view_get_rect(_view, &rect);

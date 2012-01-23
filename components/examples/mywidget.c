@@ -102,7 +102,7 @@ static void _rtgui_mywidget_constructor(rtgui_mywidget_t *mywidget)
 	/* 默认这个控件接收聚焦 */
 	RTGUI_WIDGET(mywidget)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 	/* 初始化控件并设置事件处理函数 */
-	rtgui_widget_set_event_handler(RTGUI_WIDGET(mywidget), rtgui_mywidget_event_handler);
+	rtgui_object_set_event_handler(RTGUI_WIDGET(mywidget), rtgui_mywidget_event_handler);
 
 	/* 初始状态时OFF */
 	mywidget->status = MYWIDGET_STATUS_OFF;
