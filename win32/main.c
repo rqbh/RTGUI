@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 					struct rtgui_event_mouse emouse;
 					emouse.parent.type = RTGUI_EVENT_MOUSE_MOTION;
 					emouse.parent.sender = RT_NULL;
+                    emouse.wid = RT_NULL;
 
 					emouse.x = ((SDL_MouseMotionEvent*)&event)->x;
 					emouse.y = ((SDL_MouseMotionEvent*)&event)->y;
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
 
 					emouse.parent.type = RTGUI_EVENT_MOUSE_BUTTON;
 					emouse.parent.sender = RT_NULL;
+                    emouse.wid = RT_NULL;
 
 					mb = (SDL_MouseButtonEvent*)&event;
 
@@ -111,6 +113,7 @@ int main(int argc, char *argv[])
 					ekbd.parent.type	= RTGUI_EVENT_KBD;
 					ekbd.parent.sender	= RT_NULL;
 					ekbd.type = RTGUI_KEYUP;
+					ekbd.wid = RT_NULL;
 					ekbd.mod = event.key.keysym.mod;
 					ekbd.key = event.key.keysym.sym;
 
@@ -128,6 +131,7 @@ int main(int argc, char *argv[])
 					ekbd.parent.type	= RTGUI_EVENT_KBD;
 					ekbd.parent.sender	= RT_NULL;
 					ekbd.type = RTGUI_KEYDOWN;
+					ekbd.wid = RT_NULL;
 					ekbd.mod = event.key.keysym.mod;
 					ekbd.key = event.key.keysym.sym;
 
