@@ -493,7 +493,6 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     RT_ASSERT(object != RT_NULL);
     RT_ASSERT(event != RT_NULL);
 
-    rt_kprintf("server got event:%x\n", event->type);
     /* dispatch event */
     switch (event->type)
     {
