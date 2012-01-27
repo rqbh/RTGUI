@@ -65,7 +65,7 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 	rt_free(win->title);
 }
 
-static rt_bool_t _rtgui_win_create_in_server(rtgui_win_t* win)
+static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
 {
 	if (RTGUI_TOPLEVEL(win)->server == RT_NULL)
 	{
@@ -82,15 +82,17 @@ static rt_bool_t _rtgui_win_create_in_server(rtgui_win_t* win)
 		}
 
 		/* send win create event to server */
-		ecreate.wid 		= win;
+		ecreate.wid         = win;
 		ecreate.parent.user	= win->style;
 #ifndef RTGUI_USING_SMALL_SIZE
-		ecreate.extent 		= RTGUI_WIDGET(win)->extent;
+		ecreate.extent      = RTGUI_WIDGET(win)->extent;
 		rt_strncpy((char*)ecreate.title, (char*)win->title, RTGUI_NAME_MAX);
 #endif
 
-		if (rtgui_application_send_sync(server, RTGUI_EVENT(&ecreate),
-			sizeof(struct rtgui_event_win_create)) != RT_EOK)
+		if (rtgui_application_send_sync(server,
+										RTGUI_EVENT(&ecreate),
+										sizeof(struct rtgui_event_win_create)
+				) != RT_EOK)
 		{
 			rt_kprintf("create win: %s failed\n", win->title);
 			return RT_FALSE;
@@ -103,26 +105,31 @@ static rt_bool_t _rtgui_win_create_in_server(rtgui_win_t* win)
 	return RT_TRUE;
 }
 
-DEFINE_CLASS_TYPE(win, "win", 
+DEFINE_CLASS_TYPE(win, "win",
 	RTGUI_TOPLEVEL_TYPE,
 	_rtgui_win_constructor,
 	_rtgui_win_destructor,
 	sizeof(struct rtgui_win));
 
-rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* title, rtgui_rect_t *rect, rt_uint8_t style)
+rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel,
+		                      const char* title,
+							  rtgui_rect_t *rect,
+							  rt_uint8_t style)
 {
 	struct rtgui_win* win;
 
 	/* allocate win memory */
-	win = (struct rtgui_win*) rtgui_widget_create (RTGUI_WIN_TYPE);
+	win = RTGUI_WIN(rtgui_widget_create(RTGUI_WIN_TYPE));
 	if (win != RT_NULL)
 	{
 		/* set parent toplevel */
 		win->parent_toplevel = parent_toplevel;
 
 		/* set title, rect and style */
-		if (title != RT_NULL) win->title = rt_strdup(title);
-		else win->title = RT_NULL;
+		if (title != RT_NULL)
+			win->title = rt_strdup(title);
+		else
+			win->title = RT_NULL;
 
 		rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 		win->style = style;
@@ -202,15 +209,22 @@ void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 	if (RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)))
 	{
+		rt_thread_t stid;
 		/* send show message to server */
 		struct rtgui_event_win_show eshow;
+
+		stid = rtgui_application_get_server();
+		RT_ASSERT(stid != RT_NULL);
+
 		RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
 		eshow.wid = win;
 
-		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&eshow),
-			sizeof(struct rtgui_event_win_show)) != RT_EOK)
+		if (rtgui_application_send_sync(stid,
+					                    RTGUI_EVENT(&eshow),
+										sizeof(struct rtgui_event_win_show)
+				) != RT_EOK)
 		{
-			/* hide window failed */
+			rt_kprintf("show win failed\n");
 			return;
 		}
 
