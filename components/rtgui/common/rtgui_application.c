@@ -791,13 +791,14 @@ rt_bool_t _rtgui_application_event_loop(struct rtgui_application *app,
 	event = (struct rtgui_event*)app->event_buffer;
 
 	while (!(app->state_flag & RTGUI_APPLICATION_FLAG_CLOSED ||
-			 object->flag & RTGUI_OBJECT_FLAG_DISABLED))
+			 object->flag & RTGUI_OBJECT_FLAG_DISABLED ||
+			 object->event_handler == RT_NULL))
 	{
 		if (app->on_idle != RT_NULL)
 		{
 			result = rtgui_application_recv_nosuspend(event, RTGUI_EVENT_BUFFER_SIZE);
 			if (result == RT_EOK)
-				RTGUI_OBJECT(app)->event_handler(object, event);
+				object->event_handler(object, event);
 			else if (result == -RT_ETIMEOUT)
 				app->on_idle(object, RT_NULL);
 		}
@@ -805,7 +806,7 @@ rt_bool_t _rtgui_application_event_loop(struct rtgui_application *app,
 		{
 			result = rtgui_application_recv(event, RTGUI_EVENT_BUFFER_SIZE);
 			if (result == RT_EOK)
-				RTGUI_OBJECT(app)->event_handler(object, event);
+				object->event_handler(object, event);
 		}
 	}
 
