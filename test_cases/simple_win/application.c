@@ -8,18 +8,17 @@
 #include <rtgui/widgets/label.h>
 #include <rtgui/driver.h>
 
-#include "test_cases.h"
+/*#include "test_cases.h"*/
 
 struct rtgui_application* app;
-rtgui_win_t *win1;
-rtgui_win_t *win2;
+struct rtgui_win *win1;
+struct rtgui_win *win2;
 
-rt_bool_t on_window_close(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event)
 {
 	rt_kprintf("win %s(%p) closing\n",
-			rtgui_win_get_title(RTGUI_WIN(widget)),
-			widget);
-	rtgui_win_show(win2, RT_FALSE);
+			rtgui_win_get_title(RTGUI_WIN(object)),
+			object);
 	return RT_TRUE;
 }
 
@@ -28,18 +27,20 @@ void create_wins(void)
 	rtgui_label_t *label;
 	rtgui_rect_t rect = {40, 40, 200, 80};
 
-	/* 斐膘珨跺敦諳 */
 	win1 = rtgui_win_create(RT_NULL,
 		"test window", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rtgui_win_set_onclose(win1, on_window_close);
 
-	/* 耀怓珆尨敦諳 */
 	rtgui_win_show(win1, RT_TRUE);
 
-	/* 斐膘珨跺敦諳 */
+	rt_kprintf("win1 terminated\n");
+	rtgui_win_destroy(win1);
+
 	win2 = rtgui_win_create(RT_NULL,
 		"test window2", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rtgui_win_show(win2, RT_FALSE);
 
 	rect.x1 += 20;
 	rect.x2 -= 5;
@@ -59,7 +60,7 @@ void rt_init_thread_entry(void* parameter)
 
 	app = rtgui_application_create(
 			rt_thread_self(),
-			"main",
+			RT_NULL,
 			"guiapp");
 
 	RT_ASSERT(app != RT_NULL);
