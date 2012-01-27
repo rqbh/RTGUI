@@ -236,6 +236,8 @@ void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
     if (is_modal == RT_TRUE)
     {
+		win->flag |= RTGUI_WIN_FLAG_MODAL;
+
         RTGUI_OBJECT(win)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
         _rtgui_application_event_loop(rtgui_application_self(),
                                       RTGUI_OBJECT(win));
