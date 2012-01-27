@@ -12,7 +12,6 @@
 
 struct rtgui_application* app;
 struct rtgui_win *win1;
-struct rtgui_win *win2;
 
 rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event)
 {
@@ -32,24 +31,19 @@ void create_wins(void)
 
 	rtgui_win_set_onclose(win1, on_window_close);
 
-	rtgui_win_show(win1, RT_TRUE);
-
-	rt_kprintf("win1 terminated\n");
-	rtgui_win_destroy(win1);
-
-	win2 = rtgui_win_create(RT_NULL,
-		"test window2", &rect, RTGUI_WIN_STYLE_DEFAULT);
-
-	rtgui_win_show(win2, RT_FALSE);
-
 	rect.x1 += 20;
 	rect.x2 -= 5;
 	rect.y1 += 5;
 	rect.y2 = rect.y1 + 20;
 
-	label = rtgui_label_create("test label in win");
+	label = rtgui_label_create("window in modal mode");
 	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(win2), RTGUI_WIDGET(label));
+	rtgui_container_add_child(RTGUI_CONTAINER(win1), RTGUI_WIDGET(label));
+
+	rtgui_win_show(win1, RT_TRUE);
+
+	rt_kprintf("win1 terminated\n");
+	rtgui_win_destroy(win1);
 }
 
 void rt_init_thread_entry(void* parameter)
@@ -67,7 +61,7 @@ void rt_init_thread_entry(void* parameter)
 
 	create_wins();
 
-    /*window_focus();*/
+	window_focus();
 
 	rtgui_application_exec(app);
 
