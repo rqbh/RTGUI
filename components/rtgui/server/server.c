@@ -623,7 +623,7 @@ static void rtgui_server_entry(void* parameter)
 	rtgui_mouse_show_cursor();
 #endif
 
-    rtgui_application_exec(rtgui_server_application);
+    rtgui_application_run(rtgui_server_application);
 
     rtgui_application_destroy(rtgui_server_application);
     rtgui_server_application = RT_NULL;

@@ -89,7 +89,7 @@ void rtgui_application_destroy(struct rtgui_application *app);
 rt_err_t rtgui_application_show(struct rtgui_application *app);
 rt_err_t rtgui_application_hide(struct rtgui_application *app);
 
-rt_base_t rtgui_application_exec(struct rtgui_application *app);
+rt_base_t rtgui_application_run(struct rtgui_application *app);
 void rtgui_application_exit(struct rtgui_application *app, rt_base_t code);
 
 void rtgui_application_set_onidle(rtgui_idle_func onidle);

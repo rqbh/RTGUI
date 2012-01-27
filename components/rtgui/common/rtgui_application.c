@@ -76,15 +76,17 @@ static void rtgui_event_dump(rt_thread_t tid, rtgui_event_t* event)
 {
 	char* sender = "(unknown)";
 
-	if (event->sender != RT_NULL) sender = event->sender->name;
-
 	if ((event->type == RTGUI_EVENT_TIMER) ||
 		(event->type == RTGUI_EVENT_UPDATE_BEGIN) ||
+		(event->type == RTGUI_EVENT_MOUSE_MOTION) ||
 		(event->type == RTGUI_EVENT_UPDATE_END))
 	{
 		/* don't dump timer event */
 		return ;
 	}
+
+	if (event->sender != RT_NULL)
+		sender = event->sender->name;
 
 	rt_kprintf("%s -- %s --> %s ", sender, event_string[event->type], tid->name);
 	switch (event->type)
@@ -862,7 +864,7 @@ rt_err_t rtgui_application_hide(struct rtgui_application* app)
 	return RT_EOK;
 }
 
-rt_base_t rtgui_application_exec(struct rtgui_application *app)
+rt_base_t rtgui_application_run(struct rtgui_application *app)
 {
 	_rtgui_application_check(app);
 

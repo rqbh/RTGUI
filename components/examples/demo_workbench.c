@@ -93,7 +93,7 @@ static void workbench_entry(void* parameter)
 	demo_view_show();
 
 	/* 执行工作台事件循环 */
-	rtgui_application_exec(app);
+	rtgui_application_run(app);
 
 	/* 去注册GUI线程 */
 	rtgui_application_destroy(app);
