@@ -222,7 +222,7 @@ static void _draw_textview(rtgui_textview_t *textview)
 static void _rtgui_textview_constructor(rtgui_textview_t *textview)
 {
 	/* init widget and set event handler */
-	rtgui_object_set_event_handler(RTGUI_WIDGET(textview), rtgui_textview_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(textview), rtgui_textview_event_handler);
 	RTGUI_WIDGET(textview)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 
 	/* set field */

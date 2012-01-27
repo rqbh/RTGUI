@@ -28,7 +28,7 @@ static void _rtgui_slider_constructor(rtgui_slider_t *slider)
 	/* init widget and set event handler */
 	RTGUI_WIDGET(slider)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 	rtgui_widget_set_rect(RTGUI_WIDGET(slider), &rect);
-	rtgui_object_set_event_handler(RTGUI_WIDGET(slider), rtgui_slider_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(slider), rtgui_slider_event_handler);
 
 	/* set proper of control */
 	slider->min = RTGUI_SLIDER_DEFAULT_MIN;

@@ -384,7 +384,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 
 		if (win->on_activate != RT_NULL)
 		{
-			win->on_activate(RTGUI_WIDGET(object), event);
+			win->on_activate(RTGUI_OBJECT(object), event);
 		}
 		break;
 
@@ -411,7 +411,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 
 			if (win->on_deactivate != RT_NULL)
 			{
-				win->on_deactivate(RTGUI_WIDGET(object), event);
+				win->on_deactivate(RTGUI_OBJECT(object), event);
 			}
 		}
 		break;
@@ -496,7 +496,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 						)->event_handler(RTGUI_OBJECT(win->modal_widget),
 										 event);
 		}
-		else if (RTGUI_CONTAINER(win)->focused != object &&
+		else if (RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused) != object &&
 				 RTGUI_CONTAINER(win)->focused != RT_NULL)
 		{
 			RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused

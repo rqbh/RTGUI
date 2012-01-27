@@ -19,6 +19,7 @@
 #include <rtgui/image.h>
 #include <rtgui/rtgui_theme.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_application.h>
 #include <rtgui/widgets/window.h>
 
 struct rtgui_topwin* rtgui_server_focus_topwin = RT_NULL;

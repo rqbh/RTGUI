@@ -86,7 +86,7 @@ DECLARE_CLASS_TYPE(type);
 /** Gets the type of an object */
 #define RTGUI_OBJECT_TYPE       RTGUI_TYPE(type)
 /** Casts the object to an rtgui_object_t */
-#define RTGUI_OBJECT(obj)       (RTGUI_OBJECT_CAST((obj), RTGUI_OBJECT_TYPE, rtgui_object_t))
+#define RTGUI_OBJECT(obj)       (RTGUI_OBJECT_CAST((obj), RTGUI_OBJECT_TYPE, struct rtgui_object))
 /** Checks if the object is an rtgui_Object */
 #define RTGUI_IS_OBJECT(obj)    (RTGUI_OBJECT_CHECK_TYPE((obj), RTGUI_OBJECT_TYPE))
 

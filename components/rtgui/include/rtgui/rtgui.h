@@ -24,6 +24,7 @@
 struct rtgui_panel;
 struct rtgui_event;
 
+struct rtgui_object;
 struct rtgui_widget;
 struct rtgui_win;
 struct rtgui_font;

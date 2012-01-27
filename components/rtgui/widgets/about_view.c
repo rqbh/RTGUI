@@ -21,7 +21,7 @@ static void _rtgui_about_view_constructor(struct rtgui_about_view *view)
 	struct rtgui_rect rect = {0, 0, 200, 200};
 
 	/* set default widget rect and set event handler */
-	rtgui_object_set_event_handler(RTGUI_WIDGET(view),rtgui_about_view_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(view),rtgui_about_view_event_handler);
 	rtgui_widget_set_rect(RTGUI_WIDGET(view), &rect);
 
 	RTGUI_WIDGET(view)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
@@ -64,7 +64,7 @@ void rtgui_about_view_ondraw(struct rtgui_about_view* view)
 	rtgui_dc_end_drawing(dc);
 }
 
-rt_bool_t rtgui_about_view_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_about_view_event_handler(struct rtgui_object* widget, struct rtgui_event* event)
 {
 	struct rtgui_about_view* view = RT_NULL;
 

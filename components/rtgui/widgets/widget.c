@@ -301,7 +301,7 @@ void rtgui_widget_focus(rtgui_widget_t *widget)
 
 	/* invoke on focus in call back */
 	if (widget->on_focus_in != RT_NULL)
-   		widget->on_focus_in(widget, RT_NULL);
+   		widget->on_focus_in(RTGUI_OBJECT(widget), RT_NULL);
 }
 
 /**
@@ -318,7 +318,7 @@ void rtgui_widget_unfocus(rtgui_widget_t *widget)
 	widget->flag &= ~RTGUI_WIDGET_FLAG_FOCUS;
 
 	if (widget->on_focus_out != RT_NULL)
-   		widget->on_focus_out(widget, RT_NULL);
+   		widget->on_focus_out(RTGUI_OBJECT(widget), RT_NULL);
 
 	/* refresh widget */
 	rtgui_widget_update(widget);

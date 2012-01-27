@@ -39,6 +39,6 @@ struct rtgui_about_view
 typedef struct rtgui_about_view rtgui_about_view_t;
 
 rtgui_about_view_t* rtgui_about_view_create(rtgui_image_t *logo, const char* description);
-rt_bool_t rtgui_about_view_event_handler(struct rtgui_widget* widget, struct rtgui_event* event);
+rt_bool_t rtgui_about_view_event_handler(struct rtgui_object* widget, struct rtgui_event* event);
 
 #endif

@@ -191,7 +191,7 @@ rt_bool_t rtgui_container_event_handler(struct rtgui_object* object, struct rtgu
 
 	default:
 		/* call parent widget event handler */
-		return rtgui_widget_event_handler(widget, event);
+		return rtgui_widget_event_handler(RTGUI_OBJECT(widget), event);
 	}
 
 	return RT_FALSE;
@@ -339,7 +339,7 @@ void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box)
 }
 #endif
 
-rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
+rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
 {
 	struct rtgui_application *app;
 
@@ -367,12 +367,12 @@ rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t 
 	{
 		/* set modal mode */
 		app->state_flag |= RTGUI_APPLICATION_FLAG_MODALED;
-		app->modal_object = RTGUI_WIDGET(container);
+		app->modal_object = RTGUI_OBJECT(container);
 
 		/* perform app event loop */
 		_rtgui_application_event_loop(app);
 
-		app->exit_code = RT_NULL;
+		app->exit_code = 0;
 		return app->exit_code;
 	}
 

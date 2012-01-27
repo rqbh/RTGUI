@@ -323,7 +323,7 @@ rt_bool_t rtgui_notebook_event_handler(struct rtgui_object* object, struct rtgui
 						)->event_handler != RT_NULL)
 				return RTGUI_OBJECT(notebook->childs[notebook->current].widget
 						)->event_handler(
-							notebook->childs[notebook->current].widget,
+							RTGUI_OBJECT(notebook->childs[notebook->current].widget),
 							event);
 		}
 	}

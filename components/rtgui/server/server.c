@@ -594,6 +594,8 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     case RTGUI_EVENT_COMMAND:
         break;
     }
+
+	return RT_TRUE;
 }
 
 /**
@@ -614,7 +616,7 @@ static void rtgui_server_entry(void* parameter)
     if (rtgui_server_application == RT_NULL)
         return;
 
-    rtgui_object_set_event_handler(rtgui_server_application,
+    rtgui_object_set_event_handler(RTGUI_OBJECT(rtgui_server_application),
                                    rtgui_server_event_handler);
 	/* init mouse and show */
 	rtgui_mouse_init();
@@ -630,8 +632,8 @@ static void rtgui_server_entry(void* parameter)
 
 void rtgui_server_post_event(struct rtgui_event* event, rt_size_t size)
 {
-	if (rtgui_server_application != RT_NULL)
-		rtgui_application_send(rtgui_server_application, event, size);
+	if (rtgui_server_tid != RT_NULL)
+		rtgui_application_send(rtgui_server_tid, event, size);
 	else
 		rt_kprintf("post when server is not running\n");
 }

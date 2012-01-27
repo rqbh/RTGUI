@@ -70,7 +70,7 @@ rtgui_list_view_t* rtgui_list_view_create(const struct rtgui_list_item* items, r
     rtgui_rect_t *rect, rt_uint16_t flag);
 void rtgui_list_view_destroy(rtgui_list_view_t* view);
 
-rt_bool_t rtgui_list_view_event_handler(struct rtgui_widget* widget, struct rtgui_event* event);
+rt_bool_t rtgui_list_view_event_handler(struct rtgui_object* widget, struct rtgui_event* event);
 
 #endif
 

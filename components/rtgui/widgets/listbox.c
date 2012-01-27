@@ -20,7 +20,7 @@
 static void _rtgui_listbox_constructor(struct rtgui_listbox *box)
 {
 	/* set default widget rect and set event handler */
-	rtgui_object_set_event_handler(RTGUI_WIDGET(box),rtgui_listbox_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(box),rtgui_listbox_event_handler);
 
 	RTGUI_WIDGET(box)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 
@@ -322,7 +322,7 @@ rt_bool_t rtgui_listbox_event_handler(struct rtgui_widget* widget, struct rtgui_
 	}
 
     /* use box event handler */
-    return rtgui_widget_event_handler(widget, event);
+    return rtgui_widget_event_handler(RTGUI_OBJECT(widget), event);
 }
 
 rtgui_listbox_t* rtgui_listbox_create(const struct rtgui_listbox_item* items, rt_uint16_t count, rtgui_rect_t *rect)

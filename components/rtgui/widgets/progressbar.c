@@ -8,7 +8,7 @@ static void _rtgui_progressbar_constructor(rtgui_progressbar_t *bar)
 {
 	rtgui_rect_t rect = {0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT};
 
-	rtgui_object_set_event_handler(RTGUI_WIDGET(bar), rtgui_progressbar_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(bar), rtgui_progressbar_event_handler);
 	rtgui_widget_set_rect(RTGUI_WIDGET(bar), &rect);
 
 	bar->orient = RTGUI_HORIZONTAL;

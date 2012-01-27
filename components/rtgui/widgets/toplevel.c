@@ -54,7 +54,7 @@ rt_bool_t rtgui_toplevel_event_handler(struct rtgui_object* object, rtgui_event_
 	RT_ASSERT(object != RT_NULL);
 	RT_ASSERT(event != RT_NULL);
 
-	toplevel = RTGUI_OBJECT(object);
+	toplevel = RTGUI_TOPLEVEL(object);
 
 	switch (event->type)
 	{

@@ -19,7 +19,7 @@ static void _rtgui_iconbox_constructor(rtgui_iconbox_t *iconbox)
 {
 	/* init widget and set event handler */
 	RTGUI_WIDGET(iconbox)->flag |= RTGUI_WIDGET_FLAG_TRANSPARENT;
-	rtgui_object_set_event_handler(RTGUI_WIDGET(iconbox), rtgui_iconbox_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(iconbox), rtgui_iconbox_event_handler);
 
 	/* set proper of control */
 	iconbox->image = RT_NULL;

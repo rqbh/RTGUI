@@ -20,7 +20,7 @@ static void rtgui_listctrl_update_current(struct rtgui_listctrl* ctrl, rt_uint16
 static void _rtgui_listctrl_constructor(struct rtgui_listctrl *ctrl)
 {
 	/* set default widget rect and set event handler */
-	rtgui_object_set_event_handler(RTGUI_WIDGET(ctrl),rtgui_listctrl_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(ctrl),rtgui_listctrl_event_handler);
 
 	RTGUI_WIDGET(ctrl)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 
@@ -356,7 +356,7 @@ rt_bool_t rtgui_listctrl_event_handler(struct rtgui_widget* widget, struct rtgui
 	}
 
     /* use ctrl event handler */
-    return rtgui_widget_event_handler(widget, event);
+    return rtgui_widget_event_handler(RTGUI_OBJECT(widget), event);
 }
 
 rtgui_listctrl_t* rtgui_listctrl_create(rt_uint32_t items, rt_uint16_t count, rtgui_rect_t *rect, 

@@ -10,7 +10,7 @@ static void _rtgui_combobox_constructor(rtgui_combobox_t *box)
 	rtgui_rect_t rect = {0, 0, RTGUI_COMBOBOX_WIDTH, RTGUI_COMBOBOX_HEIGHT};
 
 	/* init widget and set event handler */
-	rtgui_object_set_event_handler(RTGUI_WIDGET(box), rtgui_combobox_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(box), rtgui_combobox_event_handler);
 	rtgui_widget_set_rect(RTGUI_WIDGET(box), &rect);
 
 	RTGUI_WIDGET_TEXTALIGN(RTGUI_WIDGET(box)) = RTGUI_ALIGN_CENTER_VERTICAL;
