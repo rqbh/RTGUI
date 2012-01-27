@@ -338,7 +338,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 {
 	struct rtgui_win* win;
 
-	RT_ASSERT(win != RT_NULL);
+	RT_ASSERT(object != RT_NULL);
 	RT_ASSERT(event != RT_NULL);
 
 	win = RTGUI_WIN(object);

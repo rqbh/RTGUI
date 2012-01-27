@@ -257,7 +257,7 @@ static rt_bool_t _rtgui_application_detach_panel(
 {
 	struct rtgui_event_panel_detach edetach;
 
-	if (RTGUI_TOPLEVEL(app)->server == RT_NULL)
+	if (app->server == RT_NULL)
 		return RT_FALSE;
 
 	RTGUI_EVENT_PANEL_DETACH_INIT(&edetach);
@@ -266,12 +266,12 @@ static rt_bool_t _rtgui_application_detach_panel(
 	edetach.panel = app->panel;
 
 	/* send PANEL DETACH to server */
-	if (rtgui_application_send_sync(RTGUI_TOPLEVEL(app)->server,
+	if (rtgui_application_send_sync(app->server,
 				               RTGUI_EVENT(&edetach),
 							   sizeof(struct rtgui_event_panel_detach)) != RT_EOK)
 		return RT_FALSE;
 
-	RTGUI_TOPLEVEL(app)->server = RT_NULL;
+	app->server = RT_NULL;
 
 	return RT_TRUE;
 }
@@ -288,7 +288,7 @@ static void _rtgui_application_destructor(struct rtgui_application *app)
 }
 
 DEFINE_CLASS_TYPE(application, "application",
-	RTGUI_TOPLEVEL_TYPE,
+	RTGUI_OBJECT_TYPE,
 	_rtgui_application_constructor,
 	_rtgui_application_destructor,
 	sizeof(struct rtgui_application));
@@ -818,7 +818,7 @@ rt_err_t rtgui_application_show(struct rtgui_application* app)
 
 	RT_ASSERT(app != RT_NULL);
 
-	if (RTGUI_TOPLEVEL(app)->server == RT_NULL)
+	if (app->server == RT_NULL)
 		return -RT_ERROR;
 
 	RTGUI_EVENT_PANEL_SHOW_INIT(&eraise);
@@ -830,7 +830,7 @@ rt_err_t rtgui_application_show(struct rtgui_application* app)
 		return -RT_ERROR;
 
 	RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(app));
-	rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));
+	/*rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));*/
 
 	app->state_flag |= RTGUI_APPLICATION_FLAG_SHOWN;
 
@@ -843,18 +843,18 @@ rt_err_t rtgui_application_hide(struct rtgui_application* app)
 
 	RT_ASSERT(app != RT_NULL);
 
-	if (RTGUI_TOPLEVEL(app)->server == RT_NULL)
+	if (app->server == RT_NULL)
 		return RT_FALSE;
 
 	RTGUI_EVENT_PANEL_HIDE_INIT(&ehide);
 
 	ehide.panel = app->panel;
-	if (rtgui_application_send_sync(RTGUI_TOPLEVEL(app)->server, RTGUI_EVENT(&ehide),
+	if (rtgui_application_send_sync(app->server, RTGUI_EVENT(&ehide),
 				sizeof(struct rtgui_event_panel_hide)) != RT_EOK)
 		return -RT_ERROR;
 
 	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(app));
-	rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));
+	/*rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));*/
 
 	app->state_flag &= ~RTGUI_APPLICATION_FLAG_SHOWN;
 
