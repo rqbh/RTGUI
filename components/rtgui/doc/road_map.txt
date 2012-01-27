@@ -1,7 +1,6 @@
 RTGUI for 1.1 路线图(排名不分先后)
 1, 把 rtgui_thread 给去掉，变成 rtgui_application ，消除原来的 rtgui_thread +
-mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 extent(这个或许
-不用，用时再取也好。)
+mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 extent。(Done)
    1.1, rtgui_application_run 运行主事件循环
 
 2, workbench，window并成一个，其事件主循环并合并到rtgui_application中。
