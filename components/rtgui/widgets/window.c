@@ -120,28 +120,46 @@ rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel,
 
 	/* allocate win memory */
 	win = RTGUI_WIN(rtgui_widget_create(RTGUI_WIN_TYPE));
-	if (win != RT_NULL)
+	if (win == RT_NULL)
+		return RT_NULL;
+
+	if (parent_toplevel == RT_NULL)
+	{
+		struct rtgui_application *app;
+
+		app = rtgui_application_self();
+		if (app == RT_NULL)
+		{
+			rt_kprintf("please create rtgui_application before creating window.\n");
+			goto __on_err;
+		}
+
+		rtgui_application_set_root_object(RTGUI_OBJECT(win));
+	}
+	else
 	{
 		/* set parent toplevel */
 		win->parent_toplevel = parent_toplevel;
-
-		/* set title, rect and style */
-		if (title != RT_NULL)
-			win->title = rt_strdup(title);
-		else
-			win->title = RT_NULL;
-
-		rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
-		win->style = style;
-
-		if (_rtgui_win_create_in_server(win) == RT_FALSE)
-		{
-			rtgui_widget_destroy(RTGUI_WIDGET(win));
-			return RT_NULL;
-		}
 	}
 
+	/* set title, rect and style */
+	if (title != RT_NULL)
+		win->title = rt_strdup(title);
+	else
+		win->title = RT_NULL;
+
+	rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
+	win->style = style;
+
+	if (_rtgui_win_create_in_server(win) == RT_FALSE)
+	{
+		goto __on_err;
+	}
 	return win;
+
+__on_err:
+	rtgui_widget_destroy(RTGUI_WIDGET(win));
+	return RT_NULL;
 }
 
 void rtgui_win_destroy(struct rtgui_win* win)
