@@ -148,11 +148,13 @@ void rtgui_win_destroy(struct rtgui_win* win)
 {
 	if (win->flag & RTGUI_WIN_FLAG_MODAL)
 	{
-		/* end modal */
+		/* set the RTGUI_WIN_STYLE_DESTROY_ON_CLOSE flag so the window will be
+		 * destroyed after the event_loop */
+		win->style |= RTGUI_WIN_STYLE_DESTROY_ON_CLOSE;
 		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
 	}
-
-	rtgui_widget_destroy(RTGUI_WIDGET(win));
+	else
+		rtgui_widget_destroy(RTGUI_WIDGET(win));
 }
 
 static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
@@ -164,20 +166,18 @@ static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
 			return RT_FALSE;
 	}
 
-	if (win->flag & RTGUI_WIN_FLAG_MODAL)
-	{
-		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
-	}
-
 	rtgui_win_hiden(win);
 
 	win->flag |= RTGUI_WIN_FLAG_CLOSED;
 
-	/* ugly part here. If the window is a stand alone window, we have to
-	 * destroy is after the event loop. */
-	if (win->parent_toplevel != RT_NULL &&
-		win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
+	if (win->flag & RTGUI_WIN_FLAG_MODAL)
+	{
+		rtgui_win_end_modal(win, RTGUI_MODAL_CANCEL);
+	}
+	else if (win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
+	{
 		rtgui_win_destroy(win);
+	}
 
 	return RT_TRUE;
 }
@@ -241,8 +241,12 @@ void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
         RTGUI_OBJECT(win)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
         _rtgui_application_event_loop(rtgui_application_self(),
                                       RTGUI_OBJECT(win));
-
 		win->flag &= ~RTGUI_WIN_FLAG_MODAL;
+
+		if (win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
+		{
+			rtgui_win_destroy(win);
+		}
     }
 
 	return;
