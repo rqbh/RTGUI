@@ -15,6 +15,8 @@
 #include <rtgui/rtgui.h>
 #include <rtgui/event.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_object.h>
+#include <rtgui/rtgui_application.h>
 #include <rtgui/driver.h>
 
 #include "mouse.h"
@@ -22,7 +24,7 @@
 #include "topwin.h"
 
 static struct rt_thread *rtgui_server_tid;
-static struct rt_messagequeue *rtgui_server_mq;
+static struct rtgui_application *rtgui_server_application;
 
 extern struct rtgui_topwin* rtgui_server_focus_topwin;
 struct rtgui_panel* rtgui_server_focus_panel = RT_NULL;
@@ -39,23 +41,23 @@ void rtgui_server_create_application(struct rtgui_event_panel_attach* event)
 		if (panel->wm_thread != RT_NULL)
 		{
 			/* notify to workbench */
-			rtgui_thread_send(panel->wm_thread, &(event->parent), sizeof(struct rtgui_event_panel_attach));
+			rtgui_application_send(panel->wm_thread, &(event->parent), sizeof(struct rtgui_event_panel_attach));
 		}
 
 		/* send the responses - ok */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 		/* send the panel info */
 		ep.panel = panel;
 		ep.extent = panel->extent;
-		rtgui_thread_send(event->parent.sender, (struct rtgui_event*)&ep, sizeof(ep));
+		rtgui_application_send(event->parent.sender, (struct rtgui_event*)&ep, sizeof(ep));
 
 		rtgui_panel_thread_add(event->panel_name, event->parent.sender);
 	}
 	else
 	{
 		/* send the responses - failure */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_NRC);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_NRC);
 	}
 }
 
@@ -68,11 +70,11 @@ void rtgui_server_destroy_application(struct rtgui_event_panel_detach* event)
 		if (panel->wm_thread != RT_NULL)
 		{
 			/* notify to workbench */
-			rtgui_thread_send(panel->wm_thread, &(event->parent), sizeof(struct rtgui_event_panel_detach));
+			rtgui_application_send(panel->wm_thread, &(event->parent), sizeof(struct rtgui_event_panel_detach));
 		}
 
 		/* send the responses */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 		rtgui_panel_thread_remove(panel, event->parent.sender);
 
@@ -85,14 +87,14 @@ void rtgui_server_destroy_application(struct rtgui_event_panel_detach* event)
 				struct rtgui_event_paint epaint;
 				RTGUI_EVENT_PAINT_INIT(&epaint);
 				epaint.wid = RT_NULL;
-				rtgui_thread_send(tid, (struct rtgui_event*)&epaint, sizeof(epaint));
+				rtgui_application_send(tid, (struct rtgui_event*)&epaint, sizeof(epaint));
 			}
 		}
 	}
 	else
 	{
 		/* send the responses - failure */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_NRC);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_NRC);
 	}
 }
 
@@ -105,12 +107,12 @@ void rtgui_server_thread_panel_show(struct rtgui_event_panel_show* event)
 		struct rtgui_event_paint epaint;
 
 		/* send the responses */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 		if (panel->wm_thread != RT_NULL)
 		{
 			/* notify to workbench */
-			rtgui_thread_send(panel->wm_thread, &(event->parent), sizeof(struct rtgui_event_panel_show));
+			rtgui_application_send(panel->wm_thread, &(event->parent), sizeof(struct rtgui_event_panel_show));
 		}
 
 		rtgui_panel_set_active_thread(panel, event->parent.sender);
@@ -121,13 +123,13 @@ void rtgui_server_thread_panel_show(struct rtgui_event_panel_show* event)
 		/* send paint event */
 		RTGUI_EVENT_PAINT_INIT(&epaint);
 		epaint.wid = RT_NULL;
-		rtgui_thread_send(event->parent.sender, (struct rtgui_event*)&epaint,
+		rtgui_application_send(event->parent.sender, (struct rtgui_event*)&epaint,
 			sizeof(epaint));
 	}
 	else
 	{
 		/* send failed */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 	}
 }
 
@@ -140,7 +142,7 @@ void rtgui_server_thread_panel_hide(struct rtgui_event_panel_hide* event)
 		rt_thread_t tid;
 
 		/* send the responses */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 		if (panel->thread_list.next != RT_NULL)
 		{
@@ -166,13 +168,13 @@ void rtgui_server_thread_panel_hide(struct rtgui_event_panel_hide* event)
 			/* send paint event */
 			RTGUI_EVENT_PAINT_INIT(&epaint);
 			epaint.wid = RT_NULL;
-			rtgui_thread_send(tid, (struct rtgui_event*)&epaint, sizeof(epaint));
+			rtgui_application_send(tid, (struct rtgui_event*)&epaint, sizeof(epaint));
 		}
 	}
 	else
 	{
 		/* send failed */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 	}
 }
 
@@ -263,7 +265,7 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 			}
 
 			/* send to client thread */
-			rtgui_thread_send(topwin->tid, &(ewin.parent), sizeof(ewin));
+			rtgui_application_send(topwin->tid, &(ewin.parent), sizeof(ewin));
 
 			return;
 		}
@@ -291,7 +293,7 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 		else
 		{
 			/* send mouse event to thread */
-			rtgui_thread_send(wnd->tid, (struct rtgui_event*)event, sizeof(struct rtgui_event_mouse));
+			rtgui_application_send(wnd->tid, (struct rtgui_event*)event, sizeof(struct rtgui_event_mouse));
 		}
 		return ;
 	}
@@ -315,7 +317,7 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 		/* send mouse event to thread */
 		if (rtgui_panel_get_active_thread(panel) != RT_NULL)
 		{
-			rtgui_thread_send(rtgui_panel_get_active_thread(panel),
+			rtgui_application_send(rtgui_panel_get_active_thread(panel),
 				(struct rtgui_event*)event,
 				sizeof(struct rtgui_event_mouse));
 		}
@@ -399,7 +401,7 @@ void rtgui_server_handle_mouse_motion(struct rtgui_event_mouse* event)
 		if (tid != RT_NULL)
 		{
 			event->wid = RT_NULL;
-			rtgui_thread_send(tid, &(event->parent), sizeof(struct rtgui_event_mouse));
+			rtgui_application_send(tid, &(event->parent), sizeof(struct rtgui_event_mouse));
 		}
 	}
 	else if (last_monitor_topwin != RT_NULL)
@@ -407,7 +409,7 @@ void rtgui_server_handle_mouse_motion(struct rtgui_event_mouse* event)
 		event->wid = last_monitor_topwin->wid;
 
 		/* send mouse motion event */
-		rtgui_thread_send(last_monitor_topwin->tid, &(event->parent), sizeof(struct rtgui_event_mouse));
+		rtgui_application_send(last_monitor_topwin->tid, &(event->parent), sizeof(struct rtgui_event_mouse));
 	}
 
 	if (last_monitor_panel != panel)
@@ -420,7 +422,7 @@ void rtgui_server_handle_mouse_motion(struct rtgui_event_mouse* event)
 
 			/* send mouse motion event */
 			if (tid != RT_NULL)
-				rtgui_thread_send(tid, &(event->parent), sizeof(struct rtgui_event_mouse));
+				rtgui_application_send(tid, &(event->parent), sizeof(struct rtgui_event_mouse));
 		}
 	}
 
@@ -432,7 +434,7 @@ void rtgui_server_handle_mouse_motion(struct rtgui_event_mouse* event)
 			event->wid = last_monitor_topwin->wid;
 
 			/* send mouse motion event */
-			rtgui_thread_send(last_monitor_topwin->tid, &(event->parent), sizeof(struct rtgui_event_mouse));
+			rtgui_application_send(last_monitor_topwin->tid, &(event->parent), sizeof(struct rtgui_event_mouse));
 		}
 	}
 
@@ -458,7 +460,7 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
 		event->wid = wnd->wid;
 
 		/* send keyboard event to thread */
-		rtgui_thread_send(wnd->tid, (struct rtgui_event*)event, sizeof(struct rtgui_event_kbd));
+		rtgui_application_send(wnd->tid, (struct rtgui_event*)event, sizeof(struct rtgui_event_kbd));
 
 		return;
 	}
@@ -476,7 +478,7 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
 			event->wid = RT_NULL;
 
 			/* send keyboard event to thread */
-			rtgui_thread_send(tid, (struct rtgui_event*)event, sizeof(struct rtgui_event_kbd));
+			rtgui_application_send(tid, (struct rtgui_event*)event, sizeof(struct rtgui_event_kbd));
 		}
 	}
 }
@@ -484,6 +486,115 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
+                                            struct rtgui_event *event)
+{
+    RT_ASSERT(object != RT_NULL);
+    RT_ASSERT(event != RT_NULL);
+
+    rt_kprintf("server got event:%x\n", event->type);
+    /* dispatch event */
+    switch (event->type)
+    {
+        /* panel event */
+    case RTGUI_EVENT_PANEL_ATTACH:
+        /* register an application in panel */
+        rtgui_server_create_application((struct rtgui_event_panel_attach*)event);
+        break;
+
+    case RTGUI_EVENT_PANEL_DETACH:
+        /* unregister an application */
+        rtgui_server_destroy_application((struct rtgui_event_panel_detach*)event);
+        break;
+
+    case RTGUI_EVENT_PANEL_SHOW:
+        /* handle raise an application */
+        rtgui_server_thread_panel_show((struct rtgui_event_panel_show*)event);
+        break;
+
+    case RTGUI_EVENT_PANEL_HIDE:
+        /* handle hide an application */
+        rtgui_server_thread_panel_hide((struct rtgui_event_panel_hide*)event);
+        break;
+
+    case RTGUI_EVENT_SET_WM:
+        /* handle set workbench manager event */
+        rtgui_server_handle_set_wm((struct rtgui_event_set_wm*)event);
+        break;
+
+        /* window event */
+    case RTGUI_EVENT_WIN_CREATE:
+        rtgui_application_ack(event, RTGUI_STATUS_OK);
+        rtgui_topwin_add((struct rtgui_event_win_create*)event);
+        break;
+
+    case RTGUI_EVENT_WIN_DESTROY:
+        if (rtgui_topwin_remove(((struct rtgui_event_win*)event)->wid) == RT_EOK)
+            rtgui_application_ack(event, RTGUI_STATUS_OK);
+        else
+            rtgui_application_ack(event, RTGUI_STATUS_ERROR);
+        break;
+
+    case RTGUI_EVENT_WIN_SHOW:
+        rtgui_topwin_show((struct rtgui_event_win*)event);
+        break;
+
+    case RTGUI_EVENT_WIN_HIDE:
+        rtgui_topwin_hide((struct rtgui_event_win*)event);
+        break;
+
+    case RTGUI_EVENT_WIN_MOVE:
+        rtgui_topwin_move((struct rtgui_event_win_move*)event);
+        break;
+
+    case RTGUI_EVENT_WIN_RESIZE:
+        rtgui_topwin_resize(((struct rtgui_event_win_resize*)event)->wid,
+                &(((struct rtgui_event_win_resize*)event)->rect));
+        break;
+
+        /* other event */
+    case RTGUI_EVENT_UPDATE_BEGIN:
+#ifdef RTGUI_USING_MOUSE_CURSOR
+        /* hide cursor */
+        rtgui_mouse_hide_cursor();
+#endif
+        break;
+
+    case RTGUI_EVENT_UPDATE_END:
+        /* handle screen update */
+        rtgui_server_handle_update((struct rtgui_event_update_end*)event);
+#ifdef RTGUI_USING_MOUSE_CURSOR
+        /* show cursor */
+        rtgui_mouse_show_cursor();
+#endif
+        break;
+
+    case RTGUI_EVENT_MONITOR_ADD:
+        /* handle mouse monitor */
+        rtgui_server_handle_monitor_add((struct rtgui_event_monitor*)event);
+        break;
+
+        /* mouse and keyboard event */
+    case RTGUI_EVENT_MOUSE_MOTION:
+        /* handle mouse motion event */
+        rtgui_server_handle_mouse_motion((struct rtgui_event_mouse*)event);
+        break;
+
+    case RTGUI_EVENT_MOUSE_BUTTON:
+        /* handle mouse button */
+        rtgui_server_handle_mouse_btn((struct rtgui_event_mouse*)event);
+        break;
+
+    case RTGUI_EVENT_KBD:
+        /* handle keyboard event */
+        rtgui_server_handle_kbd((struct rtgui_event_kbd*)event);
+        break;
+
+    case RTGUI_EVENT_COMMAND:
+        break;
+    }
+}
 
 /**
  * rtgui server thread's entry
@@ -496,150 +607,40 @@ static void rtgui_server_entry(void* parameter)
 	SetThreadPriority(hCurrentThread, THREAD_PRIORITY_HIGHEST);
 #endif
 
-#ifdef RTGUI_USING_SMALL_SIZE
-	/* create rtgui server msgq */
-	rtgui_server_mq = rt_mq_create("rtgui",
-		32, 16, RT_IPC_FLAG_FIFO);
-#else
-	/* create rtgui server msgq */
-	rtgui_server_mq = rt_mq_create("rtgui",
-		256, 8, RT_IPC_FLAG_FIFO);
-#endif
 	/* register rtgui server thread */
-	rtgui_thread_register(rtgui_server_tid, rtgui_server_mq);
+	rtgui_server_application = rtgui_application_create(rtgui_server_tid,
+                                                        RT_NULL,
+                                                        "rtgui");
+    if (rtgui_server_application == RT_NULL)
+        return;
 
+    rtgui_object_set_event_handler(rtgui_server_application,
+                                   rtgui_server_event_handler);
 	/* init mouse and show */
 	rtgui_mouse_init();
 #ifdef RTGUI_USING_MOUSE_CURSOR
 	rtgui_mouse_show_cursor();
 #endif
 
-	while (1)
-	{
-		/* the buffer uses to receive event */
-#ifdef RTGUI_USING_SMALL_SIZE
-		char event_buf[64];
-#else
-		char event_buf[256];
-#endif
-		struct rtgui_event* event = (struct rtgui_event*)&(event_buf[0]);
+    rtgui_application_exec(rtgui_server_application);
 
-		if (rtgui_thread_recv(event, sizeof(event_buf)) == RT_EOK)
-		{
-			/* dispatch event */
-			switch (event->type)
-			{
-			/* panel event */
-			case RTGUI_EVENT_PANEL_ATTACH:
-				/* register an application in panel */
-				rtgui_server_create_application((struct rtgui_event_panel_attach*)event);
-				break;
-
-			case RTGUI_EVENT_PANEL_DETACH:
-				/* unregister an application */
-				rtgui_server_destroy_application((struct rtgui_event_panel_detach*)event);
-				break;
-
-			case RTGUI_EVENT_PANEL_SHOW:
-				/* handle raise an application */
-				rtgui_server_thread_panel_show((struct rtgui_event_panel_show*)event);
-				break;
-
-			case RTGUI_EVENT_PANEL_HIDE:
-				/* handle hide an application */
-				rtgui_server_thread_panel_hide((struct rtgui_event_panel_hide*)event);
-				break;
-
-			case RTGUI_EVENT_SET_WM:
-				/* handle set workbench manager event */
-				rtgui_server_handle_set_wm((struct rtgui_event_set_wm*)event);
-				break;
-
-			/* window event */
-			case RTGUI_EVENT_WIN_CREATE:
-				rtgui_thread_ack(event, RTGUI_STATUS_OK);
-				rtgui_topwin_add((struct rtgui_event_win_create*)event);
-				break;
-
-			case RTGUI_EVENT_WIN_DESTROY:
-				if (rtgui_topwin_remove(((struct rtgui_event_win*)event)->wid) == RT_EOK)
-					rtgui_thread_ack(event, RTGUI_STATUS_OK);
-				else
-					rtgui_thread_ack(event, RTGUI_STATUS_ERROR);
-				break;
-
-			case RTGUI_EVENT_WIN_SHOW:
-				rtgui_topwin_show((struct rtgui_event_win*)event);
-				break;
-
-			case RTGUI_EVENT_WIN_HIDE:
-				rtgui_topwin_hide((struct rtgui_event_win*)event);
-				break;
-
-			case RTGUI_EVENT_WIN_MOVE:
-				rtgui_topwin_move((struct rtgui_event_win_move*)event);
-				break;
-
-			case RTGUI_EVENT_WIN_RESIZE:
-				rtgui_topwin_resize(((struct rtgui_event_win_resize*)event)->wid,
-					&(((struct rtgui_event_win_resize*)event)->rect));
-				break;
-
-			/* other event */
-			case RTGUI_EVENT_UPDATE_BEGIN:
-#ifdef RTGUI_USING_MOUSE_CURSOR
-				/* hide cursor */
-				rtgui_mouse_hide_cursor();
-#endif
-				break;
-
-			case RTGUI_EVENT_UPDATE_END:
-				/* handle screen update */
-				rtgui_server_handle_update((struct rtgui_event_update_end*)event);
-#ifdef RTGUI_USING_MOUSE_CURSOR
-				/* show cursor */
-				rtgui_mouse_show_cursor();
-#endif
-				break;
-
-			case RTGUI_EVENT_MONITOR_ADD:
-				/* handle mouse monitor */
-				rtgui_server_handle_monitor_add((struct rtgui_event_monitor*)event);
-				break;
-
-			/* mouse and keyboard event */
-			case RTGUI_EVENT_MOUSE_MOTION:
-				/* handle mouse motion event */
-				rtgui_server_handle_mouse_motion((struct rtgui_event_mouse*)event);
-				break;
-
-			case RTGUI_EVENT_MOUSE_BUTTON:
-				/* handle mouse button */
-				rtgui_server_handle_mouse_btn((struct rtgui_event_mouse*)event);
-				break;
-
-			case RTGUI_EVENT_KBD:
-				/* handle keyboard event */
-				rtgui_server_handle_kbd((struct rtgui_event_kbd*)event);
-				break;
-
-			case RTGUI_EVENT_COMMAND:
-				break;
-			}
-		}
-	}
-
-	/* unregister in rtgui thread */
-	// rtgui_thread_deregister(rt_thread_self());
+    rtgui_application_destroy(rtgui_server_application);
+    rtgui_server_application = RT_NULL;
 }
 
 void rtgui_server_post_event(struct rtgui_event* event, rt_size_t size)
 {
-	rt_mq_send(rtgui_server_mq, event, size);
+	if (rtgui_server_application != RT_NULL)
+		rtgui_application_send(rtgui_server_application, event, size);
+	else
+		rt_kprintf("post when server is not running\n");
 }
 
-void rtgui_server_init()
+void rtgui_server_init(void)
 {
+    if (rtgui_server_tid != RT_NULL)
+        return;
+
 	rtgui_server_tid = rt_thread_create("rtgui",
 		rtgui_server_entry, RT_NULL,
 		RTGUI_SVR_THREAD_STACK_SIZE,

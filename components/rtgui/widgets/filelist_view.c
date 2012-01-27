@@ -685,7 +685,7 @@ rtgui_filelist_view_t* rtgui_filelist_view_create(struct rtgui_application *app,
 		view->page_items = rtgui_rect_height(*rect) / (1 + rtgui_theme_get_selected_height());
 		rtgui_filelist_view_set_directory(view, directory);
 
-		rtgui_application_add_container(app, RTGUI_CONTAINER(view));
+		/*rtgui_application_add_container(app, RTGUI_CONTAINER(view));*/
 	}
 
 	return view;

@@ -197,7 +197,7 @@ void rtgui_panel_set_active_thread(rtgui_panel_t* panel, rt_thread_t tid)
 
 		ehide.panel = panel;
 		ehide.application = RT_NULL;
-		rtgui_thread_send_urgent(prev_actived, &(ehide.parent), sizeof (ehide));
+		rtgui_application_send_urgent(prev_actived, &(ehide.parent), sizeof (ehide));
 	}
 
 	if (panel != RT_NULL )

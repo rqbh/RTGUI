@@ -97,7 +97,7 @@ void rtgui_win_destroy(rtgui_win_t* win);
  */
 rt_bool_t rtgui_win_close(struct rtgui_win* win);
 
-rtgui_modal_code_t rtgui_win_show(rtgui_win_t* win, rt_bool_t is_modal);
+void rtgui_win_show(struct rtgui_win *win, rt_bool_t is_modal);
 void rtgui_win_hiden(rtgui_win_t* win);
 void rtgui_win_end_modal(rtgui_win_t* win, rtgui_modal_code_t modal_code);
 

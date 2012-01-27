@@ -72,4 +72,10 @@
 #define RTGUI_APP_THREAD_STACK_SIZE		2048
 #endif
 
+#ifdef RTGUI_USING_SMALL_SIZE
+#define RTGUI_EVENT_BUFFER_SIZE	32
+#else
+#define RTGUI_EVENT_BUFFER_SIZE	256
+#endif
+
 #endif

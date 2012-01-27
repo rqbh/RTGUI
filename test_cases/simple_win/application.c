@@ -3,9 +3,53 @@
 #include <rtgui/rtgui.h>
 #include <rtgui/rtgui_server.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_application.h>
+#include <rtgui/widgets/window.h>
+#include <rtgui/widgets/label.h>
 #include <rtgui/driver.h>
 
 #include "test_cases.h"
+
+struct rtgui_application* app;
+rtgui_win_t *win1;
+rtgui_win_t *win2;
+
+rt_bool_t on_window_close(struct rtgui_widget* widget, struct rtgui_event* event)
+{
+	rt_kprintf("win %s(%p) closing\n",
+			rtgui_win_get_title(RTGUI_WIN(widget)),
+			widget);
+	rtgui_win_show(win2, RT_FALSE);
+	return RT_TRUE;
+}
+
+void create_wins(void)
+{
+	rtgui_label_t *label;
+	rtgui_rect_t rect = {40, 40, 200, 80};
+
+	/* 斐膘珨跺敦諳 */
+	win1 = rtgui_win_create(RT_NULL,
+		"test window", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rtgui_win_set_onclose(win1, on_window_close);
+
+	/* 耀怓珆尨敦諳 */
+	rtgui_win_show(win1, RT_TRUE);
+
+	/* 斐膘珨跺敦諳 */
+	win2 = rtgui_win_create(RT_NULL,
+		"test window2", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rect.x1 += 20;
+	rect.x2 -= 5;
+	rect.y1 += 5;
+	rect.y2 = rect.y1 + 20;
+
+	label = rtgui_label_create("test label in win");
+	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
+	rtgui_container_add_child(RTGUI_CONTAINER(win2), RTGUI_WIDGET(label));
+}
 
 void rt_init_thread_entry(void* parameter)
 {
@@ -13,34 +57,21 @@ void rt_init_thread_entry(void* parameter)
     extern void rt_hw_lcd_init();
     extern void rtgui_touch_hw_init(void);
 
-    rt_device_t lcd;
+	app = rtgui_application_create(
+			rt_thread_self(),
+			"main",
+			"guiapp");
 
-    /* init lcd */
-    rt_hw_lcd_init();
+	RT_ASSERT(app != RT_NULL);
 
-    /* init touch panel */
-    /*rtgui_touch_hw_init();*/
+	create_wins();
 
-    /* re-init device driver */
-    rt_device_init_all();
+    /*window_focus();*/
 
-    /* find lcd device */
-    lcd = rt_device_find("sdl");
+	rtgui_application_exec(app);
 
-    /* set lcd device as rtgui graphic driver */
-    rtgui_graphic_set_device(lcd);
-
-    rtgui_system_server_init();
-
-    become_rtgui_thread();
-
-    show_win1();
-
-    show_win2();
-
-    window_focus();
-
-    end_become_rtgui_thread();
+	rtgui_application_destroy(app);
+	rt_kprintf("app destroyed\n");
 }
 
 int rt_application_init()
@@ -52,7 +83,7 @@ int rt_application_init()
 #if (RT_THREAD_PRIORITY_MAX == 32)
 	init_thread = rt_thread_create("init",
 								rt_init_thread_entry, RT_NULL,
-								2048, 8, 20);
+								2048, 20, 20);
 #else
 	init_thread = rt_thread_create("init",
 								rt_init_thread_entry, RT_NULL,

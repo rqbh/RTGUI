@@ -16,6 +16,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/rtgui_application.h>
 #include <rtgui/widgets/container.h>
+#include <rtgui/widgets/toplevel.h>
 
 static void _rtgui_container_constructor(rtgui_container_t *container)
 {
@@ -57,7 +58,6 @@ static void _rtgui_container_destructor(rtgui_container_t *container)
 			rtgui_container_end_modal(container, RTGUI_MODAL_CANCEL);
 
 		app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
-		rtgui_application_remove_container(app, container);
 	}
 
 	if (container->title != RT_NULL)
@@ -354,7 +354,6 @@ rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t 
 	}
 
 	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
-	rtgui_application_show_container(app, container);
 	if (RTGUI_CONTAINER(container)->focused != RT_NULL)
 		rtgui_widget_focus(RTGUI_CONTAINER(container)->focused);
 	else
@@ -368,20 +367,20 @@ rtgui_modal_code_t rtgui_container_show(rtgui_container_t* container, rt_bool_t 
 	{
 		/* set modal mode */
 		app->state_flag |= RTGUI_APPLICATION_FLAG_MODALED;
-		app->modal_widget = RTGUI_WIDGET(container);
+		app->modal_object = RTGUI_WIDGET(container);
 
 		/* perform app event loop */
 		_rtgui_application_event_loop(app);
 
-		app->modal_widget = RT_NULL;
-		return app->modal_code;
+		app->exit_code = RT_NULL;
+		return app->exit_code;
 	}
 
 	/* no modal mode, always return modal_ok */
 	return RTGUI_MODAL_OK;
 }
 
-void rtgui_container_end_modal(rtgui_container_t* container, rtgui_modal_code_t modal_code)
+void rtgui_container_end_modal(rtgui_container_t* container, rt_base_t exit_code)
 {
 	struct rtgui_application *app;
 
@@ -389,7 +388,7 @@ void rtgui_container_end_modal(rtgui_container_t* container, rtgui_modal_code_t 
 	if ((container == RT_NULL) || (RTGUI_WIDGET(container)->parent == RT_NULL))return ;
 
 	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
-	app->modal_code = modal_code;
+	app->exit_code = exit_code;
 	app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
 
 	/* remove modal mode */
@@ -405,10 +404,6 @@ void rtgui_container_hide(rtgui_container_t* container)
 		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(container));
 		return;
 	}
-
-	rtgui_application_hide_container(
-			(struct rtgui_application*)(RTGUI_WIDGET(container)->parent),
-			container);
 }
 
 char* rtgui_container_get_title(rtgui_container_t* container)

@@ -90,6 +90,13 @@ DECLARE_CLASS_TYPE(type);
 /** Checks if the object is an rtgui_Object */
 #define RTGUI_IS_OBJECT(obj)    (RTGUI_OBJECT_CHECK_TYPE((obj), RTGUI_OBJECT_TYPE))
 
+enum rtgui_object_flag
+{
+    RTGUI_OBJECT_FLAG_NONE     = 0x00,
+    RTGUI_OBJECT_FLAG_STATIC   = 0x01,
+    RTGUI_OBJECT_FLAG_DISABLED = 0x02
+};
+
 /* rtgui base object */
 struct rtgui_object
 {
@@ -99,7 +106,7 @@ struct rtgui_object
 	/* the event handler */
 	rtgui_event_handler_ptr event_handler;
 
-	rt_bool_t is_static;
+	enum rtgui_object_flag flag;
 };
 
 rtgui_object_t *rtgui_object_create(rtgui_type_t *object_type);

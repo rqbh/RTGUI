@@ -17,7 +17,6 @@
 #include <rtthread.h>
 #include <rtgui/rtgui.h>
 #include <rtgui/rtgui_system.h>
-#include <rtgui/widgets/toplevel.h>
 
 DECLARE_CLASS_TYPE(application);
 
@@ -41,11 +40,13 @@ enum rtgui_application_flag
 };
 #define RTGUI_APPLICATION_IS_MODALED(w) ((w)->state_flag & RTGUI_APPLICATION_FLAG_MODALED)
 
+typedef void (*rtgui_idle_func)(struct rtgui_object* obj, struct rtgui_event *event);
+
 struct rtgui_application
 {
-	struct rtgui_toplevel parent;
+	struct rtgui_object parent;
 
-	/* panel id */
+	/* panel */
 	struct rtgui_panel *panel;
 
 	/* application name */
@@ -56,14 +57,30 @@ struct rtgui_application
 	rt_base_t exit_code;
 
 	// TODO: remove some unneeded variables
-	rtgui_modal_code_t modal_code;
-	rtgui_widget_t *modal_widget;
-	rtgui_container_t* current_view;
+	struct rtgui_object *modal_object;
 
-    rt_mq_t mq;
-    rtgui_thread_t *gui_thread;
+	/* the thread id */
+	rt_thread_t tid;
+    rt_thread_t server;
+
+	/* the message queue of thread */
+	rt_mq_t mq;
+
+	/* the object I sent event to */
+	struct rtgui_object *root_object;
+	/* event buffer */
+	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
+
+	/* on idle event handler */
+	rtgui_idle_func on_idle;
 };
 
+/**
+ * create an application named @myname on thread @param tid
+ *
+ * If the panel_name is RT_NULL, then the application won't attach to any
+ * server and panel. Suitable for use in the server thread
+ */
 struct rtgui_application* rtgui_application_create(
         rt_thread_t tid,
         const char *panel_name,
@@ -73,10 +90,24 @@ rt_err_t rtgui_application_show(struct rtgui_application *app);
 rt_err_t rtgui_application_hide(struct rtgui_application *app);
 
 rt_base_t rtgui_application_exec(struct rtgui_application *app);
-void rtgui_application_exit(rt_base_t code);
+void rtgui_application_exit(struct rtgui_application *app, rt_base_t code);
 
-void rtgui_application_add_container(struct rtgui_application *app, rtgui_container_t *view);
-void rtgui_application_remove_container(struct rtgui_application *app, rtgui_container_t *view);
-void rtgui_application_show_container(struct rtgui_application *app, rtgui_container_t *view);
-void rtgui_application_hide_container(struct rtgui_application *app, rtgui_container_t *view);
+void rtgui_application_set_onidle(rtgui_idle_func onidle);
+rtgui_idle_func rtgui_application_get_onidle(void);
+struct rtgui_application* rtgui_application_self(void);
+
+rt_thread_t rtgui_application_get_server(void);
+
+void rtgui_application_set_root_object(struct rtgui_object* object);
+struct rtgui_object* rtgui_application_get_root_object(void);
+
+struct rtgui_event;
+rt_err_t rtgui_application_send(rt_thread_t tid, struct rtgui_event* event, rt_size_t event_size);
+rt_err_t rtgui_application_send_urgent(rt_thread_t tid, struct rtgui_event* event, rt_size_t event_size);
+rt_err_t rtgui_application_send_sync(rt_thread_t tid, struct rtgui_event* event, rt_size_t event_size);
+rt_err_t rtgui_application_ack(struct rtgui_event* event, rt_int32_t status);
+rt_err_t rtgui_application_recv(struct rtgui_event* event, rt_size_t event_size);
+rt_err_t rtgui_application_recv_nosuspend(struct rtgui_event* event, rt_size_t event_size);
+rt_err_t rtgui_application_recv_filter(rt_uint32_t type, struct rtgui_event* event, rt_size_t event_size);
+
 #endif /* end of include guard: RTGUI_APPLICATION_H */

@@ -153,7 +153,7 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 				/* activate the window */
 				RTGUI_EVENT_WIN_ACTIVATE_INIT(&wevent);
 				wevent.wid = wnd->wid;
-				rtgui_thread_send(wnd->tid, &(wevent.parent), sizeof(struct rtgui_event_win));
+				rtgui_application_send(wnd->tid, &(wevent.parent), sizeof(struct rtgui_event_win));
 
 				/* set new focus topwin */
 				rtgui_server_focus_topwin = wnd;
@@ -215,7 +215,7 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* win)
 	/* activate the raised window */
 	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
 	event.wid = win->wid;
-	rtgui_thread_send(win->tid, &(event.parent), sizeof(struct rtgui_event_win));
+	rtgui_application_send(win->tid, &(event.parent), sizeof(struct rtgui_event_win));
 
 	/* redraw title */
 	if (win->title != RT_NULL)
@@ -232,7 +232,7 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* win)
 		/* deactivate the old focus win  */
 		RTGUI_EVENT_WIN_DEACTIVATE_INIT(&event);
 		event.wid = rtgui_server_focus_topwin->wid;
-		rtgui_thread_send(rtgui_server_focus_topwin->tid,
+		rtgui_application_send(rtgui_server_focus_topwin->tid,
 			&event.parent, sizeof(struct rtgui_event_win));
 
 		/* redraw title */
@@ -258,7 +258,7 @@ void rtgui_topwin_deactivate_win(struct rtgui_topwin* win)
 	struct rtgui_event_win event;
 	RTGUI_EVENT_WIN_DEACTIVATE_INIT(&event);
 	event.wid = win->wid;
-	rtgui_thread_send(win->tid,
+	rtgui_application_send(win->tid,
 		&event.parent, sizeof(struct rtgui_event_win));
 
 	win->flag &= ~WINTITLE_ACTIVATE;
@@ -312,7 +312,7 @@ void rtgui_topwin_raise(struct rtgui_win* wid, rt_thread_t sender)
 				eclip.wid = wnd->wid;
 
 				/* send to destination window */
-				rtgui_thread_send(wnd->tid, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
+				rtgui_application_send(wnd->tid, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
 
 				/* reset clip info in title */
 				if (wnd->title != RT_NULL)
@@ -360,7 +360,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		/* update clip info */
 		rtgui_topwin_update_clip();
 
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 		/* activate this window */
 		rtgui_topwin_activate_win(topwin);
@@ -373,7 +373,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		{
 			if (_rtgui_topwin_show_list.next != &(topwin->list))
 			{
-				rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+				rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 				/* not the front window, raise it */
 				rtgui_topwin_raise(wid, sender);
@@ -387,7 +387,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		else
 		{
 			/* there is no wnd in wnd list */
-			rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
+			rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 		}
 	}
 }
@@ -416,7 +416,7 @@ void rtgui_topwin_update_clip_to_panel(struct rtgui_panel* panel)
 
 	/* send to the activated thread of panel */
 	tid = rtgui_panel_get_active_thread(panel);
-	rtgui_thread_send(tid, &eclip.parent, sizeof(struct rtgui_event_clip_info));
+	rtgui_application_send(tid, &eclip.parent, sizeof(struct rtgui_event_clip_info));
 }
 #else
 void rtgui_topwin_update_clip_to_panel(struct rtgui_panel* panel)
@@ -461,7 +461,7 @@ void rtgui_topwin_update_clip_to_panel(struct rtgui_panel* panel)
 
 	/* send to the activated thread of panel */
 	tid = rtgui_panel_get_active_thread(panel);
-	rtgui_thread_send(tid, (struct rtgui_event*)eclip, sizeof(struct rtgui_event_clip_info)
+	rtgui_application_send(tid, (struct rtgui_event*)eclip, sizeof(struct rtgui_event_clip_info)
 		+ count* sizeof(struct rtgui_rect));
 
 	/* release clip info event */
@@ -520,11 +520,11 @@ void rtgui_topwin_hide(struct rtgui_event_win* event)
 	}
 	else
 	{
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 		return;
 	}
 
-	rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 }
 
 /* move top window */
@@ -541,7 +541,7 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 		struct rtgui_list_node* node;
 
 		/* send status ok */
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 
 		/* get the delta move x, y */
 		dx = event->x - topwin->extent.x1;
@@ -581,7 +581,7 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 			struct rtgui_event_paint epaint;
 			RTGUI_EVENT_PAINT_INIT(&epaint);
 			epaint.wid = topwin->wid;
-			rtgui_thread_send(topwin->tid, &(epaint.parent), sizeof(epaint));
+			rtgui_application_send(topwin->tid, &(epaint.parent), sizeof(epaint));
 		}
 
 		/* update old window coverage area */
@@ -589,7 +589,7 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 	}
 	else
 	{
-		rtgui_thread_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
+		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 	}
 }
 
@@ -677,7 +677,7 @@ static void rtgui_topwin_update_clip()
 		count ++;
 
 		/* send to destination window */
-		rtgui_thread_send(wnd->tid, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
+		rtgui_application_send(wnd->tid, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
 
 		/* update clip in win title */
 		if (wnd->title != RT_NULL)
@@ -707,7 +707,7 @@ static void rtgui_topwin_update_clip()
 			thread = rtgui_list_entry(panel_node, struct rtgui_panel_thread, list);
 
 			/* send clip info to panel */
-			rtgui_thread_send(thread->tid, &(eclip.parent),	sizeof(struct rtgui_event_clip_info));
+			rtgui_application_send(thread->tid, &(eclip.parent),	sizeof(struct rtgui_event_clip_info));
 		}
 	}
 }
@@ -727,7 +727,7 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 		{
 			/* draw window */
 			epaint.wid = wnd->wid;
-			rtgui_thread_send(wnd->tid, &(epaint.parent), sizeof(epaint));
+			rtgui_application_send(wnd->tid, &(epaint.parent), sizeof(epaint));
 
 			/* draw title */
 			if (wnd->title != RT_NULL)
@@ -752,7 +752,7 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 			{
 				/* draw panel */
 				epaint.wid = RT_NULL;
-				rtgui_thread_send(tid, &(epaint.parent), sizeof(epaint));
+				rtgui_application_send(tid, &(epaint.parent), sizeof(epaint));
 			}
 		}
 	}
@@ -766,7 +766,7 @@ void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mou
 	if (rtgui_rect_contains_point(&win->extent, event->x, event->y) == RT_EOK)
 	{
 		/* send mouse event to thread */
-		rtgui_thread_send(win->tid, &(event->parent), sizeof(struct rtgui_event_mouse));
+		rtgui_application_send(win->tid, &(event->parent), sizeof(struct rtgui_event_mouse));
 		return;
 	}
 
@@ -805,7 +805,7 @@ void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mou
 				/* send close event to window */
 				RTGUI_EVENT_WIN_CLOSE_INIT(&event);
 				event.wid = win->wid;
-				rtgui_thread_send(win->tid, &(event.parent), sizeof(struct rtgui_event_win));
+				rtgui_application_send(win->tid, &(event.parent), sizeof(struct rtgui_event_win));
 			}
 		}
 	}

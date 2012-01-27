@@ -53,7 +53,7 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 		/* destroy in server */
 		RTGUI_EVENT_WIN_DESTROY_INIT(&edestroy);
 		edestroy.wid = win;
-		if (rtgui_thread_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&edestroy),
+		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&edestroy),
 			sizeof(struct rtgui_event_win_destroy)) != RT_EOK)
 		{
 			/* destroy in server failed */
@@ -74,7 +74,7 @@ static rt_bool_t _rtgui_win_create_in_server(rtgui_win_t* win)
 		RTGUI_EVENT_WIN_CREATE_INIT(&ecreate);
 
 		/* get server thread id */
-		server = rtgui_thread_get_server();
+		server = rtgui_application_get_server();
 		if (server == RT_NULL)
 		{
 			rt_kprintf("RTGUI server is not running...\n");
@@ -89,7 +89,7 @@ static rt_bool_t _rtgui_win_create_in_server(rtgui_win_t* win)
 		rt_strncpy((char*)ecreate.title, (char*)win->title, RTGUI_NAME_MAX);
 #endif
 
-		if (rtgui_thread_send_sync(server, RTGUI_EVENT(&ecreate),
+		if (rtgui_application_send_sync(server, RTGUI_EVENT(&ecreate),
 			sizeof(struct rtgui_event_win_create)) != RT_EOK)
 		{
 			rt_kprintf("create win: %s failed\n", win->title);
@@ -153,7 +153,7 @@ static rt_bool_t _rtgui_win_deal_close(struct rtgui_win *win,
 {
 	if (win->on_close != RT_NULL)
 	{
-		if (win->on_close(RTGUI_WIDGET(win), event) == RT_FALSE)
+		if (win->on_close(RTGUI_OBJECT(win), event) == RT_FALSE)
 			return RT_FALSE;
 	}
 
@@ -186,18 +186,18 @@ rt_bool_t rtgui_win_close(struct rtgui_win* win)
 								 (struct rtgui_event*)&eclose);
 }
 
-rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
+// TODO: return modal code
+void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 {
-	rtgui_modal_code_t result;
 
-	RT_ASSERT(win != RT_NULL);
-	result = RTGUI_MODAL_CANCEL;
+	if (win == RT_NULL)
+		return;
 
 	/* if it does not register into server, create it in server */
 	if (RTGUI_TOPLEVEL(win)->server == RT_NULL)
 	{
 		if (_rtgui_win_create_in_server(win) == RT_FALSE)
-			return result;
+			return;
 	}
 
 	if (RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)))
@@ -207,11 +207,11 @@ rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 		RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
 		eshow.wid = win;
 
-		if (rtgui_thread_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&eshow),
+		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&eshow),
 			sizeof(struct rtgui_event_win_show)) != RT_EOK)
 		{
 			/* hide window failed */
-			return result;
+			return;
 		}
 
 		/* set window unhidden */
@@ -220,84 +220,22 @@ rtgui_modal_code_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 	else
 		rtgui_widget_update(RTGUI_WIDGET(win));
 
-	if (is_modal == RT_TRUE)
-	{
-		if (win->parent_toplevel != RT_NULL)
-		{
-			rtgui_widget_t *parent_widget;
+    if (is_modal == RT_TRUE)
+    {
+        RTGUI_OBJECT(win)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
+        _rtgui_application_event_loop(rtgui_application_self(),
+                                      RTGUI_OBJECT(win));
+    }
 
-			/* set style */
-			win->flag |= RTGUI_WIN_FLAG_MODAL;
-
-			/* get root toplevel */
-			parent_widget = RTGUI_WIDGET(win->parent_toplevel);
-			if (RTGUI_IS_APPLICATION(parent_widget))
-			{
-				struct rtgui_application *app;
-				app = RTGUI_APPLICATION(win->parent_toplevel);
-				app->state_flag |= RTGUI_APPLICATION_FLAG_MODALED;
-				app->modal_widget = RTGUI_WIDGET(win);
-
-				_rtgui_application_event_loop(app);
-				result = app->modal_code;
-				app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
-				app->modal_widget = RT_NULL;
-			}
-			else if (RTGUI_IS_WIN(parent_widget))
-			{
-				rtgui_win_t* parent_win;
-				parent_win = RTGUI_WIN(win->parent_toplevel);
-				parent_win->flag |= RTGUI_WIN_FLAG_UNDER_MODAL;
-				parent_win->modal_widget = RTGUI_WIDGET(win);
-
-				rtgui_win_event_loop(parent_win);
-				result = parent_win->modal_code;
-				parent_win->flag &= ~RTGUI_WIN_FLAG_UNDER_MODAL;
-				parent_win->modal_widget = RT_NULL;
-			}
-		}
-		else
-		{
-			/* which is a root window */
-			win->flag |= RTGUI_WIN_FLAG_MODAL;
-			rtgui_win_event_loop(win);
-
-			result = win->modal_code;
-			win->flag &= ~RTGUI_WIN_FLAG_MODAL;
-		}
-	}
-
-	return result;
+	return;
 }
 
 void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 {
-	if (win->parent_toplevel != RT_NULL)
-	{
-		if (RTGUI_IS_APPLICATION(win->parent_toplevel))
-		{
-			struct rtgui_application *app;
+    if (win == RT_NULL)
+        return;
 
-			/* which is shown under app */
-			app = RTGUI_APPLICATION(win->parent_toplevel);
-			app->modal_code = modal_code;
-			app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
-		}
-		else if (RTGUI_IS_WIN(win->parent_toplevel))
-		{
-			rtgui_win_t* parent_win;
-
-			/* which is shown under win */
-			parent_win = RTGUI_WIN(win->parent_toplevel);
-			parent_win->modal_code = modal_code;
-			parent_win->flag &= ~RTGUI_WIN_FLAG_UNDER_MODAL;
-		}
-	}
-	else
-	{
-		/* which is a stand alone window */
-		win->modal_code = modal_code;
-	}
+    RTGUI_OBJECT(win)->flag |= RTGUI_OBJECT_FLAG_DISABLED;
 
 	/* remove modal mode */
 	win->flag &= ~RTGUI_WIN_FLAG_MODAL;
@@ -315,7 +253,7 @@ void rtgui_win_hiden(struct rtgui_win* win)
 		RTGUI_EVENT_WIN_HIDE_INIT(&ehide);
 		ehide.wid = win;
 
-		if (rtgui_thread_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&ehide),
+		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&ehide),
 			sizeof(struct rtgui_event_win_hide)) != RT_EOK)
 		{
 			rt_kprintf("hide win: %s failed\n", win->title);
@@ -352,7 +290,7 @@ void rtgui_win_move(struct rtgui_win* win, int x, int y)
 		emove.wid 	= win;
 		emove.x		= x;
 		emove.y		= y;
-		if (rtgui_thread_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&emove),
+		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&emove),
 			sizeof(struct rtgui_event_win_move)) != RT_EOK)
 		{
 			return;
@@ -377,7 +315,8 @@ static rt_bool_t rtgui_win_ondraw(struct rtgui_win* win)
 
 	/* begin drawing */
 	dc = rtgui_dc_begin_drawing(RTGUI_WIDGET(win));
-	if (dc == RT_NULL) return RT_FALSE;
+	if (dc == RT_NULL)
+		return RT_FALSE;
 
 	/* get window rect */
 	rtgui_widget_get_rect(RTGUI_WIDGET(win), &rect);
@@ -387,7 +326,8 @@ static rt_bool_t rtgui_win_ondraw(struct rtgui_win* win)
 	/* paint each widget */
 	RTGUI_EVENT_PAINT_INIT(&event);
 	event.wid = RT_NULL;
-	rtgui_container_dispatch_event(RTGUI_CONTAINER(win), (rtgui_event_t*)&event);
+	rtgui_container_dispatch_event(RTGUI_CONTAINER(win),
+								   (rtgui_event_t*)&event);
 
 	rtgui_dc_end_drawing(dc);
 
@@ -456,7 +396,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 			RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
 			eshow.wid = win;
 
-			rtgui_thread_send(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&eshow),
+			rtgui_application_send(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&eshow),
 				sizeof(struct rtgui_event_win_show));
 		}
 		else
@@ -483,6 +423,11 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 		else
 #endif
 			rtgui_win_ondraw(win);
+		break;
+
+	case RTGUI_EVENT_PANEL_SHOW:
+		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
+		rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(win));
 		break;
 
 	case RTGUI_EVENT_MOUSE_BUTTON:
@@ -569,92 +514,6 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 	return RT_FALSE;
 }
 
-/* windows event loop */
-void rtgui_win_event_loop(rtgui_win_t* wnd)
-{
-	rt_err_t result;
-	rtgui_thread_t* tid;
-	struct rtgui_event* event;
-
-	tid = rtgui_thread_self();
-	RT_ASSERT(tid != RT_NULL);
-
-	/* point to event buffer */
-	event = (struct rtgui_event*)tid->event_buffer;
-
-	if (wnd->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
-	{
-		while (wnd->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
-		{
-			if (tid->on_idle != RT_NULL)
-			{
-				result = rtgui_thread_recv_nosuspend(event, RTGUI_EVENT_BUFFER_SIZE);
-				if (result == RT_EOK)
-				{
-					/* perform event handler */
-					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
-							RTGUI_OBJECT(wnd),
-							event);
-				}
-				else if (result == -RT_ETIMEOUT)
-				{
-					tid->on_idle(RTGUI_WIDGET(wnd), RT_NULL);
-				}
-			}
-			else
-			{
-				result = rtgui_thread_recv(event, RTGUI_EVENT_BUFFER_SIZE);
-				if (result == RT_EOK)
-				{
-					/* perform event handler */
-					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
-							RTGUI_OBJECT(wnd),
-							event);
-				}
-			}
-		}
-	}
-	else
-	{
-		while (!(wnd->flag & RTGUI_WIN_FLAG_CLOSED))
-		{
-			if (tid->on_idle != RT_NULL)
-			{
-				result = rtgui_thread_recv_nosuspend(event, RTGUI_EVENT_BUFFER_SIZE);
-				if (result == RT_EOK)
-				{
-					/* perform event handler */
-					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
-							RTGUI_OBJECT(wnd),
-							event);
-				}
-				else if (result == -RT_ETIMEOUT)
-				{
-					tid->on_idle(RTGUI_WIDGET(wnd), RT_NULL);
-				}
-			}
-			else
-			{
-				result = rtgui_thread_recv(event, RTGUI_EVENT_BUFFER_SIZE);
-				if (result == RT_EOK)
-				{
-					/* perform event handler */
-					RTGUI_OBJECT(RTGUI_WIDGET(wnd))->event_handler(
-							RTGUI_OBJECT(wnd),
-							event);
-				}
-			}
-		}
-	}
-
-	/* it's expected that the window is shown before the event loop and exit
-	 * the event loop on closed. So do the cleanups here */
-	rtgui_win_hiden(wnd);
-
-	if (wnd->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
-		rtgui_win_destroy(wnd);
-}
-
 void rtgui_win_set_rect(rtgui_win_t* win, rtgui_rect_t* rect)
 {
 	struct rtgui_event_win_resize event;
@@ -670,7 +529,7 @@ void rtgui_win_set_rect(rtgui_win_t* win, rtgui_rect_t* rect)
 		event.wid = win;
 		event.rect = *rect;
 
-		rtgui_thread_send(RTGUI_TOPLEVEL(win)->server, &(event.parent), sizeof(struct rtgui_event_win_resize));
+		rtgui_application_send(RTGUI_TOPLEVEL(win)->server, &(event.parent), sizeof(struct rtgui_event_win_resize));
 	}
 }
 

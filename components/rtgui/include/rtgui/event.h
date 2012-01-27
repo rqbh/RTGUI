@@ -156,20 +156,21 @@ struct rtgui_event_panel_info
 #define RTGUI_EVENT_PANEL_HIDE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_HIDE)
 #define RTGUI_EVENT_PANEL_INFO_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_INFO)
 
+#define _RTGUI_EVENT_WIN_ELEMENTS \
+	struct rtgui_event parent; \
+	struct rtgui_win *wid;
+
 /*
  * RTGUI Window Event
  */
 struct rtgui_event_win
 {
-	struct rtgui_event parent;
-
-	/* the window id */
-	rtgui_win_t* wid;
+	_RTGUI_EVENT_WIN_ELEMENTS
 };
 
 struct rtgui_event_win_create
 {
-	struct rtgui_event parent;
+	_RTGUI_EVENT_WIN_ELEMENTS
 
 #ifndef RTGUI_USING_SMALL_SIZE
 	/* the window title */
@@ -177,27 +178,17 @@ struct rtgui_event_win_create
 	/* the window extent */
 	struct rtgui_rect extent;
 #endif
-
-	/* the window id */
-	rtgui_win_t* wid;
 };
 
 struct rtgui_event_win_move
 {
-	struct rtgui_event parent;
-
-	/* the window id */
-	rtgui_win_t* wid;
-
+	_RTGUI_EVENT_WIN_ELEMENTS
 	rt_int16_t x, y;
 };
 
 struct rtgui_event_win_resize
 {
-	struct rtgui_event parent;
-
-	/* the window id */
-	rtgui_win_t* wid;
+	_RTGUI_EVENT_WIN_ELEMENTS
 
 	rtgui_rect_t rect;
 };
@@ -254,23 +245,19 @@ struct rtgui_event_update_end
 
 struct rtgui_event_monitor
 {
-	struct rtgui_event parent;
+	_RTGUI_EVENT_WIN_ELEMENTS
 
 	/* the monitor rect */
 	rtgui_rect_t rect;
 
 	/* under panel */
 	rtgui_panel_t* panel;
-
-	/* or under window */
-	rtgui_win_t* wid;
 };
 
 struct rtgui_event_paint
 {
-	struct rtgui_event parent;
+	_RTGUI_EVENT_WIN_ELEMENTS
 
-	rtgui_win_t* wid;		/* destination window */
 	rtgui_rect_t rect;		/* rect to be updated */
 };
 
@@ -286,10 +273,7 @@ typedef struct rtgui_event_timer rtgui_event_timer_t;
 
 struct rtgui_event_clip_info
 {
-	struct rtgui_event parent;
-
-	/* destination window */
-	rtgui_win_t* wid;
+	_RTGUI_EVENT_WIN_ELEMENTS
 
 	/* the number of rects */
 	rt_uint32_t num_rect;
@@ -311,9 +295,7 @@ struct rtgui_event_clip_info
  */
 struct rtgui_event_mouse
 {
-	struct rtgui_event parent;
-
-	rtgui_win_t* wid;		/* destination window */
+	_RTGUI_EVENT_WIN_ELEMENTS
 
 	rt_uint16_t x, y;
 	rt_uint16_t button;
@@ -329,9 +311,7 @@ struct rtgui_event_mouse
 
 struct rtgui_event_kbd
 {
-	struct rtgui_event parent;
-
-	rtgui_win_t* wid;		/* destination window */
+	_RTGUI_EVENT_WIN_ELEMENTS
 
 	rt_uint16_t type;		/* key down or up */
 	rt_uint16_t key;		/* current key */
@@ -415,5 +395,7 @@ struct rtgui_event_resize
 	rt_int16_t w, h;
 };
 #define RTGUI_EVENT_RESIZE_INIT(e) RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_RESIZE)
+
+#undef _RTGUI_EVENT_WIN_ELEMENT
 
 #endif
