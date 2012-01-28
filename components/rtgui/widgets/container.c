@@ -341,8 +341,6 @@ void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box)
 
 rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
 {
-	struct rtgui_application *app;
-
 	/* parameter check */
 	if (container == RT_NULL)
 		return RTGUI_MODAL_CANCEL;
@@ -353,7 +351,6 @@ rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
 		return RTGUI_MODAL_CANCEL;
 	}
 
-	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
 	if (RTGUI_CONTAINER(container)->focused != RT_NULL)
 		rtgui_widget_focus(RTGUI_CONTAINER(container)->focused);
 	else
@@ -365,15 +362,10 @@ rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
 	container->modal_show = is_modal;
 	if (is_modal == RT_TRUE)
 	{
-		/* set modal mode */
-		app->state_flag |= RTGUI_APPLICATION_FLAG_MODALED;
-		app->modal_object = RTGUI_OBJECT(container);
+		struct rtgui_application *app = rtgui_application_self();
 
-		/* perform app event loop */
-		_rtgui_application_event_loop(app);
-
-		app->exit_code = 0;
-		return app->exit_code;
+		RTGUI_OBJECT(container)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
+		return _rtgui_application_event_loop(app, RTGUI_OBJECT(container));
 	}
 
 	/* no modal mode, always return modal_ok */
@@ -385,11 +377,12 @@ void rtgui_container_end_modal(rtgui_container_t* container, rt_base_t exit_code
 	struct rtgui_application *app;
 
 	/* parameter check */
-	if ((container == RT_NULL) || (RTGUI_WIDGET(container)->parent == RT_NULL))return ;
+	if ((container == RT_NULL) || (RTGUI_WIDGET(container)->parent == RT_NULL))
+		return;
 
 	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
 	app->exit_code = exit_code;
-	app->state_flag &= ~RTGUI_APPLICATION_FLAG_MODALED;
+	RTGUI_OBJECT(container)->flag |= RTGUI_OBJECT_FLAG_DISABLED;
 
 	/* remove modal mode */
 	container->modal_show = RT_FALSE;

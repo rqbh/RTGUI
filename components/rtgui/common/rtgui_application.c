@@ -246,7 +246,6 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	/* set EXITED so we can destroy an application that just created */
 	app->state_flag   = RTGUI_APPLICATION_FLAG_EXITED;
 	app->exit_code    = 0;
-	app->modal_object = RT_NULL;
 	app->tid          = RT_NULL;
 	app->server       = RT_NULL;
 	app->mq           = RT_NULL;
@@ -332,7 +331,7 @@ static rt_bool_t _rtgui_application_attach_panel(
 	app->panel = (struct rtgui_panel*)event.epanel.panel;
 
 	/* set extent of application */
-	rtgui_widget_set_rect(RTGUI_WIDGET(app), &(event.epanel.extent));
+	app->extent = event.epanel.extent;
 
 	return RT_TRUE;
 }
@@ -698,35 +697,6 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 
 	case RTGUI_EVENT_MOUSE_BUTTON:
 	case RTGUI_EVENT_KBD:
-		{
-			struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
-			struct rtgui_toplevel* top = RTGUI_TOPLEVEL(wevent->wid);
-
-			/* check the destination window */
-			if (top != RT_NULL && RTGUI_OBJECT(top)->event_handler != RT_NULL)
-			{
-				RTGUI_OBJECT(top)->event_handler(RTGUI_OBJECT(top), event);
-			}
-			else
-			{
-				if (RTGUI_APPLICATION_IS_MODALED(app))
-				{
-					/* let modal widget to handle it */
-					if (app->modal_object != RT_NULL &&
-						app->modal_object->event_handler != RT_NULL)
-					{
-						app->modal_object->event_handler(app->modal_object,
-								                         event);
-					}
-				}
-				else
-				{
-					return _rtgui_application_root_object_handle(app, event);
-				}
-			}
-		}
-		break;
-
 	case RTGUI_EVENT_PAINT:
 	case RTGUI_EVENT_CLIP_INFO:
 	case RTGUI_EVENT_MOUSE_MOTION:
@@ -778,9 +748,9 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 }
 
 /* Internal API. Should not called by user. This can be simplified by only
- * dispatch the events to root window. But this will require a more context
- * variable to determine whether we should exit */
-rt_bool_t _rtgui_application_event_loop(struct rtgui_application *app,
+ * dispatch the events to root window.
+ */
+rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 		                                struct rtgui_object *object)
 {
 	rt_err_t result;
@@ -812,7 +782,7 @@ rt_bool_t _rtgui_application_event_loop(struct rtgui_application *app,
 		}
 	}
 
-	return RT_TRUE;
+	return app->exit_code;
 }
 
 rt_err_t rtgui_application_show(struct rtgui_application* app)
@@ -832,7 +802,7 @@ rt_err_t rtgui_application_show(struct rtgui_application* app)
 				sizeof(struct rtgui_event_panel_show)) != RT_EOK)
 		return -RT_ERROR;
 
-	RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(app));
+	/*RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(app));*/
 	/*rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));*/
 
 	app->state_flag |= RTGUI_APPLICATION_FLAG_SHOWN;
@@ -856,7 +826,7 @@ rt_err_t rtgui_application_hide(struct rtgui_application* app)
 				sizeof(struct rtgui_event_panel_hide)) != RT_EOK)
 		return -RT_ERROR;
 
-	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(app));
+	/*RTGUI_WIDGET_HIDE(RTGUI_WIDGET(app));*/
 	/*rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));*/
 
 	app->state_flag &= ~RTGUI_APPLICATION_FLAG_SHOWN;

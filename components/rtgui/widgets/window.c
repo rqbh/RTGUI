@@ -211,18 +211,18 @@ rt_bool_t rtgui_win_close(struct rtgui_win* win)
 								 (struct rtgui_event*)&eclose);
 }
 
-// TODO: return modal code
-void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
+rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 {
+	rt_base_t exit_code = -1;
 
 	if (win == RT_NULL)
-		return;
+		return exit_code;
 
 	/* if it does not register into server, create it in server */
 	if (RTGUI_TOPLEVEL(win)->server == RT_NULL)
 	{
 		if (_rtgui_win_create_in_server(win) == RT_FALSE)
-			return;
+			return exit_code;
 	}
 
 	if (RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)))
@@ -243,7 +243,7 @@ void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 				) != RT_EOK)
 		{
 			rt_kprintf("show win failed\n");
-			return;
+			return exit_code;
 		}
 
 		/* set window unhidden */
@@ -257,8 +257,8 @@ void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 		win->flag |= RTGUI_WIN_FLAG_MODAL;
 
         RTGUI_OBJECT(win)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
-        _rtgui_application_event_loop(rtgui_application_self(),
-                                      RTGUI_OBJECT(win));
+        exit_code = _rtgui_application_event_loop(rtgui_application_self(),
+												  RTGUI_OBJECT(win));
 		win->flag &= ~RTGUI_WIN_FLAG_MODAL;
 
 		if (win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
@@ -267,7 +267,7 @@ void rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 		}
     }
 
-	return;
+	return exit_code;
 }
 
 void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)

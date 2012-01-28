@@ -29,7 +29,6 @@ DECLARE_CLASS_TYPE(application);
 
 enum rtgui_application_flag
 {
-	RTGUI_APPLICATION_FLAG_MODALED = 0x01,
 	/* use this flag to exit from the event loop. It's different from the
 	 * EXITED flag in that when it marked as closed, it's not guarantee that
 	 * the event loop is exited already. But EXITED do.*/
@@ -38,7 +37,6 @@ enum rtgui_application_flag
 
 	RTGUI_APPLICATION_FLAG_SHOWN   = 0x08
 };
-#define RTGUI_APPLICATION_IS_MODALED(w) ((w)->state_flag & RTGUI_APPLICATION_FLAG_MODALED)
 
 typedef void (*rtgui_idle_func)(struct rtgui_object* obj, struct rtgui_event *event);
 
@@ -56,15 +54,15 @@ struct rtgui_application
 
 	rt_base_t exit_code;
 
-	// TODO: remove some unneeded variables
-	struct rtgui_object *modal_object;
-
 	/* the thread id */
 	rt_thread_t tid;
     rt_thread_t server;
 
 	/* the message queue of thread */
 	rt_mq_t mq;
+
+	/* the panel extent */
+	rtgui_rect_t extent;
 
 	/* the object I sent event to */
 	struct rtgui_object *root_object;
