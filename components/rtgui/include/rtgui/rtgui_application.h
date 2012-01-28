@@ -62,7 +62,7 @@ struct rtgui_application
 	rt_mq_t mq;
 
 	/* the panel extent */
-	rtgui_rect_t extent;
+	rtgui_rect_t panel_extent;
 
 	/* the object I sent event to */
 	struct rtgui_object *root_object;

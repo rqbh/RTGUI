@@ -330,8 +330,8 @@ static rt_bool_t _rtgui_application_attach_panel(
 	/* set panel */
 	app->panel = (struct rtgui_panel*)event.epanel.panel;
 
-	/* set extent of application */
-	app->extent = event.epanel.extent;
+	/* set panel_extent of application */
+	app->panel_extent = event.epanel.extent;
 
 	return RT_TRUE;
 }
