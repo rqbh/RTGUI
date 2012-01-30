@@ -78,4 +78,6 @@
 #define RTGUI_EVENT_BUFFER_SIZE	256
 #endif
 
+#define RTGUI_USING_CAST_CHECK
+
 #endif
