@@ -254,11 +254,17 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
     if (is_modal == RT_TRUE)
     {
+		struct rtgui_application *app;
+
+		app = rtgui_application_self();
+		RT_ASSERT(app != RT_NULL);
+
 		win->flag |= RTGUI_WIN_FLAG_MODAL;
 
-        RTGUI_OBJECT(win)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
-        exit_code = _rtgui_application_event_loop(rtgui_application_self(),
-												  RTGUI_OBJECT(win));
+		win->in_modal = 1;
+		app->modal_object = RTGUI_OBJECT(win);
+		exit_code = _rtgui_application_event_loop(app, &(win->in_modal));
+		app->modal_object = RT_NULL;
 		win->flag &= ~RTGUI_WIN_FLAG_MODAL;
 
 		if (win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
@@ -272,10 +278,11 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 {
-    if (win == RT_NULL)
-        return;
+	if (win == RT_NULL)
+		return;
 
-    RTGUI_OBJECT(win)->flag |= RTGUI_OBJECT_FLAG_DISABLED;
+	RTGUI_OBJECT(win)->flag |= RTGUI_OBJECT_FLAG_DISABLED;
+	win->in_modal = 0;
 
 	/* remove modal mode */
 	win->flag &= ~RTGUI_WIN_FLAG_MODAL;

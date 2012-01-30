@@ -250,6 +250,7 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	app->server       = RT_NULL;
 	app->mq           = RT_NULL;
 	app->root_object  = RT_NULL;
+	app->modal_object = RT_NULL;
 	app->on_idle      = RT_NULL;
 }
 
@@ -659,11 +660,15 @@ rt_err_t rtgui_application_recv_filter(rt_uint32_t type, rtgui_event_t* event, r
 	return -RT_ERROR;
 }
 
-rt_inline rt_bool_t _rtgui_application_root_object_handle(
+rt_inline rt_bool_t _rtgui_application_object_handle(
 		struct rtgui_application *app,
 		struct rtgui_event *event)
 {
-	if (app->root_object != RT_NULL &&
+	if (app->modal_object != RT_NULL &&
+		app->modal_object->event_handler != RT_NULL)
+		return app->modal_object->event_handler(app->modal_object,
+												event);
+	else if (app->root_object != RT_NULL &&
 		app->root_object->event_handler != RT_NULL)
 		return app->root_object->event_handler(app->root_object,
 											   event);
@@ -695,24 +700,42 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 		rtgui_application_hide(app);
 		break;
 
-	case RTGUI_EVENT_MOUSE_BUTTON:
-	case RTGUI_EVENT_KBD:
 	case RTGUI_EVENT_PAINT:
 	case RTGUI_EVENT_CLIP_INFO:
-	case RTGUI_EVENT_MOUSE_MOTION:
 		{
 			struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
-			struct rtgui_widget* dest_widget = RTGUI_WIDGET(wevent->wid);
-			if (dest_widget != RT_NULL &&
-				RTGUI_OBJECT(dest_widget)->event_handler != RT_NULL)
+			struct rtgui_object* dest_object = RTGUI_OBJECT(wevent->wid);
+
+			if (dest_object != RT_NULL &&
+				dest_object->event_handler != RT_NULL)
 			{
-				RTGUI_OBJECT(dest_widget)->event_handler(
-						RTGUI_OBJECT(dest_widget),
-						event);
+				dest_object->event_handler(RTGUI_OBJECT(dest_object), event);
 			}
 			else
 			{
-				_rtgui_application_root_object_handle(app, event);
+				_rtgui_application_object_handle(app, event);
+			}
+		}
+		break;
+
+	case RTGUI_EVENT_MOUSE_BUTTON:
+	case RTGUI_EVENT_MOUSE_MOTION:
+	case RTGUI_EVENT_KBD:
+		{
+			struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
+			struct rtgui_object* dest_object = RTGUI_OBJECT(wevent->wid);
+
+			// FIXME: let application determine the dest_wiget but not in sever
+			// so we can combine this handler with above one
+			if (app->modal_object != RT_NULL &&
+				dest_object != app->modal_object)
+			{
+				rt_kprintf("discard event %s that is not sent to modal object\n",
+						   event_string[event->type]);
+			}
+			else
+			{
+				_rtgui_application_object_handle(app, event);
 			}
 		}
 		break;
@@ -735,11 +758,14 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 		break;
 
 	default:
-		if (app->root_object != RT_NULL &&
-			app->root_object->event_handler != RT_NULL)
-			return app->root_object->event_handler(
-					app->root_object,
-					event);
+		if (app->modal_object != RT_NULL &&
+			app->modal_object->event_handler != RT_NULL)
+			return app->modal_object->event_handler(app->modal_object,
+													event);
+		else if (app->root_object != RT_NULL &&
+				 app->root_object->event_handler != RT_NULL)
+			return app->root_object->event_handler(app->root_object,
+												   event);
 		else
 			return rtgui_object_event_handler(object, event);
 	}
@@ -751,34 +777,32 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
  * dispatch the events to root window.
  */
 rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
-		                                struct rtgui_object *object)
+										rt_bool_t *loop_guard)
 {
 	rt_err_t result;
 	struct rtgui_event *event;
 
 	_rtgui_application_check(app);
-	RT_ASSERT(object != RT_NULL);
 
 	/* point to event buffer */
 	event = (struct rtgui_event*)app->event_buffer;
 
-	while (!(app->state_flag & RTGUI_APPLICATION_FLAG_CLOSED ||
-			 object->flag & RTGUI_OBJECT_FLAG_DISABLED ||
-			 object->event_handler == RT_NULL))
+	while (!(app->state_flag & RTGUI_APPLICATION_FLAG_CLOSED) &&
+			 *loop_guard)
 	{
 		if (app->on_idle != RT_NULL)
 		{
 			result = rtgui_application_recv_nosuspend(event, RTGUI_EVENT_BUFFER_SIZE);
 			if (result == RT_EOK)
-				object->event_handler(object, event);
+				RTGUI_OBJECT(app)->event_handler(RTGUI_OBJECT(app), event);
 			else if (result == -RT_ETIMEOUT)
-				app->on_idle(object, RT_NULL);
+				app->on_idle(RTGUI_OBJECT(app), RT_NULL);
 		}
 		else
 		{
 			result = rtgui_application_recv(event, RTGUI_EVENT_BUFFER_SIZE);
 			if (result == RT_EOK)
-				object->event_handler(object, event);
+				RTGUI_OBJECT(app)->event_handler(RTGUI_OBJECT(app), event);
 		}
 	}
 
@@ -836,6 +860,8 @@ rt_err_t rtgui_application_hide(struct rtgui_application* app)
 
 rt_base_t rtgui_application_run(struct rtgui_application *app)
 {
+	rt_bool_t loop = 1;
+
 	_rtgui_application_check(app);
 
 	if (!(app->state_flag & RTGUI_APPLICATION_FLAG_SHOWN))
@@ -846,7 +872,7 @@ rt_base_t rtgui_application_run(struct rtgui_application *app)
 	app->state_flag &= ~RTGUI_APPLICATION_FLAG_CLOSED;
 
 	app->state_flag &= ~RTGUI_APPLICATION_FLAG_EXITED;
-	_rtgui_application_event_loop(app, RTGUI_OBJECT(app));
+	_rtgui_application_event_loop(app, &loop);
 	app->state_flag |= RTGUI_APPLICATION_FLAG_EXITED;
 
 	rtgui_application_hide(app);

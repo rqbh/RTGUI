@@ -359,13 +359,14 @@ rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
 			rtgui_widget_focus(RTGUI_WIDGET(container));
 	}
 
+	// FIXME: should be no modal mode
 	container->modal_show = is_modal;
 	if (is_modal == RT_TRUE)
 	{
 		struct rtgui_application *app = rtgui_application_self();
 
 		RTGUI_OBJECT(container)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
-		return _rtgui_application_event_loop(app, RTGUI_OBJECT(container));
+		return _rtgui_application_event_loop(app, &(container->modal_show));
 	}
 
 	/* no modal mode, always return modal_ok */

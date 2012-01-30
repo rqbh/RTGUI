@@ -69,6 +69,7 @@ struct rtgui_win
 
 	rtgui_modal_code_t modal_code;
 	rtgui_widget_t* modal_widget;
+	rt_bool_t in_modal;
 
 	/* window title */
 	char* title;

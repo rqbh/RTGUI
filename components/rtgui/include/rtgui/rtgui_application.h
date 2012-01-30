@@ -60,14 +60,17 @@ struct rtgui_application
 
 	/* the message queue of thread */
 	rt_mq_t mq;
+	/* event buffer */
+	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
 
 	/* the panel extent */
 	rtgui_rect_t panel_extent;
 
 	/* the object I sent event to */
 	struct rtgui_object *root_object;
-	/* event buffer */
-	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
+	/* if not RT_NULL, the application is modaled by modal_object. If is
+	 * RT_NULL, nothing modals. */
+	struct rtgui_object *modal_object;
 
 	/* on idle event handler */
 	rtgui_idle_func on_idle;
