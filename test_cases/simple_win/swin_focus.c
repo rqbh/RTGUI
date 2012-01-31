@@ -18,10 +18,15 @@ rt_bool_t picture_win_onpaint(struct rtgui_object* object, struct rtgui_event* e
 		struct rtgui_rect rect;
 		struct rtgui_event_paint event;
 
+		rt_kprintf("handle custom paint event\n");
+
 		/* begin drawing */
 		dc = rtgui_dc_begin_drawing(RTGUI_WIDGET(widget));
 		if (dc == RT_NULL)
+		{
+			rt_kprintf("dc init failed\n");
 			return RT_FALSE;
+		}
 
 		/* get window rect */
 		rtgui_widget_get_rect(RTGUI_WIDGET(widget), &rect);
@@ -78,7 +83,6 @@ rt_bool_t window_focus(void)
 
 	rtgui_button_t* start_btn;
 	rtgui_button_t* stop_btn;
-	rtgui_toplevel_t *parent;
     rtgui_win_t *picture_win;
 	rtgui_rect_t rect = {0, 20, 240, 320};
 
@@ -140,7 +144,6 @@ rt_bool_t window_focus(void)
 	rtgui_container_add_child(RTGUI_CONTAINER(main_win),
 			RTGUI_WIDGET(stop_btn));
 
-	parent = RTGUI_TOPLEVEL(rtgui_widget_get_toplevel(RTGUI_WIDGET(start_btn)));
 	/*创建一个绘图Windows控件*/
 	rtgui_widget_get_rect(RTGUI_WIDGET(main_win), &rect);
 	rtgui_widget_rect_to_device(RTGUI_WIDGET(main_win), &rect);
@@ -148,8 +151,7 @@ rt_bool_t window_focus(void)
 	rect.y1 += 20;
 	rect.x2 = rect.x1 + 200;
 	rect.y2 = rect.y1 + 150;
-	picture_win = rtgui_win_create(parent,
-			"绘图窗口", &rect,
+	picture_win = rtgui_win_create(main_win, "绘图窗口", &rect,
             RTGUI_WIN_STYLE_NO_TITLE|RTGUI_WIN_STYLE_NO_BORDER|RTGUI_WIN_STYLE_NO_FOCUS);
     //创建窗口，没有标题栏，没有最小化窗口，也不能获取焦点
 	/* 添加windows的事件*/

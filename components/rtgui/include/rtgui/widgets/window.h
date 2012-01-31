@@ -58,8 +58,8 @@ struct rtgui_win
 	/* inherit from toplevel */
 	struct rtgui_toplevel parent;
 
-	/* parent toplevel */
-	rtgui_toplevel_t* parent_toplevel;
+	/* parent window. RT_NULL if the parent is the application. */
+	struct rtgui_win *parent_toplevel;
 
 	/* top window style */
 	rt_uint16_t style;
@@ -83,8 +83,8 @@ struct rtgui_win
 	rt_uint32_t user_data;
 };
 
-rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel, const char* title,
-	rtgui_rect_t *rect, rt_uint8_t flag);
+rtgui_win_t* rtgui_win_create(struct rtgui_win *parent_toplevel, const char* title,
+							  rtgui_rect_t *rect, rt_uint8_t flag);
 void rtgui_win_destroy(rtgui_win_t* win);
 
 /** Close window.

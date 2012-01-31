@@ -111,7 +111,7 @@ DEFINE_CLASS_TYPE(win, "win",
 	_rtgui_win_destructor,
 	sizeof(struct rtgui_win));
 
-rtgui_win_t* rtgui_win_create(rtgui_toplevel_t* parent_toplevel,
+rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_toplevel,
 		                      const char* title,
 							  rtgui_rect_t *rect,
 							  rt_uint8_t style)
