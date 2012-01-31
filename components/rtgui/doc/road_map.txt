@@ -41,7 +41,7 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 8, 添加一些工业控制当中用到的波形、仪表之类的控件。
 
 9, 在 application 中记录焦点控件，键盘事件由 application 直接投送。各个控件不记
-录焦点控件。
+录焦点控件。(Done)
 
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
