@@ -7,7 +7,6 @@ common/color.c
 common/region.c
 common/rtgui_object.c
 common/rtgui_system.c
-common/rtgui_application.c
 common/rtgui_theme.c
 common/rtgui_xml.c
 common/dc.c
@@ -35,6 +34,7 @@ common/pixel_driver.c
 """)
 
 server_src = Split("""
+server/rtgui_application.c
 server/driver.c
 server/mouse.c
 server/panel.c
