@@ -58,16 +58,6 @@ rt_bool_t rtgui_toplevel_event_handler(struct rtgui_object* object, rtgui_event_
 
 	switch (event->type)
 	{
-	case RTGUI_EVENT_KBD:
-		if (RTGUI_CONTAINER(toplevel)->focused != RT_NULL)
-		{
-			RTGUI_OBJECT(RTGUI_CONTAINER(toplevel)->focused
-					)->event_handler(
-						RTGUI_OBJECT(RTGUI_CONTAINER(toplevel)->focused),
-						event);
-		}
-		break;
-
 	case RTGUI_EVENT_CLIP_INFO:
 		/* update toplevel clip */
 		rtgui_toplevel_update_clip(toplevel);

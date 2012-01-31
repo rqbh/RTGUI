@@ -22,6 +22,7 @@
 
 static void _rtgui_win_constructor(rtgui_win_t *win)
 {
+	RTGUI_WIDGET(win)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 	/* init window attribute */
 	win->on_activate	= RT_NULL;
 	win->on_deactivate	= RT_NULL;
@@ -254,18 +255,27 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
     if (is_modal == RT_TRUE)
     {
+		struct rtgui_object *old_focus;
 		struct rtgui_application *app;
 
 		app = rtgui_application_self();
 		RT_ASSERT(app != RT_NULL);
 
+		old_focus = app->focused_widget;
+
 		win->flag |= RTGUI_WIN_FLAG_MODAL;
 
 		win->in_modal = 1;
 		app->modal_object = RTGUI_OBJECT(win);
+		rtgui_widget_focus(RTGUI_WIDGET(win));
+
 		exit_code = _rtgui_application_event_loop(app, &(win->in_modal));
+
+		rtgui_widget_unfocus(RTGUI_WIDGET(win));
 		app->modal_object = RT_NULL;
 		win->flag &= ~RTGUI_WIN_FLAG_MODAL;
+		if (old_focus != RT_NULL)
+			rtgui_widget_focus(old_focus);
 
 		if (win->style & RTGUI_WIN_STYLE_DESTROY_ON_CLOSE)
 		{
@@ -534,24 +544,6 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 		else return RT_TRUE;
 #endif
 		break;
-
-    case RTGUI_EVENT_KBD:
-		if (win->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
-		{
-			if (win->modal_widget != RT_NULL)
-				return RTGUI_OBJECT(win->modal_widget
-						)->event_handler(RTGUI_OBJECT(win->modal_widget),
-										 event);
-		}
-		else if (RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused) != object &&
-				 RTGUI_CONTAINER(win)->focused != RT_NULL)
-		{
-			RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused
-					)->event_handler(
-						RTGUI_OBJECT(RTGUI_CONTAINER(win)->focused),
-						event);
-		}
-        break;
 
 	default:
 		/* call parent event handler */

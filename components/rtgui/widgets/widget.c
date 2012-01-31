@@ -14,6 +14,7 @@
  */
 
 #include <rtgui/dc_client.h>
+#include <rtgui/rtgui_application.h>
 #include <rtgui/widgets/widget.h>
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/container.h>
@@ -273,35 +274,31 @@ void rtgui_widget_set_oncommand(rtgui_widget_t* widget, rtgui_event_handler_ptr 
  */
 void rtgui_widget_focus(rtgui_widget_t *widget)
 {
-	rtgui_container_t *parent;
+	struct rtgui_application *app;
+
+	app = rtgui_application_self();
 
 	RT_ASSERT(widget != RT_NULL);
+	RT_ASSERT(app != RT_NULL);
 
-	if (!widget->parent || !widget->toplevel) return;
 	if (!RTGUI_WIDGET_IS_FOCUSABLE(widget) || !RTGUI_WIDGET_IS_ENABLE(widget))
 		return;
 
-	/* set widget as focused */
-	widget->flag |= RTGUI_WIDGET_FLAG_FOCUS;
-
 	/* get root parent view and old focused widget */
-	parent = RTGUI_CONTAINER(widget->toplevel);
-	if (parent->focused == widget) return ; /* it's the same focused widget */
+	if (app->focused_widget == RTGUI_OBJECT(widget))
+		return; /* it's the same focused widget */
 
 	/* unfocused the old widget */
-	if (parent->focused != RT_NULL)	rtgui_widget_unfocus(parent->focused);
+	if (app->focused_widget != RT_NULL)
+		rtgui_widget_unfocus(RTGUI_WIDGET(app->focused_widget));
 
-	/* set widget as focused widget in parent link */
-	parent = RTGUI_CONTAINER(widget->parent);
-	do
-	{
-		parent->focused = widget;
-		parent = RTGUI_CONTAINER(RTGUI_WIDGET(parent)->parent);
-	} while ((parent != RT_NULL) && !RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(parent)));
+	/* set widget as focused */
+	widget->flag |= RTGUI_WIDGET_FLAG_FOCUS;
+	app->focused_widget = widget;
 
 	/* invoke on focus in call back */
 	if (widget->on_focus_in != RT_NULL)
-   		widget->on_focus_in(RTGUI_OBJECT(widget), RT_NULL);
+		widget->on_focus_in(RTGUI_OBJECT(widget), RT_NULL);
 }
 
 /**
@@ -310,7 +307,12 @@ void rtgui_widget_focus(rtgui_widget_t *widget)
  */
 void rtgui_widget_unfocus(rtgui_widget_t *widget)
 {
+	struct rtgui_application *app;
+
 	RT_ASSERT(widget != RT_NULL);
+
+	app = rtgui_application_self();
+	RT_ASSERT(app != RT_NULL);
 
 	if (!widget->toplevel || !RTGUI_WIDGET_IS_FOCUSED(widget))
 		return;
@@ -318,7 +320,9 @@ void rtgui_widget_unfocus(rtgui_widget_t *widget)
 	widget->flag &= ~RTGUI_WIDGET_FLAG_FOCUS;
 
 	if (widget->on_focus_out != RT_NULL)
-   		widget->on_focus_out(RTGUI_OBJECT(widget), RT_NULL);
+		widget->on_focus_out(RTGUI_OBJECT(widget), RT_NULL);
+
+	app->focused_widget = RT_NULL;
 
 	/* refresh widget */
 	rtgui_widget_update(widget);

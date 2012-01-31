@@ -26,8 +26,6 @@ static void _rtgui_container_constructor(rtgui_container_t *container)
 
 	rtgui_list_init(&(container->children));
 
-	/* no focus on start up */
-	container->focused = RT_NULL;
 	/* container is used to 'contain'(show) widgets and dispatch events to
 	 * them, not interact with user. So no need to grab focus. If we did it,
 	 * some widget inherited from container(e.g. notebook) will grab the focus
@@ -113,10 +111,11 @@ rt_bool_t rtgui_container_dispatch_mouse_event(rtgui_container_t *container, str
 {
 	/* handle in child widget */
 	struct rtgui_list_node* node;
-	rtgui_widget_t *focus;
+	struct rtgui_application *app;
 
-	/* get focus widget on toplevel */
-	focus = RTGUI_CONTAINER(RTGUI_WIDGET(container)->toplevel)->focused;
+	app = rtgui_application_self();
+	RT_ASSERT(app != RT_NULL);
+
 	rtgui_list_foreach(node, &(container->children))
 	{
 		struct rtgui_widget* w;
@@ -124,7 +123,7 @@ rt_bool_t rtgui_container_dispatch_mouse_event(rtgui_container_t *container, str
 		if (rtgui_rect_contains_point(&(w->extent),
 					                  event->x, event->y) == RT_EOK)
 		{
-			if ((focus != w) && RTGUI_WIDGET_IS_FOCUSABLE(w))
+			if ((app->focused_widget != w) && RTGUI_WIDGET_IS_FOCUSABLE(w))
 				rtgui_widget_focus(w);
 			if (RTGUI_OBJECT(w)->event_handler(RTGUI_OBJECT(w),
 											   (rtgui_event_t*)event) == RT_TRUE)
@@ -258,13 +257,7 @@ void rtgui_container_remove_child(rtgui_container_t *container, rtgui_widget_t* 
 	RT_ASSERT(container != RT_NULL);
 	RT_ASSERT(child != RT_NULL);
 
-	if (child == container->focused)
-	{
-		/* set focused to itself */
-		container->focused = RT_NULL;
-
-		rtgui_widget_focus(RTGUI_WIDGET(container));
-	}
+	rtgui_widget_unfocus(child);
 
 	/* remove widget from parent's children list */
 	rtgui_list_remove(&(container->children), &(child->sibling));
@@ -308,9 +301,6 @@ void rtgui_container_destroy_children(rtgui_container_t *container)
 	}
 
 	container->children.next = RT_NULL;
-	container->focused = RT_NULL;
-	if (RTGUI_WIDGET(container)->parent != RT_NULL)
-		rtgui_widget_focus(RTGUI_WIDGET(container));
 
 	/* update widget clip */
 	rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(RTGUI_WIDGET(container)->toplevel));
@@ -338,40 +328,6 @@ void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box)
 	rtgui_widget_set_rect(RTGUI_WIDGET(box), &(RTGUI_WIDGET(container)->extent));
 }
 #endif
-
-rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal)
-{
-	/* parameter check */
-	if (container == RT_NULL)
-		return RTGUI_MODAL_CANCEL;
-
-	if (RTGUI_WIDGET(container)->parent == RT_NULL)
-	{
-		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(container));
-		return RTGUI_MODAL_CANCEL;
-	}
-
-	if (RTGUI_CONTAINER(container)->focused != RT_NULL)
-		rtgui_widget_focus(RTGUI_CONTAINER(container)->focused);
-	else
-	{
-		if (RTGUI_WIDGET_IS_FOCUSABLE(RTGUI_WIDGET(container)))
-			rtgui_widget_focus(RTGUI_WIDGET(container));
-	}
-
-	// FIXME: should be no modal mode
-	container->modal_show = is_modal;
-	if (is_modal == RT_TRUE)
-	{
-		struct rtgui_application *app = rtgui_application_self();
-
-		RTGUI_OBJECT(container)->flag &= ~RTGUI_OBJECT_FLAG_DISABLED;
-		return _rtgui_application_event_loop(app, &(container->modal_show));
-	}
-
-	/* no modal mode, always return modal_ok */
-	return RTGUI_MODAL_OK;
-}
 
 void rtgui_container_end_modal(rtgui_container_t* container, rt_base_t exit_code)
 {

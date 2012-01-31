@@ -71,6 +71,8 @@ struct rtgui_application
 	/* if not RT_NULL, the application is modaled by modal_object. If is
 	 * RT_NULL, nothing modals. */
 	struct rtgui_object *modal_object;
+	/* the widget that will receive the KBD event by default */
+	struct rtgui_widget *focused_widget;
 
 	/* on idle event handler */
 	rtgui_idle_func on_idle;

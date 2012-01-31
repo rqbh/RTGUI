@@ -35,7 +35,6 @@ struct rtgui_container
 {
 	struct rtgui_widget parent;
 
-	struct rtgui_widget* focused;
 	rtgui_list_t children;
 
 	// TODO: remove this stuff that we don't need
@@ -55,7 +54,6 @@ struct rtgui_box_t;
 void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box);
 #endif
 
-rt_base_t rtgui_container_show(rtgui_container_t* container, rt_bool_t is_modal);
 void rtgui_container_hide(rtgui_container_t* container);
 void rtgui_container_end_modal(rtgui_container_t* container, rt_base_t modal_code);
 

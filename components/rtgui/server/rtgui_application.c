@@ -241,17 +241,18 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	rtgui_object_set_event_handler(RTGUI_OBJECT(app),
 			                       rtgui_application_event_handler);
 
-	app->panel        = RT_NULL;
-	app->name         = RT_NULL;
+	app->panel          = RT_NULL;
+	app->name           = RT_NULL;
 	/* set EXITED so we can destroy an application that just created */
-	app->state_flag   = RTGUI_APPLICATION_FLAG_EXITED;
-	app->exit_code    = 0;
-	app->tid          = RT_NULL;
-	app->server       = RT_NULL;
-	app->mq           = RT_NULL;
-	app->root_object  = RT_NULL;
-	app->modal_object = RT_NULL;
-	app->on_idle      = RT_NULL;
+	app->state_flag     = RTGUI_APPLICATION_FLAG_EXITED;
+	app->exit_code      = 0;
+	app->tid            = RT_NULL;
+	app->server         = RT_NULL;
+	app->mq             = RT_NULL;
+	app->root_object    = RT_NULL;
+	app->modal_object   = RT_NULL;
+	app->focused_widget = RT_NULL;
+	app->on_idle        = RT_NULL;
 }
 
 static rt_bool_t _rtgui_application_detach_panel(
@@ -718,9 +719,15 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 		}
 		break;
 
+	case RTGUI_EVENT_KBD:
+		if (app->focused_widget != RT_NULL &&
+			RTGUI_OBJECT(app->focused_widget)->event_handler != RT_NULL)
+			RTGUI_OBJECT(app->focused_widget)->event_handler(RTGUI_OBJECT(app->focused_widget),
+															 event);
+		break;
+
 	case RTGUI_EVENT_MOUSE_BUTTON:
 	case RTGUI_EVENT_MOUSE_MOTION:
-	case RTGUI_EVENT_KBD:
 		{
 			struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
 			struct rtgui_object* dest_object = RTGUI_OBJECT(wevent->wid);
