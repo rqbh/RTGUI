@@ -43,6 +43,9 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 9, 在 application 中记录焦点控件，键盘事件由 application 直接投送。各个控件不记
 录焦点控件。(Done)
 
+10, server 只派发事件给 panel 上的 application，由 application 自己派发给自己内
+部的窗口。server 不处理 topwin。
+
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
 的控件。实现这样的功能有一个就好，container 可以担当这个责任。其他需要放多个控
