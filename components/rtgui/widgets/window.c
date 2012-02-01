@@ -20,6 +20,8 @@
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/button.h>
 
+#include "../server/rtgui_application_prv.h"
+
 static void _rtgui_win_constructor(rtgui_win_t *win)
 {
 	RTGUI_WIDGET(win)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;

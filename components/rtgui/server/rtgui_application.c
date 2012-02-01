@@ -780,9 +780,6 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 	return RT_TRUE;
 }
 
-/* Internal API. Should not called by user. This can be simplified by only
- * dispatch the events to root window.
- */
 rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 										rt_bool_t *loop_guard)
 {
