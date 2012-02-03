@@ -76,8 +76,10 @@ struct rtgui_widget
    /* inherit from rtgui_object */
 	struct rtgui_object object;
 
-	/* the parent and root widget */
-	struct rtgui_widget *parent, *toplevel;
+	/* the widget that contains this widget */
+	struct rtgui_widget *parent;
+	/* the window that contains this widget */
+	struct rtgui_win *toplevel;
 	/* the widget children and sibling */
 	rtgui_list_t sibling;
 
@@ -172,7 +174,7 @@ void rtgui_widget_move_to_logic(rtgui_widget_t* widget, int dx, int dy);
 void rtgui_widget_update_clip(rtgui_widget_t* widget);
 
 /* get the toplevel widget of widget */
-rtgui_widget_t* rtgui_widget_get_toplevel(rtgui_widget_t* widget);
+struct rtgui_win* rtgui_widget_get_toplevel(rtgui_widget_t* widget);
 
 void rtgui_widget_show(rtgui_widget_t* widget);
 void rtgui_widget_hide(rtgui_widget_t* widget);

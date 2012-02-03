@@ -16,7 +16,7 @@
 #include <rtgui/rtgui_system.h>
 #include <rtgui/rtgui_application.h>
 #include <rtgui/widgets/container.h>
-#include <rtgui/widgets/toplevel.h>
+#include <rtgui/widgets/window.h>
 
 static void _rtgui_container_constructor(rtgui_container_t *container)
 {
@@ -49,13 +49,16 @@ static void _rtgui_container_destructor(rtgui_container_t *container)
 
 static void _rtgui_container_update_toplevel(rtgui_container_t* container)
 {
+	struct rtgui_win *window;
 	struct rtgui_list_node* node;
+
+	window = rtgui_widget_get_toplevel(RTGUI_WIDGET(container));
 
 	rtgui_list_foreach(node, &(container->children))
 	{
 		rtgui_widget_t* child = rtgui_list_entry(node, rtgui_widget_t, sibling);
 		/* set child toplevel */
-		child->toplevel = rtgui_widget_get_toplevel(RTGUI_WIDGET(container));
+		child->toplevel = window;
 
 		if (RTGUI_IS_CONTAINER(child))
 		{
@@ -91,10 +94,9 @@ rt_bool_t rtgui_container_dispatch_mouse_event(rtgui_container_t *container, str
 {
 	/* handle in child widget */
 	struct rtgui_list_node* node;
-	struct rtgui_application *app;
+	struct rtgui_widget *old_focus;
 
-	app = rtgui_application_self();
-	RT_ASSERT(app != RT_NULL);
+	old_focus = RTGUI_WIDGET(container)->toplevel->focused_widget;
 
 	rtgui_list_foreach(node, &(container->children))
 	{
@@ -103,7 +105,7 @@ rt_bool_t rtgui_container_dispatch_mouse_event(rtgui_container_t *container, str
 		if (rtgui_rect_contains_point(&(w->extent),
 					                  event->x, event->y) == RT_EOK)
 		{
-			if ((app->focused_widget != w) && RTGUI_WIDGET_IS_FOCUSABLE(w))
+			if ((old_focus != w) && RTGUI_WIDGET_IS_FOCUSABLE(w))
 				rtgui_widget_focus(w);
 			if (RTGUI_OBJECT(w)->event_handler(RTGUI_OBJECT(w),
 											   (rtgui_event_t*)event) == RT_TRUE)
@@ -149,7 +151,8 @@ rt_bool_t rtgui_container_event_handler(struct rtgui_object* object, struct rtgu
 
 	case RTGUI_EVENT_KBD:
 		/* let parent to handle keyboard event */
-		if (widget->parent != RT_NULL && widget->parent != widget->toplevel)
+		if (widget->parent != RT_NULL &&
+			widget->parent != RTGUI_WIDGET(widget->toplevel))
 		{
 			return RTGUI_OBJECT(widget->parent)->event_handler(
 					RTGUI_OBJECT(widget->parent),

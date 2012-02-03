@@ -274,27 +274,24 @@ void rtgui_widget_set_oncommand(rtgui_widget_t* widget, rtgui_event_handler_ptr 
  */
 void rtgui_widget_focus(rtgui_widget_t *widget)
 {
-	struct rtgui_application *app;
-
-	app = rtgui_application_self();
+	struct rtgui_widget *old_focus;
 
 	RT_ASSERT(widget != RT_NULL);
-	RT_ASSERT(app != RT_NULL);
 
 	if (!RTGUI_WIDGET_IS_FOCUSABLE(widget) || !RTGUI_WIDGET_IS_ENABLE(widget))
 		return;
 
-	/* get root parent view and old focused widget */
-	if (app->focused_widget == RTGUI_OBJECT(widget))
+	old_focus = RTGUI_WIN(widget->toplevel)->focused_widget;
+	if (old_focus == widget)
 		return; /* it's the same focused widget */
 
 	/* unfocused the old widget */
-	if (app->focused_widget != RT_NULL)
-		rtgui_widget_unfocus(RTGUI_WIDGET(app->focused_widget));
+	if (old_focus != RT_NULL)
+		rtgui_widget_unfocus(old_focus);
 
 	/* set widget as focused */
 	widget->flag |= RTGUI_WIDGET_FLAG_FOCUS;
-	app->focused_widget = widget;
+	RTGUI_WIN(widget->toplevel)->focused_widget = widget;
 
 	/* invoke on focus in call back */
 	if (widget->on_focus_in != RT_NULL)
@@ -307,12 +304,8 @@ void rtgui_widget_focus(rtgui_widget_t *widget)
  */
 void rtgui_widget_unfocus(rtgui_widget_t *widget)
 {
-	struct rtgui_application *app;
 
 	RT_ASSERT(widget != RT_NULL);
-
-	app = rtgui_application_self();
-	RT_ASSERT(app != RT_NULL);
 
 	if (!widget->toplevel || !RTGUI_WIDGET_IS_FOCUSED(widget))
 		return;
@@ -322,7 +315,7 @@ void rtgui_widget_unfocus(rtgui_widget_t *widget)
 	if (widget->on_focus_out != RT_NULL)
 		widget->on_focus_out(RTGUI_OBJECT(widget), RT_NULL);
 
-	app->focused_widget = RT_NULL;
+	RTGUI_WIN(widget->toplevel)->focused_widget = RT_NULL;
 
 	/* refresh widget */
 	rtgui_widget_update(widget);
@@ -378,7 +371,7 @@ void rtgui_widget_rect_to_logic(rtgui_widget_t* widget, rtgui_rect_t* rect)
 	}
 }
 
-rtgui_widget_t* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
+struct rtgui_win* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
 {
 	rtgui_widget_t* r;
 
@@ -387,14 +380,16 @@ rtgui_widget_t* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
 	if (widget->toplevel)
 		return widget->toplevel;
 
+	rt_kprintf("widget->toplevel not properly set\n");
 	r = widget;
 	/* get the toplevel widget */
-	while (r->parent != RT_NULL) r = r->parent;
+	while (r->parent != RT_NULL)
+		r = r->parent;
 
 	/* set toplevel */
 	widget->toplevel = r;
 
-	return r;
+	return RTGUI_WIN(r);
 }
 
 rt_bool_t rtgui_widget_event_handler(struct rtgui_object* object, rtgui_event_t* event)

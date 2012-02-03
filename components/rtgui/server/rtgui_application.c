@@ -234,7 +234,6 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	app->server         = RT_NULL;
 	app->mq             = RT_NULL;
 	app->modal_object   = RT_NULL;
-	app->focused_widget = RT_NULL;
 	app->on_idle        = RT_NULL;
 }
 
@@ -554,18 +553,12 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 	{
 	case RTGUI_EVENT_PAINT:
 	case RTGUI_EVENT_CLIP_INFO:
-	case RTGUI_EVENT_WIN_CLOSE:
 	case RTGUI_EVENT_WIN_ACTIVATE:
 	case RTGUI_EVENT_WIN_DEACTIVATE:
+	case RTGUI_EVENT_WIN_CLOSE:
 	case RTGUI_EVENT_WIN_MOVE:
-		_rtgui_application_dest_handle(app, event);
-		break;
-
 	case RTGUI_EVENT_KBD:
-		if (app->focused_widget != RT_NULL &&
-			RTGUI_OBJECT(app->focused_widget)->event_handler != RT_NULL)
-			RTGUI_OBJECT(app->focused_widget)->event_handler(RTGUI_OBJECT(app->focused_widget),
-															 event);
+		_rtgui_application_dest_handle(app, event);
 		break;
 
 	case RTGUI_EVENT_MOUSE_BUTTON:
