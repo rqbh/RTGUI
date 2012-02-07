@@ -23,16 +23,6 @@
 #ifdef RTGUI_EVENT_DEBUG
 const char *event_string[] =
 {
-	/* panel event */
-	"PANEL_ATTACH",			/* attach to a panel	*/
-	"PANEL_DETACH",			/* detach from a panel	*/
-	"PANEL_SHOW",			/* show in a panel		*/
-	"PANEL_HIDE",			/* hide from a panel	*/
-	"PANEL_INFO",			/* panel information 	*/
-	"PANEL_RESIZE",			/* resize panel 		*/
-	"PANEL_FULLSCREEN",		/* to full screen 		*/
-	"PANEL_NORMAL",			/* to normal screen 	*/
-
 	/* window event */
 	"WIN_CREATE",			/* create a window 	*/
 	"WIN_DESTROY",			/* destroy a window 	*/
@@ -210,13 +200,7 @@ static void rtgui_event_dump(rt_thread_t tid, rtgui_event_t* event)
 	case RTGUI_EVENT_MONITOR_ADD:
 		{
 			struct rtgui_event_monitor *monitor = (struct rtgui_event_monitor*)event;
-			if (monitor->panel != RT_NULL)
-			{
-				rt_kprintf("the rect is:(%d, %d) - (%d, %d)",
-					monitor->rect.x1, monitor->rect.y1,
-					monitor->rect.x2, monitor->rect.y2);
-			}
-			else if (monitor->wid != RT_NULL)
+			if (monitor->wid != RT_NULL)
 			{
 				rt_kprintf("win: %s, the rect is:(%d, %d) - (%d, %d)", monitor->wid->title,
 					monitor->rect.x1, monitor->rect.y1,
@@ -241,7 +225,6 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	rtgui_object_set_event_handler(RTGUI_OBJECT(app),
 			                       rtgui_application_event_handler);
 
-	app->panel          = RT_NULL;
 	app->name           = RT_NULL;
 	/* set EXITED so we can destroy an application that just created */
 	app->state_flag     = RTGUI_APPLICATION_FLAG_EXITED;
@@ -255,36 +238,9 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	app->on_idle        = RT_NULL;
 }
 
-static rt_bool_t _rtgui_application_detach_panel(
-		struct rtgui_application *app)
-{
-	struct rtgui_event_panel_detach edetach;
-
-	if (app->server == RT_NULL)
-		return RT_FALSE;
-
-	RTGUI_EVENT_PANEL_DETACH_INIT(&edetach);
-
-	/* detach from panel */
-	edetach.panel = app->panel;
-
-	/* send PANEL DETACH to server */
-	if (rtgui_application_send_sync(app->server,
-				               RTGUI_EVENT(&edetach),
-							   sizeof(struct rtgui_event_panel_detach)) != RT_EOK)
-		return RT_FALSE;
-
-	app->server = RT_NULL;
-
-	return RT_TRUE;
-}
-
 static void _rtgui_application_destructor(struct rtgui_application *app)
 {
 	RT_ASSERT(app != RT_NULL);
-
-	if (app->panel != RT_NULL)
-		_rtgui_application_detach_panel(app);
 
 	rt_free(app->name);
 	app->name = RT_NULL;
@@ -296,69 +252,8 @@ DEFINE_CLASS_TYPE(application, "application",
 	_rtgui_application_destructor,
 	sizeof(struct rtgui_application));
 
-static rt_bool_t _rtgui_application_attach_panel(
-		struct rtgui_application *app,
-        const char *panel_name)
-{
-	/* the buffer uses to receive event */
-	union
-	{
-		struct rtgui_event_panel_attach ecreate;
-		struct rtgui_event_panel_info epanel;
-
-		char buffer[256];	/* use to recv other information */
-	} event;
-
-	/* create application in server */
-	RTGUI_EVENT_PANEL_ATTACH_INIT(&(event.ecreate));
-
-	/* set the panel name and application */
-	rt_strncpy(event.ecreate.panel_name, panel_name, RTGUI_NAME_MAX);
-	event.ecreate.application = app;
-
-	/* send PANEL ATTACH to server */
-	if (rtgui_application_send_sync(app->server,
-								   &(event.ecreate.parent),
-								   sizeof(struct rtgui_event_panel_attach))
-			!= RTGUI_STATUS_OK)
-	{
-		rt_kprintf("att err\n");
-		return RT_FALSE;
-	}
-
-	/* get PANEL INFO */
-	rtgui_application_recv_filter(RTGUI_EVENT_PANEL_INFO, &(event.epanel.parent), sizeof(event));
-
-	/* set panel */
-	app->panel = (struct rtgui_panel*)event.epanel.panel;
-
-	/* set panel_extent of application */
-	app->panel_extent = event.epanel.extent;
-
-	return RT_TRUE;
-}
-
-static rt_bool_t _rtgui_application_attach_server(
-		struct rtgui_application *app,
-		const char *panel_name)
-{
-	RT_ASSERT(app != RT_NULL);
-	RT_ASSERT(panel_name != RT_NULL);
-
-	/* the server thread id */
-	app->server = rtgui_application_get_server();
-	if (app->server == RT_NULL)
-	{
-		rt_kprintf("can't find rtgui server\n");
-		return RT_FALSE;
-	}
-
-	return _rtgui_application_attach_panel(app, panel_name);
-}
-
 struct rtgui_application* rtgui_application_create(
         rt_thread_t tid,
-        const char *panel_name,
         const char *myname)
 {
 	struct rtgui_application *app;
@@ -384,23 +279,11 @@ struct rtgui_application* rtgui_application_create(
 		goto __mq_err;
 	}
 
-	if (panel_name != RT_NULL)
-	{
-		if (_rtgui_application_attach_server(
-					app,
-					panel_name) != RT_TRUE)
-		{
-			goto __attach_err;
-		}
-	}
-
 	/* set application title */
 	app->name = (unsigned char*)rt_strdup((char*)myname);
 	if (app->name != RT_NULL)
 		return app;
 
-__attach_err:
-	_rtgui_application_detach_panel(app);
 __mq_err:
 	rtgui_object_destroy(RTGUI_OBJECT(app));
 	tid->user_data = 0;
@@ -688,19 +571,6 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 
 	switch (event->type)
 	{
-	case RTGUI_EVENT_PANEL_DETACH:
-		rtgui_application_hide(app);
-		app->server = RT_NULL;
-		return RT_TRUE;
-
-	case RTGUI_EVENT_PANEL_SHOW:
-		rtgui_application_show(app);
-		break;
-
-	case RTGUI_EVENT_PANEL_HIDE:
-		rtgui_application_hide(app);
-		break;
-
 	case RTGUI_EVENT_PAINT:
 	case RTGUI_EVENT_CLIP_INFO:
 		{
@@ -813,63 +683,11 @@ rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 	return app->exit_code;
 }
 
-rt_err_t rtgui_application_show(struct rtgui_application* app)
-{
-	struct rtgui_event_panel_show eraise;
-
-	RT_ASSERT(app != RT_NULL);
-
-	if (app->server == RT_NULL)
-		return -RT_ERROR;
-
-	RTGUI_EVENT_PANEL_SHOW_INIT(&eraise);
-	eraise.application = app;
-
-	eraise.panel = app->panel;
-	if (rtgui_application_send_sync(app->server, RTGUI_EVENT(&eraise),
-				sizeof(struct rtgui_event_panel_show)) != RT_EOK)
-		return -RT_ERROR;
-
-	/*RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(app));*/
-	/*rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));*/
-
-	app->state_flag |= RTGUI_APPLICATION_FLAG_SHOWN;
-
-	return RT_EOK;
-}
-
-rt_err_t rtgui_application_hide(struct rtgui_application* app)
-{
-	struct rtgui_event_panel_hide ehide;
-
-	RT_ASSERT(app != RT_NULL);
-
-	if (app->server == RT_NULL)
-		return RT_FALSE;
-
-	RTGUI_EVENT_PANEL_HIDE_INIT(&ehide);
-
-	ehide.panel = app->panel;
-	if (rtgui_application_send_sync(app->server, RTGUI_EVENT(&ehide),
-				sizeof(struct rtgui_event_panel_hide)) != RT_EOK)
-		return -RT_ERROR;
-
-	/*RTGUI_WIDGET_HIDE(RTGUI_WIDGET(app));*/
-	/*rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(app));*/
-
-	app->state_flag &= ~RTGUI_APPLICATION_FLAG_SHOWN;
-
-	return RT_EOK;
-}
-
 rt_base_t rtgui_application_run(struct rtgui_application *app)
 {
 	rt_bool_t loop = 1;
 
 	_rtgui_application_check(app);
-
-	if (!(app->state_flag & RTGUI_APPLICATION_FLAG_SHOWN))
-		rtgui_application_show(app);
 
 	/* cleanup */
 	app->exit_code = 0;
@@ -879,14 +697,11 @@ rt_base_t rtgui_application_run(struct rtgui_application *app)
 	_rtgui_application_event_loop(app, &loop);
 	app->state_flag |= RTGUI_APPLICATION_FLAG_EXITED;
 
-	rtgui_application_hide(app);
-
 	return app->exit_code;
 }
 
 void rtgui_application_exit(struct rtgui_application* app, rt_base_t code)
 {
-	_rtgui_application_detach_panel(app);
 	app->state_flag |= RTGUI_APPLICATION_FLAG_CLOSED;
 	app->exit_code = code;
 }

@@ -484,11 +484,6 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 			rtgui_win_ondraw(win);
 		break;
 
-	case RTGUI_EVENT_PANEL_SHOW:
-		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
-		rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(win));
-		break;
-
 	case RTGUI_EVENT_MOUSE_BUTTON:
 		/* check whether has widget which handled mouse event before */
 		if (RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win) != RT_NULL)

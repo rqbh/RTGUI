@@ -37,7 +37,6 @@ server_src = Split("""
 server/rtgui_application.c
 server/driver.c
 server/mouse.c
-server/panel.c
 server/server.c
 server/topwin.c
 """)

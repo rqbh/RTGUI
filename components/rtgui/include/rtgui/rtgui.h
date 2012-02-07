@@ -21,7 +21,6 @@
 #define RT_INT16_MIN		(-RT_INT16_MAX-1)
 #define RTGUI_NOT_FOUND		(-1)
 
-struct rtgui_panel;
 struct rtgui_event;
 
 struct rtgui_object;
@@ -29,7 +28,6 @@ struct rtgui_widget;
 struct rtgui_win;
 struct rtgui_font;
 
-typedef struct rtgui_panel rtgui_panel_t;
 typedef struct rtgui_win rtgui_win_t;
 typedef struct rtgui_workbench rtgui_workbench_t;
 typedef rt_bool_t (*rtgui_event_handler_ptr)(struct rtgui_object* widget, struct rtgui_event* event);

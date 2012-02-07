@@ -11,7 +11,6 @@
  * Date           Author       Notes
  * 2009-10-16     Bernard      first version
  */
-#include "panel.h"
 #include "topwin.h"
 #include "mouse.h"
 
@@ -393,83 +392,6 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 	}
 }
 
-/* send clip info to panel */
-#ifdef RTGUI_USING_SMALL_SIZE
-void rtgui_topwin_update_clip_to_panel(struct rtgui_panel* panel)
-{
-	rt_uint32_t count;
-	rt_thread_t tid;
-	struct rtgui_list_node* node;
-	struct rtgui_event_clip_info eclip;
-
-	/* get topwin count  */
-	count = 0;
-	node = _rtgui_topwin_show_list.next;
-	while (node != RT_NULL)
-	{
-		count ++;
-		node = node->next;
-	}
-
-	/* send clip info event to panel */
-	RTGUI_EVENT_CLIP_INFO_INIT(&eclip);
-	eclip.num_rect = count; eclip.wid = RT_NULL;
-
-	/* send to the activated thread of panel */
-	tid = rtgui_panel_get_active_thread(panel);
-	rtgui_application_send(tid, &eclip.parent, sizeof(struct rtgui_event_clip_info));
-}
-#else
-void rtgui_topwin_update_clip_to_panel(struct rtgui_panel* panel)
-{
-	rt_uint32_t count;
-	rt_thread_t tid;
-	struct rtgui_list_node* node;
-	struct rtgui_event_clip_info* eclip;
-
-	/* get topwin count  */
-	count = 0;
-	node = _rtgui_topwin_show_list.next;
-	while (node != RT_NULL)
-	{
-		count ++;
-		node = node->next;
-	}
-
-	eclip = (struct rtgui_event_clip_info*)rtgui_malloc(sizeof(struct rtgui_event_clip_info)
-		+ (count + 1)* sizeof(struct rtgui_rect));
-	if (eclip == RT_NULL)
-	{
-		/* no memory */
-		return ;
-	}
-
-	/* reset clip info to top window */
-	RTGUI_EVENT_CLIP_INFO_INIT(eclip);
-	eclip->num_rect = count; eclip->wid = RT_NULL;
-
-	count = 0;
-	for (node = _rtgui_topwin_show_list.next; node != RT_NULL; node  = node->next)
-	{
-		struct rtgui_topwin* wnd;
-		struct rtgui_rect* rect;
-
-		wnd = rtgui_list_entry(node, struct rtgui_topwin, list);
-
-		rect = RTGUI_EVENT_GET_RECT(eclip, count++);
-		*rect = (wnd->title != RT_NULL)? RTGUI_WIDGET(wnd->title)->extent : wnd->extent;
-	}
-
-	/* send to the activated thread of panel */
-	tid = rtgui_panel_get_active_thread(panel);
-	rtgui_application_send(tid, (struct rtgui_event*)eclip, sizeof(struct rtgui_event_clip_info)
-		+ count* sizeof(struct rtgui_rect));
-
-	/* release clip info event */
-	rtgui_free(eclip);
-}
-#endif
-
 /* hide a window */
 void rtgui_topwin_hide(struct rtgui_event_win* event)
 {
@@ -658,7 +580,6 @@ struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y)
 	return RT_NULL;
 }
 
-extern struct rtgui_list_node _rtgui_panel_list;
 static void rtgui_topwin_update_clip()
 {
 	rt_int32_t count = 0;
@@ -690,27 +611,6 @@ static void rtgui_topwin_update_clip()
 				&(wnd->extent));
 		}
 	}
-
-	/* send clip info to each panel */
-	eclip.wid = RT_NULL;
-	eclip.num_rect = count;
-
-	rtgui_list_foreach(node, &(_rtgui_panel_list))
-	{
-		struct rtgui_panel* panel;
-		struct rtgui_list_node* panel_node;
-
-		panel = rtgui_list_entry(node, struct rtgui_panel, sibling);
-
-		rtgui_list_foreach(panel_node, &(panel->thread_list))
-		{
-			struct rtgui_panel_thread* thread;
-			thread = rtgui_list_entry(panel_node, struct rtgui_panel_thread, list);
-
-			/* send clip info to panel */
-			rtgui_application_send(thread->tid, &(eclip.parent),	sizeof(struct rtgui_event_clip_info));
-		}
-	}
 }
 
 static void rtgui_topwin_redraw(struct rtgui_rect* rect)
@@ -734,26 +634,6 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 			if (wnd->title != RT_NULL)
 			{
 				rtgui_theme_draw_win(wnd);
-			}
-		}
-	}
-
-	/* redraw the panel */
-	rtgui_list_foreach(node, &(_rtgui_panel_list))
-	{
-		struct rtgui_panel* panel;
-		panel = rtgui_list_entry(node, struct rtgui_panel, sibling);
-
-		if (rtgui_rect_is_intersect(rect, &(panel->extent)) == RT_EOK)
-		{
-			rt_thread_t tid;
-
-			tid = rtgui_panel_get_active_thread(panel);
-			if (tid != RT_NULL)
-			{
-				/* draw panel */
-				epaint.wid = RT_NULL;
-				rtgui_application_send(tid, &(epaint.parent), sizeof(epaint));
 			}
 		}
 	}

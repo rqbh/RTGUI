@@ -44,9 +44,6 @@ struct rtgui_application
 {
 	struct rtgui_object parent;
 
-	/* panel */
-	struct rtgui_panel *panel;
-
 	/* application name */
 	unsigned char *name;
 
@@ -63,9 +60,6 @@ struct rtgui_application
 	/* event buffer */
 	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
 
-	/* the panel extent */
-	rtgui_rect_t panel_extent;
-
 	/* the object I sent event to */
 	struct rtgui_object *root_object;
 	/* if not RT_NULL, the application is modaled by modal_object. If is
@@ -80,13 +74,9 @@ struct rtgui_application
 
 /**
  * create an application named @myname on thread @param tid
- *
- * If the panel_name is RT_NULL, then the application won't attach to any
- * server and panel. Suitable for use in the server thread
  */
 struct rtgui_application* rtgui_application_create(
         rt_thread_t tid,
-        const char *panel_name,
         const char *myname);
 void rtgui_application_destroy(struct rtgui_application *app);
 rt_err_t rtgui_application_show(struct rtgui_application *app);

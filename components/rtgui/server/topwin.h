@@ -27,8 +27,6 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid);
 
 /* raise window to front */
 void rtgui_topwin_raise(struct rtgui_win* wid, rt_thread_t sender);
-/* update clip info to a panel */
-void rtgui_topwin_update_clip_to_panel(struct rtgui_panel* panel);
 
 /* show a window */
 void rtgui_topwin_show(struct rtgui_event_win* event);

@@ -19,16 +19,6 @@
 
 enum _rtgui_event_type
 {
-	/* panel event */
-	RTGUI_EVENT_PANEL_ATTACH = 0,	/* attach to a panel	*/
-	RTGUI_EVENT_PANEL_DETACH,		/* detach from a panel	*/
-	RTGUI_EVENT_PANEL_SHOW,			/* show in a panel		*/
-	RTGUI_EVENT_PANEL_HIDE,			/* hide from a panel	*/
-	RTGUI_EVENT_PANEL_INFO,			/* panel information 	*/
-	RTGUI_EVENT_PANEL_RESIZE,		/* resize panel 		*/
-	RTGUI_EVENT_PANEL_FULLSCREEN,	/* to full screen 		*/
-	RTGUI_EVENT_PANEL_NORMAL,		/* to normal screen 	*/
-
 	/* window event */
 	RTGUI_EVENT_WIN_CREATE,			/* create a window 		*/
 	RTGUI_EVENT_WIN_DESTROY,		/* destroy a window 	*/
@@ -98,64 +88,6 @@ typedef struct rtgui_event rtgui_event_t;
 	(e)->ack = RT_NULL;					\
 } while (0)
 
-/*
- * RTGUI Panel Event
- */
-struct rtgui_event_panel_attach
-{
-	struct rtgui_event parent;
-
-	/* the panel name to be attached */
-	char panel_name[RTGUI_NAME_MAX];
-
-	struct rtgui_application *application;
-};
-
-struct rtgui_event_panel_detach
-{
-	struct rtgui_event parent;
-
-	/* the panel which thread belong to */
-	rtgui_panel_t* panel;
-
-	struct rtgui_application *application;
-};
-
-struct rtgui_event_panel_show
-{
-	struct rtgui_event parent;
-
-	/* the panel which thread belong to */
-	rtgui_panel_t* panel;
-
-	struct rtgui_application *application;
-};
-
-struct rtgui_event_panel_hide
-{
-	struct rtgui_event parent;
-
-	/* the panel which thread belong to */
-	rtgui_panel_t* panel;
-
-	struct rtgui_application *application;
-};
-
-struct rtgui_event_panel_info
-{
-	struct rtgui_event parent;
-
-	/* panel info */
-	rtgui_panel_t* panel;
-	rtgui_rect_t extent;
-};
-
-#define RTGUI_EVENT_PANEL_ATTACH_INIT(e)	RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_ATTACH)
-#define RTGUI_EVENT_PANEL_DETACH_INIT(e)	RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_DETACH)
-#define RTGUI_EVENT_PANEL_SHOW_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_SHOW)
-#define RTGUI_EVENT_PANEL_HIDE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_HIDE)
-#define RTGUI_EVENT_PANEL_INFO_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_PANEL_INFO)
-
 #define _RTGUI_EVENT_WIN_ELEMENTS \
 	struct rtgui_event parent; \
 	struct rtgui_win *wid;
@@ -212,19 +144,6 @@ struct rtgui_event_win_resize
 #define RTGUI_EVENT_WIN_RESIZE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_RESIZE)
 
 /*
- * RTGUI Workbench Manager Event
- */
-struct rtgui_event_set_wm
-{
-	struct rtgui_event parent;
-
-	/* the panel name to be managed */
-	char panel_name[RTGUI_NAME_MAX];
-};
-/* window event init */
-#define RTGUI_EVENT_SET_WM_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_SET_WM)
-
-/*
  * RTGUI Other Event
  */
 struct rtgui_event_update_begin
@@ -249,9 +168,6 @@ struct rtgui_event_monitor
 
 	/* the monitor rect */
 	rtgui_rect_t rect;
-
-	/* under panel */
-	rtgui_panel_t* panel;
 };
 
 struct rtgui_event_paint
