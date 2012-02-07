@@ -13,19 +13,6 @@
 struct rtgui_application* app;
 struct rtgui_win *win1;
 
-void init_panel(void)
-{
-    rtgui_rect_t rect;
-
-    /* register main panel */
-    rect.x1 = 0;
-    rect.y1 = 0;
-    rect.x2 = rtgui_graphic_driver_get_default()->width;
-    rect.y2 = rtgui_graphic_driver_get_default()->height;
-    rtgui_panel_register("main", &rect);
-    rtgui_panel_set_default_focused("main");
-}
-
 rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event)
 {
 	rt_kprintf("win %s(%p) closing\n",
@@ -65,11 +52,8 @@ void rt_init_thread_entry(void* parameter)
     extern void rt_hw_lcd_init();
     extern void rtgui_touch_hw_init(void);
 
-	init_panel();
-
 	app = rtgui_application_create(
 			rt_thread_self(),
-			"main",
 			"guiapp");
 
 	RT_ASSERT(app != RT_NULL);
