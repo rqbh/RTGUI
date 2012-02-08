@@ -35,9 +35,6 @@ struct rtgui_toplevel
 	/* external clip info */
 	rtgui_rect_t*	external_clip_rect;
 	rt_uint32_t		external_clip_size;
-
-	/* server thread id */
-	rt_thread_t server;
 };
 typedef struct rtgui_toplevel rtgui_toplevel_t;
 
