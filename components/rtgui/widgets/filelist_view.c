@@ -266,10 +266,6 @@ static void rtgui_filelist_view_on_folder_item(rtgui_widget_t* widget, struct rt
 	case 1:
 		/* destroy menu window */
 		rtgui_win_destroy(menu);
-		if (RTGUI_CONTAINER(view)->modal_show == RT_TRUE)
-		{
-			rtgui_container_end_modal(RTGUI_CONTAINER(view), RTGUI_MODAL_OK);
-		}
 		break;
 
 	default:
@@ -524,14 +520,7 @@ static void rtgui_filelist_view_onenturn(struct rtgui_filelist_view* view)
 			(view->current_directory[0] == '/') && (view->current_directory[1] == '\0'))
 #endif
 		{
-			if (RTGUI_CONTAINER(view)->modal_show == RT_TRUE)
-			{
-				rtgui_container_end_modal(RTGUI_CONTAINER(view), RTGUI_MODAL_CANCEL);
-			}
-			else
-			{
-				rtgui_filelist_view_destroy(view);
-			}
+			rtgui_filelist_view_destroy(view);
 
 			return ;
 		}
@@ -541,13 +530,6 @@ static void rtgui_filelist_view_onenturn(struct rtgui_filelist_view* view)
 			return ;
 		}
 		rtgui_filelist_view_set_directory(view, new_path);
-	}
-	else
-	{
-		if (RTGUI_CONTAINER(view)->modal_show == RT_TRUE)
-		{
-			rtgui_container_end_modal(RTGUI_CONTAINER(view), RTGUI_MODAL_OK);
-		}
 	}
 }
 
