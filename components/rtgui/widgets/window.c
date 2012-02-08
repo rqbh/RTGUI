@@ -15,6 +15,7 @@
 #include <rtgui/color.h>
 #include <rtgui/image.h>
 #include <rtgui/rtgui_system.h>
+#include <rtgui/rtgui_server.h>
 #include <rtgui/rtgui_application.h>
 
 #include <rtgui/widgets/window.h>
@@ -53,12 +54,12 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 {
 	struct rtgui_event_win_destroy edestroy;
 
-	if (RTGUI_TOPLEVEL(win)->server != RT_NULL)
+	if (win->flag & RTGUI_WIN_FLAG_CONNECTED)
 	{
 		/* destroy in server */
 		RTGUI_EVENT_WIN_DESTROY_INIT(&edestroy);
 		edestroy.wid = win;
-		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&edestroy),
+		if (rtgui_server_post_event_sync(RTGUI_EVENT(&edestroy),
 			sizeof(struct rtgui_event_win_destroy)) != RT_EOK)
 		{
 			/* destroy in server failed */
@@ -72,19 +73,10 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 
 static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
 {
-	if (RTGUI_TOPLEVEL(win)->server == RT_NULL)
+	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
-		rt_thread_t server;
 		struct rtgui_event_win_create ecreate;
 		RTGUI_EVENT_WIN_CREATE_INIT(&ecreate);
-
-		/* get server thread id */
-		server = rtgui_application_get_server();
-		if (server == RT_NULL)
-		{
-			rt_kprintf("RTGUI server is not running...\n");
-			return RT_FALSE;
-		}
 
 		/* send win create event to server */
 		ecreate.wid         = win;
@@ -94,17 +86,15 @@ static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
 		rt_strncpy((char*)ecreate.title, (char*)win->title, RTGUI_NAME_MAX);
 #endif
 
-		if (rtgui_application_send_sync(server,
-										RTGUI_EVENT(&ecreate),
-										sizeof(struct rtgui_event_win_create)
+		if (rtgui_server_post_event_sync(RTGUI_EVENT(&ecreate),
+										 sizeof(struct rtgui_event_win_create)
 				) != RT_EOK)
 		{
 			rt_kprintf("create win: %s failed\n", win->title);
 			return RT_FALSE;
 		}
 
-		/* set server */
-		RTGUI_TOPLEVEL(win)->server = server;
+		win->flag |= RTGUI_WIN_FLAG_CONNECTED;
 	}
 
 	return RT_TRUE;
@@ -224,7 +214,7 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 		return exit_code;
 
 	/* if it does not register into server, create it in server */
-	if (RTGUI_TOPLEVEL(win)->server == RT_NULL)
+	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
 		if (_rtgui_win_create_in_server(win) == RT_FALSE)
 			return exit_code;
@@ -232,19 +222,14 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 	if (RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)))
 	{
-		rt_thread_t stid;
 		/* send show message to server */
 		struct rtgui_event_win_show eshow;
-
-		stid = rtgui_application_get_server();
-		RT_ASSERT(stid != RT_NULL);
 
 		RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
 		eshow.wid = win;
 
-		if (rtgui_application_send_sync(stid,
-					                    RTGUI_EVENT(&eshow),
-										sizeof(struct rtgui_event_win_show)
+		if (rtgui_server_post_event_sync(RTGUI_EVENT(&eshow),
+										 sizeof(struct rtgui_event_win_show)
 				) != RT_EOK)
 		{
 			rt_kprintf("show win failed\n");
@@ -307,14 +292,14 @@ void rtgui_win_hiden(struct rtgui_win* win)
 	RT_ASSERT(win != RT_NULL);
 
 	if (!RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)) &&
-		RTGUI_TOPLEVEL(win)->server != RT_NULL)
+		win->flag & RTGUI_WIN_FLAG_CONNECTED)
 	{
 		/* send hidden message to server */
 		struct rtgui_event_win_hide ehide;
 		RTGUI_EVENT_WIN_HIDE_INIT(&ehide);
 		ehide.wid = win;
 
-		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&ehide),
+		if (rtgui_server_post_event_sync(RTGUI_EVENT(&ehide),
 			sizeof(struct rtgui_event_win_hide)) != RT_EOK)
 		{
 			rt_kprintf("hide win: %s failed\n", win->title);
@@ -343,7 +328,7 @@ void rtgui_win_move(struct rtgui_win* win, int x, int y)
 
 	if (win == RT_NULL) return;
 
-	if (RTGUI_TOPLEVEL(win)->server != RT_NULL)
+	if (win->flag & RTGUI_WIN_FLAG_CONNECTED)
 	{
 		/* set win hide firstly */
 		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(win));
@@ -351,7 +336,7 @@ void rtgui_win_move(struct rtgui_win* win, int x, int y)
 		emove.wid 	= win;
 		emove.x		= x;
 		emove.y		= y;
-		if (rtgui_application_send_sync(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&emove),
+		if (rtgui_server_post_event_sync(RTGUI_EVENT(&emove),
 			sizeof(struct rtgui_event_win_move)) != RT_EOK)
 		{
 			return;
@@ -457,8 +442,8 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 			RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
 			eshow.wid = win;
 
-			rtgui_application_send(RTGUI_TOPLEVEL(win)->server, RTGUI_EVENT(&eshow),
-				sizeof(struct rtgui_event_win_show));
+			rtgui_server_post_event(RTGUI_EVENT(&eshow),
+									sizeof(struct rtgui_event_win_show));
 		}
 		else
 		{
@@ -553,14 +538,14 @@ void rtgui_win_set_rect(rtgui_win_t* win, rtgui_rect_t* rect)
 
 	RTGUI_WIDGET(win)->extent = *rect;
 
-	if (RTGUI_TOPLEVEL(win)->server != RT_NULL)
+	if (win->flag & RTGUI_WIN_FLAG_CONNECTED)
 	{
 		/* set window resize event to server */
 		RTGUI_EVENT_WIN_RESIZE_INIT(&event);
 		event.wid = win;
 		event.rect = *rect;
 
-		rtgui_application_send(RTGUI_TOPLEVEL(win)->server, &(event.parent), sizeof(struct rtgui_event_win_resize));
+		rtgui_server_post_event(&(event.parent), sizeof(struct rtgui_event_win_resize));
 	}
 }
 
@@ -601,7 +586,7 @@ void rtgui_win_set_onclose(rtgui_win_t* win, rtgui_event_handler_ptr handler)
 void rtgui_win_set_title(rtgui_win_t* win, const char *title)
 {
 	/* send title to server */
-	if (RTGUI_TOPLEVEL(win)->server != RT_NULL)
+	if (win->flag & RTGUI_WIN_FLAG_CONNECTED)
 	{
 	}
 

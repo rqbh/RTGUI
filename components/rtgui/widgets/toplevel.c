@@ -28,9 +28,6 @@ static void _rtgui_toplevel_constructor(rtgui_toplevel_t *toplevel)
 
 	/* hide toplevel default */
 	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(toplevel));
-
-	/* set server as RT_NULL (no connected) */
-	toplevel->server = RT_NULL;
 }
 
 static void _rtgui_toplevel_destructor(rtgui_toplevel_t* toplevel)

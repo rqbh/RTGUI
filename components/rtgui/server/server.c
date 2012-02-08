@@ -316,6 +316,17 @@ void rtgui_server_post_event(struct rtgui_event* event, rt_size_t size)
 		rt_kprintf("post when server is not running\n");
 }
 
+rt_err_t rtgui_server_post_event_sync(struct rtgui_event* event, rt_size_t size)
+{
+	if (rtgui_server_tid != RT_NULL)
+		return rtgui_application_send_sync(rtgui_server_tid, event, size);
+	else
+	{
+		rt_kprintf("post when server is not running\n");
+		return -RT_ENOSYS;
+	}
+}
+
 void rtgui_server_init(void)
 {
     if (rtgui_server_tid != RT_NULL)

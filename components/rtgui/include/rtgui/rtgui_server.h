@@ -67,6 +67,7 @@ void rtgui_server_init(void);
 
 /* post an event to server */
 void rtgui_server_post_event(struct rtgui_event* event, rt_size_t size);
+rt_err_t rtgui_server_post_event_sync(struct rtgui_event* event, rt_size_t size);
 
 #endif
 
