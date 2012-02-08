@@ -629,11 +629,9 @@ void rtgui_widget_dump(rtgui_widget_t* widget)
 	obj = RTGUI_OBJECT(widget);
 	rt_kprintf("widget type: %s ", obj->type->name);
 
-	if (RTGUI_IS_CONTAINER(widget) == RT_TRUE)
-		rt_kprintf(":%s ", RTGUI_CONTAINER(widget)->title);
 	if (RTGUI_IS_WIN(widget) == RT_TRUE)
 		rt_kprintf(":%s ", RTGUI_WIN(widget)->title);
-	if ((RTGUI_IS_LABEL(widget) == RT_TRUE) || (RTGUI_IS_BUTTON(widget) == RT_TRUE))
+	else if ((RTGUI_IS_LABEL(widget) == RT_TRUE) || (RTGUI_IS_BUTTON(widget) == RT_TRUE))
 		rt_kprintf(":%s ", RTGUI_LABEL(widget)->text);
 
 	rt_kprintf("extent(%d, %d) - (%d, %d)\n", widget->extent.x1, 

@@ -36,14 +36,10 @@ struct rtgui_container
 	struct rtgui_widget parent;
 
 	rtgui_list_t children;
-
-	// TODO: remove this stuff that we don't need
-	/* private field */
-	char* title;
 };
 typedef struct rtgui_container rtgui_container_t;
 
-rtgui_container_t* rtgui_container_create(const char* title);
+rtgui_container_t* rtgui_container_create(void);
 void rtgui_container_destroy(rtgui_container_t* container);
 
 rt_bool_t rtgui_container_event_handler(struct rtgui_object* widget, struct rtgui_event* event);
@@ -54,10 +50,6 @@ void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box);
 #endif
 
 void rtgui_container_hide(rtgui_container_t* container);
-void rtgui_container_end_modal(rtgui_container_t* container, rt_base_t modal_code);
-
-char* rtgui_container_get_title(rtgui_container_t* container);
-void rtgui_container_set_title(rtgui_container_t* container, const char* title);
 
 void rtgui_container_add_child(rtgui_container_t *container, rtgui_widget_t* child);
 void rtgui_container_remove_child(rtgui_container_t *container, rtgui_widget_t* child);

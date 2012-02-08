@@ -40,18 +40,10 @@ static void _rtgui_container_constructor(rtgui_container_t *container)
 	 * Just eliminate it.
 	 */
 	RTGUI_WIDGET(container)->flag &= ~RTGUI_WIDGET_FLAG_FOCUSABLE;
-
-	container->title = RT_NULL;
 }
 
 static void _rtgui_container_destructor(rtgui_container_t *container)
 {
-	if (container->title != RT_NULL)
-	{
-		rt_free(container->title);
-		container->title = RT_NULL;
-	}
-
 	rtgui_container_destroy_children(container);
 }
 
@@ -184,18 +176,12 @@ rt_bool_t rtgui_container_event_handler(struct rtgui_object* object, struct rtgu
 	return RT_FALSE;
 }
 
-rtgui_container_t* rtgui_container_create(const char* title)
+rtgui_container_t* rtgui_container_create(void)
 {
 	struct rtgui_container* container;
 
 	/* allocate container */
 	container = (struct rtgui_container*) rtgui_widget_create (RTGUI_CONTAINER_TYPE);
-	if (container != RT_NULL)
-	{
-		if (title != RT_NULL)
-			container->title = rt_strdup(title);
-	}
-
 	return container;
 }
 
@@ -323,22 +309,3 @@ void rtgui_container_hide(rtgui_container_t* container)
 	}
 }
 
-char* rtgui_container_get_title(rtgui_container_t* container)
-{
-	RT_ASSERT(container != RT_NULL);
-
-	return container->title;
-}
-
-void rtgui_container_set_title(rtgui_container_t* container, const char *title)
-{
-	RT_ASSERT(container != RT_NULL);
-
-	if (container->title != RT_NULL)
-	{
-		rtgui_free(container->title);
-
-		if (title != RT_NULL) container->title = rt_strdup(title);
-		else container->title = RT_NULL;
-	}
-}
