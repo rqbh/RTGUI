@@ -494,14 +494,15 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 
 			emouse = (struct rtgui_event_mouse*)event;
 
-			if (rtgui_rect_contains_point(
+			RTGUI_OBJECT(win->last_mevent_widget)->event_handler(
+					RTGUI_OBJECT(win->last_mevent_widget),
+					event);
+
+			if (win->last_mevent_widget != RT_NULL &&
+				rtgui_rect_contains_point(
 						&(win->last_mevent_widget->extent),
 						emouse->x, emouse->y) == RT_EOK)
 			{
-				RTGUI_OBJECT(win->last_mevent_widget)->event_handler(
-							RTGUI_OBJECT(win->last_mevent_widget),
-							event);
-
 				/* clean last mouse event handled widget */
 				win->last_mevent_widget = RT_NULL;
 			}
