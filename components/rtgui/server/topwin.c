@@ -674,7 +674,7 @@ void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mou
 			}
 #endif
 		}
-		else if (event->button & RTGUI_MOUSE_BUTTON_UP)
+		else if (win->flag & WINTITLE_CB_PRESSED && event->button & RTGUI_MOUSE_BUTTON_UP)
 		{
 			if (rtgui_rect_contains_point(&rect, event->x, event->y) == RT_EOK)
 			{
