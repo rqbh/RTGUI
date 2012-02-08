@@ -41,23 +41,11 @@ static void _rtgui_container_constructor(rtgui_container_t *container)
 	 */
 	RTGUI_WIDGET(container)->flag &= ~RTGUI_WIDGET_FLAG_FOCUSABLE;
 
-	container->modal_show = RT_FALSE;
 	container->title = RT_NULL;
 }
 
 static void _rtgui_container_destructor(rtgui_container_t *container)
 {
-	/* remove container from application */
-	if (RTGUI_WIDGET(container)->parent != RT_NULL)
-	{
-		struct rtgui_application *app;
-
-		if (container->modal_show == RT_TRUE)
-			rtgui_container_end_modal(container, RTGUI_MODAL_CANCEL);
-
-		app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
-	}
-
 	if (container->title != RT_NULL)
 	{
 		rt_free(container->title);
@@ -213,13 +201,8 @@ rtgui_container_t* rtgui_container_create(const char* title)
 
 void rtgui_container_destroy(rtgui_container_t* container)
 {
-	if (container->modal_show == RT_TRUE)
-		rtgui_container_end_modal(container, RTGUI_MODAL_CANCEL);
-	else
-	{
-		rtgui_container_hide(container);
-		rtgui_widget_destroy(RTGUI_WIDGET(container));
-	}
+	rtgui_container_hide(container);
+	rtgui_widget_destroy(RTGUI_WIDGET(container));
 }
 
 /*
@@ -328,22 +311,6 @@ void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box)
 	rtgui_widget_set_rect(RTGUI_WIDGET(box), &(RTGUI_WIDGET(container)->extent));
 }
 #endif
-
-void rtgui_container_end_modal(rtgui_container_t* container, rt_base_t exit_code)
-{
-	struct rtgui_application *app;
-
-	/* parameter check */
-	if ((container == RT_NULL) || (RTGUI_WIDGET(container)->parent == RT_NULL))
-		return;
-
-	app = RTGUI_APPLICATION(RTGUI_WIDGET(container)->parent);
-	app->exit_code = exit_code;
-	RTGUI_OBJECT(container)->flag |= RTGUI_OBJECT_FLAG_DISABLED;
-
-	/* remove modal mode */
-	container->modal_show = RT_FALSE;
-}
 
 void rtgui_container_hide(rtgui_container_t* container)
 {

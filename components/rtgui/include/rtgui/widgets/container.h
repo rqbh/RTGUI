@@ -40,7 +40,6 @@ struct rtgui_container
 	// TODO: remove this stuff that we don't need
 	/* private field */
 	char* title;
-	rt_bool_t modal_show;
 };
 typedef struct rtgui_container rtgui_container_t;
 
