@@ -59,6 +59,9 @@ static void _rtgui_notebook_draw_bar(struct rtgui_notebook *notebook,
 
 	RT_ASSERT((notebook != RT_NULL) && (dc != RT_NULL));
 
+	if (notebook->flag & RTGUI_NOTEBOOK_NOTAB)
+		return;
+
 	_rtgui_notebook_get_bar_rect(notebook, &rect);
 	rtgui_dc_fill_rect(dc, &rect);
 
@@ -147,7 +150,8 @@ static void _rtgui_notebook_get_page_rect(struct rtgui_notebook *notebook, struc
 
 	rtgui_widget_get_rect(RTGUI_WIDGET(notebook), rect);
 
-	if (notebook->flag == RTGUI_NOTEBOOK_NOTAB) return;
+	if (notebook->flag == RTGUI_NOTEBOOK_NOTAB)
+		return;
 	else if (notebook->flag == RTGUI_NOTEBOOK_TOP)
 		rect->y1 = rect->y1 + 25;
 	else if (notebook->flag == RTGUI_NOTEBOOK_BOTTOM)
@@ -160,7 +164,10 @@ static void _rtgui_notebook_get_bar_rect(struct rtgui_notebook *notebook, struct
 	RT_ASSERT(rect != RT_NULL);
 
 	rtgui_widget_get_rect(RTGUI_WIDGET(notebook), rect);
-	if (notebook->flag == RTGUI_NOTEBOOK_NOTAB) return;
+	if (notebook->flag == RTGUI_NOTEBOOK_NOTAB)
+	{
+		*rect = {0};
+	}
 	else if (notebook->flag == RTGUI_NOTEBOOK_TOP)
 		rect->y2 = rect->y1 + 25;
 	else if (notebook->flag == RTGUI_NOTEBOOK_BOTTOM)
