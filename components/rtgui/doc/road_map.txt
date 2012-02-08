@@ -33,7 +33,7 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 5, API 清理。更详细的文档。
 
 6, 使 panel 退化为无窗口标题的 window，这样 server 就只记录 window 一种东西的位
-置。
+置。(Done, 删除了 panel，使得整体以 window 为主)
 
 7, 指定名称的时候不再自己拷贝一份。(我觉得 90% 的情况下名称都是静态的字符串，这
 时用 strdup其实并没有必要。)
@@ -42,9 +42,6 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 
 9, 在 application 中记录焦点控件，键盘事件由 application 直接投送。各个控件不记
 录焦点控件。(Done)
-
-10, server 只派发事件给 panel 上的 application，由 application 自己派发给自己内
-部的窗口。server 不处理 topwin。
 
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
