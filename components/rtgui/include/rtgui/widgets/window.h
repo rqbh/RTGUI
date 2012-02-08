@@ -58,7 +58,7 @@ struct rtgui_win
 	/* inherit from toplevel */
 	struct rtgui_toplevel parent;
 
-	/* parent window. RT_NULL if the parent is the application. */
+    /* parent window. RT_NULL if the window is a top level window */
 	struct rtgui_win *parent_toplevel;
 
 	/* top window style */
@@ -68,7 +68,6 @@ struct rtgui_win
 	enum rtgui_win_flag flag;
 
 	rtgui_modal_code_t modal_code;
-	rtgui_widget_t* modal_widget;
 	rt_bool_t in_modal;
 
 	/* window title */

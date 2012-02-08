@@ -31,7 +31,6 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 	win->on_close		= RT_NULL;
 	win->title			= RT_NULL;
 	win->modal_code		= RTGUI_MODAL_OK;
-	win->modal_widget	= RT_NULL;
 
 	/* set window hide */
 	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(win));
@@ -506,14 +505,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 			}
 		}
 
-		if (win->flag & RTGUI_WIN_FLAG_UNDER_MODAL)
-		{
-			if (win->modal_widget != RT_NULL)
-				return RTGUI_OBJECT(win->modal_widget)->event_handler(
-						RTGUI_OBJECT(win->modal_widget),
-						event);
-		}
-		else if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win),
+		if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win),
 			(struct rtgui_event_mouse*)event) == RT_FALSE)
 		{
 #ifndef RTGUI_USING_SMALL_SIZE
