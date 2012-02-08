@@ -293,7 +293,7 @@ void rtgui_notebook_set_current_by_index(struct rtgui_notebook* notebook, rt_uin
 	}
 }
 
-struct rtgui_widget* rtgui_notebook_get_index(struct rtgui_notebook* notebook, rt_uint16_t index)
+struct rtgui_widget* rtgui_notebook_get_widget_at(struct rtgui_notebook* notebook, rt_uint16_t index)
 {
 	RT_ASSERT(notebook != RT_NULL);
 	if (index < notebook->count)

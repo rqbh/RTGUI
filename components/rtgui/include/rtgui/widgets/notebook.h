@@ -41,8 +41,7 @@ int rtgui_notebook_get_count(struct rtgui_notebook* notebook);
 void rtgui_notebook_set_current(struct rtgui_notebook* notebook, struct rtgui_widget* child);
 void rtgui_notebook_set_current_by_index(struct rtgui_notebook* notebook, rt_uint16_t index);
 
-// TODO: rename this API
-struct rtgui_widget* rtgui_notebook_get_index(struct rtgui_notebook* notebook, rt_uint16_t index);
+struct rtgui_widget* rtgui_notebook_get_widget_at(struct rtgui_notebook* notebook, rt_uint16_t index);
 
 rt_bool_t rtgui_notebook_event_handler(struct rtgui_object* widget, struct rtgui_event* event);
 
