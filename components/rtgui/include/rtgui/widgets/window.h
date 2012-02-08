@@ -70,6 +70,9 @@ struct rtgui_win
 	rtgui_modal_code_t modal_code;
 	rt_bool_t in_modal;
 
+	/* last mouse event handled widget */
+	rtgui_widget_t* last_mevent_widget;
+
 	/* window title */
 	char* title;
 

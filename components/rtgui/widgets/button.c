@@ -14,7 +14,7 @@
 #include <rtgui/dc.h>
 #include <rtgui/rtgui_theme.h>
 #include <rtgui/widgets/button.h>
-#include <rtgui/widgets/toplevel.h>
+#include <rtgui/widgets/window.h>
 
 static void _rtgui_button_constructor(rtgui_button_t *button)
 {
@@ -150,10 +150,10 @@ rt_bool_t rtgui_button_event_handler(struct rtgui_widget* widget, struct rtgui_e
 				if (emouse->button & RTGUI_MOUSE_BUTTON_LEFT)
 				{
 					/* set the last mouse event handled widget */
-					rtgui_toplevel_t* toplevel;
+					struct rtgui_win* win;
 
-					toplevel = RTGUI_TOPLEVEL(RTGUI_WIDGET(btn)->toplevel);
-					toplevel->last_mevent_widget = RTGUI_WIDGET(btn);
+					win = RTGUI_WIN(RTGUI_WIDGET(btn)->toplevel);
+					win->last_mevent_widget = RTGUI_WIDGET(btn);
 
 					/* it's a normal button */
 					if (emouse->button & RTGUI_MOUSE_BUTTON_DOWN)

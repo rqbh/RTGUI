@@ -32,6 +32,9 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 	win->title			= RT_NULL;
 	win->modal_code		= RTGUI_MODAL_OK;
 
+	/* initialize last mouse event handled widget */
+	win->last_mevent_widget = RT_NULL;
+
 	/* set window hide */
 	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(win));
 
@@ -485,23 +488,22 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 
 	case RTGUI_EVENT_MOUSE_BUTTON:
 		/* check whether has widget which handled mouse event before */
-		if (RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win) != RT_NULL)
+		if (win->last_mevent_widget != RT_NULL)
 		{
 			struct rtgui_event_mouse* emouse;
 
 			emouse = (struct rtgui_event_mouse*)event;
 
 			if (rtgui_rect_contains_point(
-						&(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)->extent),
+						&(win->last_mevent_widget->extent),
 						emouse->x, emouse->y) == RT_EOK)
 			{
-				RTGUI_OBJECT(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)
-						)->event_handler(
-							RTGUI_OBJECT(RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win)),
+				RTGUI_OBJECT(win->last_mevent_widget)->event_handler(
+							RTGUI_OBJECT(win->last_mevent_widget),
 							event);
 
 				/* clean last mouse event handled widget */
-				RTGUI_TOPLEVEL_LAST_MEVENT_WIDGET(win) = RT_NULL;
+				win->last_mevent_widget = RT_NULL;
 			}
 		}
 
