@@ -6,35 +6,35 @@
 #include <rtgui/widgets/button.h>
 #include <rtgui/widgets/staticline.h>
 
+extern struct rtgui_notebook *the_notebook;
+
 void demo_view_next(struct rtgui_object *object, struct rtgui_event *event)
 {
-	struct rtgui_notebook *notebook = RTGUI_NOTEBOOK(object);
-	rtgui_notebook_set_current_by_index(notebook,
-			(rtgui_notebook_get_current_index(notebook) + 1) %
-			rtgui_notebook_get_count(notebook));
+	rtgui_notebook_set_current_by_index(the_notebook,
+			(rtgui_notebook_get_current_index(the_notebook) + 1) %
+			rtgui_notebook_get_count(the_notebook));
 }
 
 void demo_view_prev(struct rtgui_object *object, struct rtgui_event *event)
 {
-	struct rtgui_notebook *notebook = RTGUI_NOTEBOOK(object);
-	rtgui_notebook_set_current_by_index(notebook,
-			(rtgui_notebook_get_current_index(notebook) - 1) %
-			rtgui_notebook_get_count(notebook));
+	rtgui_notebook_set_current_by_index(the_notebook,
+			(rtgui_notebook_get_current_index(the_notebook) - 1) %
+			rtgui_notebook_get_count(the_notebook));
 }
 
-rtgui_container_t* demo_view(struct rtgui_notebook *notebook, const char *title)
+rtgui_container_t* demo_view(const char *title)
 {
 	struct rtgui_container  *container;
 	struct rtgui_label      *label;
 	struct rtgui_staticline *line;
-	struct rtgui_button     *next_btn,  *prev_btn;
+	struct rtgui_button     *next_btn, *prev_btn;
 	struct rtgui_rect       rect;
 
 	container = rtgui_container_create();
 	if (container == RT_NULL)
 		return RT_NULL;
 
-	rtgui_notebook_add(notebook, title, RTGUI_WIDGET(container));
+	rtgui_notebook_add(the_notebook, title, RTGUI_WIDGET(container));
 
 	/* 获得视图的位置信息(在加入到 notebook 中时，notebook 会自动调整 container
 	 * 的大小) */
@@ -54,7 +54,7 @@ rtgui_container_t* demo_view(struct rtgui_notebook *notebook, const char *title)
 
 	rect.y1 += 20;
 	rect.y2 += 20;
-	/* 创建一个水平的staticline线 */
+	/* 创建一个水平的 staticline 线 */
 	line = rtgui_staticline_create(RTGUI_HORIZONTAL);
 	/* 设置静态线的位置信息 */
 	rtgui_widget_set_rect(RTGUI_WIDGET(line), &rect);

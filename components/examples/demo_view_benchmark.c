@@ -101,10 +101,10 @@ rt_bool_t benchmark_event_handler(struct rtgui_obect *object, rtgui_event_t *eve
 	return RT_FALSE;
 }
 
-rtgui_container_t *demo_view_benchmark(rtgui_workbench_t* workbench)
+rtgui_container_t *demo_view_benchmark(void)
 {
 	srand(100);
-	container = demo_view(workbench, "»æÍ¼²âÊÔ");
+	container = demo_view("»æÍ¼²âÊÔ");
 	rtgui_object_set_event_handler(RTGUI_WIDGET(container), benchmark_event_handler);
 
 	return container;

@@ -23,8 +23,8 @@
 #include <rtgui/widgets/box.h>
 #endif
 
-/* 创建一个演示视图，需要给出这个视图所在的 application 和演示标题 */
-rtgui_container_t* demo_view(struct rtgui_application *app, const char* title);
+/* 创建一个演示视图，需要给出这个视图的演示标题 */
+rtgui_container_t* demo_view(const char* title);
 /* 获得演示视图提供给演示控件用的区域信息 */
 void demo_view_get_rect(rtgui_container_t* view, rtgui_rect_t *rect);
 void demo_view_get_logic_rect(rtgui_container_t* view, rtgui_rect_t *rect);

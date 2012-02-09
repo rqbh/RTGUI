@@ -5,6 +5,8 @@
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/notebook.h>
 
+struct rtgui_notebook *the_notebook;
+
 static rt_bool_t demo_application_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
 	/* 我们目前只对按键事件感兴趣。*/
@@ -34,7 +36,6 @@ static void application_entry(void* parameter)
 {
 	struct rtgui_application *app;
 	struct rtgui_win *win;
-	struct rtgui_notebook *notebook;
 	struct rtgui_rect rect;
 
 	app = rtgui_application_create(rt_thread_self(), "gui_demo");
@@ -54,18 +55,18 @@ static void application_entry(void* parameter)
 	}
 
 	/* create a no title notebook that we can switch demo on it easily. */
-	notebook = rtgui_notebook_create(&rect, RTGUI_NOTEBOOK_NOTAB);
-	if (notebook == RT_NULL)
+	the_notebook = rtgui_notebook_create(&rect, RTGUI_NOTEBOOK_NOTAB);
+	if (the_notebook == RT_NULL)
 	{
 		rtgui_win_destroy(win);
 		rtgui_application_destroy(app);
 		return;
 	}
 
-	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(notebook));
+	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(the_notebook));
 
 	/* 初始化各个例子的视图 */
-	demo_view_benchmark(notebook);
+	demo_view_benchmark();
 
 #if 0
 	demo_view_dc(notebook);
