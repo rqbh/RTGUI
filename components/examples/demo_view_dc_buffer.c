@@ -16,8 +16,9 @@ static struct rtgui_dc *dc_buffer;
 /*
  * view的事件处理函数
  */
-static rt_bool_t dc_buffer_event_handler(rtgui_widget_t* widget, rtgui_event_t *event)
+static rt_bool_t dc_buffer_event_handler(struct rtgui_object* object, rtgui_event_t *event)
 {
+	struct rtgui_widget *widget = RTGUI_WIDGET(object);
 
 	/* 仅对PAINT事件进行处理 */
 	if (event->type == RTGUI_EVENT_PAINT)
@@ -50,14 +51,14 @@ static rt_bool_t dc_buffer_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 	else
 	{
 		/* 其他事件，调用默认的事件处理函数 */
-		return rtgui_container_event_handler(widget, event);
+		return rtgui_container_event_handler(object, event);
 	}
 
 	return RT_FALSE;
 }
 
 /* 创建用于DC Buffer操作演示用的视图 */
-rtgui_container_t *demo_view_dc_buffer(rtgui_workbench_t* workbench)
+rtgui_container_t *demo_view_dc_buffer()
 {
 	rtgui_container_t *view;
 
@@ -74,7 +75,7 @@ rtgui_container_t *demo_view_dc_buffer(rtgui_workbench_t* workbench)
 		rtgui_dc_draw_circle(dc_buffer, 25, 25, 10);
 	}
 
-	view = demo_view(workbench, "缓冲DC演示");
+	view = demo_view("缓冲DC演示");
 	if (view != RT_NULL)
 		/* 设置成自己的事件处理函数 */
 		rtgui_object_set_event_handler(RTGUI_WIDGET(view), dc_buffer_event_handler);

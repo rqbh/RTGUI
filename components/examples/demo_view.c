@@ -100,24 +100,24 @@ rtgui_container_t* demo_view(const char *title)
 }
 
 /* 这个函数用于返回演示视图的对外可用区域 */
-void demo_view_get_rect(rtgui_container_t* view, rtgui_rect_t *rect)
+void demo_view_get_rect(rtgui_container_t* container, rtgui_rect_t *rect)
 {
-	RT_ASSERT(view != RT_NULL);
+	RT_ASSERT(container != RT_NULL);
 	RT_ASSERT(rect != RT_NULL);
 
-	rtgui_widget_get_rect(RTGUI_WIDGET(view), rect);
-	rtgui_widget_rect_to_device(RTGUI_WIDGET(view), rect);
+	rtgui_widget_get_rect(RTGUI_WIDGET(container), rect);
+	rtgui_widget_rect_to_device(RTGUI_WIDGET(container), rect);
 	/* 去除演示标题和下方按钮的区域 */
 	rect->y1 += 45;
 	rect->y2 -= 35;
 }
 
-void demo_view_get_logic_rect(rtgui_container_t* view, rtgui_rect_t *rect)
+void demo_view_get_logic_rect(rtgui_container_t* container, rtgui_rect_t *rect)
 {
-	RT_ASSERT(view != RT_NULL);
+	RT_ASSERT(container != RT_NULL);
 	RT_ASSERT(rect != RT_NULL);
 
-	rtgui_widget_get_rect(RTGUI_WIDGET(view), rect);
+	rtgui_widget_get_rect(RTGUI_WIDGET(container), rect);
 	/* 去除演示标题和下方按钮的区域 */
 	rect->y1 += 45;
 	rect->y2 -= 35;
@@ -125,20 +125,20 @@ void demo_view_get_logic_rect(rtgui_container_t* view, rtgui_rect_t *rect)
 
 /* 当是标准版本时，这个函数用于返回自动布局引擎box控件 */
 #ifndef RTGUI_USING_SMALL_SIZE
-rtgui_box_t* demo_view_create_box(rtgui_container_t* view, int orient)
+struct rtgui_box* demo_view_create_box(struct rtgui_container *container, int orient)
 {
 	rtgui_rect_t rect;
-	rtgui_box_t* box;
+	struct rtgui_box* box;
 
 	/* 获得视图的位置信息 */
-	rtgui_widget_get_rect(RTGUI_WIDGET(view), &rect);
+	rtgui_widget_get_rect(RTGUI_WIDGET(container), &rect);
 	rect.y1 += 45;
 	rect.y2 -= 25;
 
 	/* 创建一个自动布局引擎 */
 	box = rtgui_box_create(orient, &rect);
 	/* 添加box控件到视图中 */
-	rtgui_container_add_child(view, RTGUI_WIDGET(box));
+	rtgui_container_add_child(container, RTGUI_WIDGET(box));
 
 	return box;
 }

@@ -69,46 +69,46 @@ static void application_entry(void* parameter)
 	demo_view_benchmark();
 
 	demo_view_dc();
-#if 0
 #ifdef RTGUI_USING_TTF
-	demo_view_ttf(notebook);
+	demo_view_ttf();
 #endif
 
 #ifndef RTGUI_USING_SMALL_SIZE
-	demo_view_dc_buffer(notebook);
+	demo_view_dc_buffer();
 #endif
-	demo_view_animation(notebook);
+	demo_view_animation();
+#if 0
 #ifndef RTGUI_USING_SMALL_SIZE
-	demo_view_buffer_animation(notebook);
-	// demo_view_instrument_panel(notebook);
+	demo_view_buffer_animation();
+	// demo_view_instrument_panel();
 #endif
-	demo_view_window(notebook);
-	demo_view_label(notebook);
-	demo_view_button(notebook);
-	demo_view_checkbox(notebook);
-	demo_view_progressbar(notebook);
-	demo_view_scrollbar(notebook);
-	demo_view_radiobox(notebook);
-	demo_view_textbox(notebook);
-	demo_view_listbox(notebook);
-	demo_view_menu(notebook);
-	demo_view_listctrl(notebook);
-	demo_view_combobox(notebook);
-	demo_view_slider(notebook);
-	demo_view_notebook(notebook);
-	demo_view_mywidget(notebook);
+	demo_view_window();
+	demo_view_label();
+	demo_view_button();
+	demo_view_checkbox();
+	demo_view_progressbar();
+	demo_view_scrollbar();
+	demo_view_radiobox();
+	demo_view_textbox();
+	demo_view_listbox();
+	demo_view_menu();
+	demo_view_listctrl();
+	demo_view_combobox();
+	demo_view_slider();
+	demo_view_notebook();
+	demo_view_mywidget();
 #if defined(RTGUI_USING_DFS_FILERW) || defined(RTGUI_USING_STDIO_FILERW)
-	demo_view_image(notebook);
+	demo_view_image();
 #endif
 #ifdef RT_USING_MODULE	
 #if defined(RTGUI_USING_DFS_FILERW) || defined(RTGUI_USING_STDIO_FILERW)
-	demo_view_module(notebook);
+	demo_view_module();
 #endif
 #endif
-	demo_listview_view(notebook);
-	demo_listview_icon_view(notebook);
+	demo_listview_view();
+	demo_listview_icon_view();
 #if defined(RTGUI_USING_DFS_FILERW) || defined(RTGUI_USING_STDIO_FILERW)
-	demo_fn_view(notebook);
+	demo_fn_view();
 #endif
 #endif
 
