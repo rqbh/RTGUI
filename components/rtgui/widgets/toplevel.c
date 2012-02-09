@@ -58,20 +58,6 @@ rt_bool_t rtgui_toplevel_event_handler(struct rtgui_object* object, rtgui_event_
 		rtgui_toplevel_update_clip(toplevel);
 		break;
 
-	case RTGUI_EVENT_TIMER:
-		{
-			struct rtgui_timer* timer;
-			struct rtgui_event_timer* etimer = (struct rtgui_event_timer*) event;
-
-			timer = etimer->timer;
-			if (timer->timeout != RT_NULL)
-			{
-				/* call timeout function */
-				timer->timeout(timer, timer->user_data);
-			}
-		}
-		break;
-
 	case RTGUI_EVENT_COMMAND:
 		if (rtgui_container_dispatch_event(RTGUI_CONTAINER(object), event) != RT_TRUE)
 		{

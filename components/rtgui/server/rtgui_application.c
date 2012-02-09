@@ -589,6 +589,20 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 		}
 		break;
 
+	case RTGUI_EVENT_TIMER:
+		{
+			struct rtgui_timer* timer;
+			struct rtgui_event_timer* etimer = (struct rtgui_event_timer*) event;
+
+			timer = etimer->timer;
+			if (timer->timeout != RT_NULL)
+			{
+				/* call timeout function */
+				timer->timeout(timer, timer->user_data);
+			}
+		}
+		break;
+
 	default:
 		return rtgui_object_event_handler(object, event);
 	}
