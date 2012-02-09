@@ -19,7 +19,7 @@ static void _rtgui_notebook_constructor(struct rtgui_notebook *notebook)
 	notebook->flag    = 0;
 	notebook->childs  = RT_NULL;
 	notebook->count   = 0;
-	notebook->current = RTGUI_NOT_FOUND;
+	notebook->current = 0;
 
 	RTGUI_WIDGET(notebook)->gc.textalign = RTGUI_ALIGN_CENTER_HORIZONTAL | RTGUI_ALIGN_CENTER_VERTICAL;
 	rtgui_object_set_event_handler(RTGUI_OBJECT(notebook), rtgui_notebook_event_handler);
@@ -212,6 +212,9 @@ void rtgui_notebook_add(struct rtgui_notebook* notebook, const char* label, stru
 	_rtgui_notebook_get_page_rect(notebook, &rect);
 	rtgui_widget_rect_to_device(RTGUI_WIDGET(notebook), &rect);
 	rtgui_widget_set_rect(child, &rect);
+
+    if (notebook->count - 1 != notebook->current)
+        rtgui_widget_hide(child);
 }
 
 void rtgui_notebook_remove(struct rtgui_notebook* notebook, rt_uint16_t index)
