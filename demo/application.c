@@ -2,9 +2,7 @@
 
 int rt_application_init()
 {
-	panel_init();
-
-	workbench_init();
+	application_init();
 
 	return 0;
 }

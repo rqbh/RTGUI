@@ -6,8 +6,6 @@ objs = []
 list = os.listdir(os.path.join(RTT_ROOT, 'components'))
 
 for d in list:
-    if d == 'examples':
-        continue
     path = os.path.join(RTT_ROOT, 'components', d)
     if os.path.isfile(os.path.join(path, 'SConscript')):
         objs = objs + SConscript(os.path.join(d, 'SConscript'))

@@ -1,13 +1,12 @@
 from building import *
 
-src = Split("""
+'''
 demo_view_dc_buffer.c
 demo_view_instrument_panel.c
 demo_fnview.c
 demo_listview.c
 demo_listview_icon.c
 demo_panel_single.c
-demo_view.c
 demo_view_animation.c
 demo_view_buffer_animation.c
 demo_view_box.c
@@ -29,10 +28,13 @@ demo_view_menu.c
 demo_view_scrollbar.c
 demo_view_textbox.c
 demo_view_window.c
-demo_view_benchmark.c
-demo_workbench.c
-gui_init.c
 mywidget.c
+'''
+
+src = Split("""
+demo_application.c
+demo_view.c
+demo_view_benchmark.c
 """)
 
 group = DefineGroup('gui_examples', src, depend = ['RT_USING_RTGUI'])
