@@ -166,7 +166,7 @@ static void _rtgui_notebook_get_bar_rect(struct rtgui_notebook *notebook, struct
 	rtgui_widget_get_rect(RTGUI_WIDGET(notebook), rect);
 	if (notebook->flag == RTGUI_NOTEBOOK_NOTAB)
 	{
-		*rect = {0};
+		rect->x1 = rect->y1 = rect->x2 = rect->y2 = 0;
 	}
 	else if (notebook->flag == RTGUI_NOTEBOOK_TOP)
 		rect->y2 = rect->y1 + 25;
