@@ -60,8 +60,6 @@ struct rtgui_application
 	/* event buffer */
 	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
 
-	/* the object I sent event to */
-	struct rtgui_object *root_object;
 	/* if not RT_NULL, the application is modaled by modal_object. If is
 	 * RT_NULL, nothing modals. */
 	struct rtgui_object *modal_object;

@@ -232,7 +232,6 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	app->tid            = RT_NULL;
 	app->server         = RT_NULL;
 	app->mq             = RT_NULL;
-	app->root_object    = RT_NULL;
 	app->modal_object   = RT_NULL;
 	app->focused_widget = RT_NULL;
 	app->on_idle        = RT_NULL;
@@ -350,26 +349,6 @@ extern rt_thread_t rt_thread_find(char* name);
 rt_thread_t rtgui_application_get_server(void)
 {
 	return rt_thread_find("rtgui");
-}
-
-void rtgui_application_set_root_object(struct rtgui_object* object)
-{
-	struct rtgui_application *app;
-
-	app = rtgui_application_self();
-	if (app != RT_NULL)
-		app->root_object = object;
-}
-
-struct rtgui_object* rtgui_application_get_root_object(void)
-{
-	struct rtgui_application *app;
-
-	app = rtgui_application_self();
-	if (app != RT_NULL)
-		return app->root_object;
-	else
-		return RT_NULL;
 }
 
 rt_err_t rtgui_application_send(rt_thread_t tid, rtgui_event_t* event, rt_size_t event_size)
@@ -532,11 +511,9 @@ rt_err_t rtgui_application_recv_filter(rt_uint32_t type, rtgui_event_t* event, r
 		}
 		else
 		{
-			/* let root_object to handle event */
-			if (app->root_object != RT_NULL &&
-				app->root_object->event_handler != RT_NULL)
+			if (RTGUI_OBJECT(app)->event_handler != RT_NULL)
 			{
-				app->root_object->event_handler(app->root_object, event);
+				RTGUI_OBJECT(app)->event_handler(RTGUI_OBJECT(app), event);
 			}
 		}
 	}
@@ -544,20 +521,23 @@ rt_err_t rtgui_application_recv_filter(rt_uint32_t type, rtgui_event_t* event, r
 	return -RT_ERROR;
 }
 
-rt_inline rt_bool_t _rtgui_application_object_handle(
+rt_inline rt_bool_t _rtgui_application_dest_handle(
 		struct rtgui_application *app,
 		struct rtgui_event *event)
 {
-	if (app->modal_object != RT_NULL &&
-		app->modal_object->event_handler != RT_NULL)
-		return app->modal_object->event_handler(app->modal_object,
-												event);
-	else if (app->root_object != RT_NULL &&
-		app->root_object->event_handler != RT_NULL)
-		return app->root_object->event_handler(app->root_object,
-											   event);
+	struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
+	struct rtgui_object* dest_object = RTGUI_OBJECT(wevent->wid);
+
+	if (dest_object != RT_NULL)
+	{
+		if (dest_object->event_handler != RT_NULL)
+			return dest_object->event_handler(RTGUI_OBJECT(dest_object), event);
+	}
 	else
+	{
+		rt_kprintf("RTGUI ERROR:server sent a event(%d) without wid\n", event->type);
 		return RT_FALSE;
+	}
 }
 
 rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_event_t* event)
@@ -573,20 +553,11 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 	{
 	case RTGUI_EVENT_PAINT:
 	case RTGUI_EVENT_CLIP_INFO:
-		{
-			struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
-			struct rtgui_object* dest_object = RTGUI_OBJECT(wevent->wid);
-
-			if (dest_object != RT_NULL &&
-				dest_object->event_handler != RT_NULL)
-			{
-				dest_object->event_handler(RTGUI_OBJECT(dest_object), event);
-			}
-			else
-			{
-				_rtgui_application_object_handle(app, event);
-			}
-		}
+	case RTGUI_EVENT_WIN_CLOSE:
+	case RTGUI_EVENT_WIN_ACTIVATE:
+	case RTGUI_EVENT_WIN_DEACTIVATE:
+	case RTGUI_EVENT_WIN_MOVE:
+		_rtgui_application_dest_handle(app, event);
 		break;
 
 	case RTGUI_EVENT_KBD:
@@ -612,39 +583,13 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 			}
 			else
 			{
-				_rtgui_application_object_handle(app, event);
-			}
-		}
-		break;
-
-	case RTGUI_EVENT_WIN_CLOSE:
-	case RTGUI_EVENT_WIN_ACTIVATE:
-	case RTGUI_EVENT_WIN_DEACTIVATE:
-	case RTGUI_EVENT_WIN_MOVE:
-		{
-			struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
-			struct rtgui_widget* dest_widget = RTGUI_WIDGET(wevent->wid);
-			if (dest_widget != RT_NULL &&
-				RTGUI_OBJECT(dest_widget)->event_handler != RT_NULL)
-			{
-				RTGUI_OBJECT(dest_widget)->event_handler(
-						RTGUI_OBJECT(dest_widget),
-						event);
+				_rtgui_application_dest_handle(app, event);
 			}
 		}
 		break;
 
 	default:
-		if (app->modal_object != RT_NULL &&
-			app->modal_object->event_handler != RT_NULL)
-			return app->modal_object->event_handler(app->modal_object,
-													event);
-		else if (app->root_object != RT_NULL &&
-				 app->root_object->event_handler != RT_NULL)
-			return app->root_object->event_handler(app->root_object,
-												   event);
-		else
-			return rtgui_object_event_handler(object, event);
+		return rtgui_object_event_handler(object, event);
 	}
 
 	return RT_TRUE;

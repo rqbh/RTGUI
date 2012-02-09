@@ -118,24 +118,8 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_toplevel,
 	if (win == RT_NULL)
 		return RT_NULL;
 
-	if (parent_toplevel == RT_NULL)
-	{
-		struct rtgui_application *app;
-
-		app = rtgui_application_self();
-		if (app == RT_NULL)
-		{
-			rt_kprintf("please create rtgui_application before creating window.\n");
-			goto __on_err;
-		}
-
-		rtgui_application_set_root_object(RTGUI_OBJECT(win));
-	}
-	else
-	{
-		/* set parent toplevel */
-		win->parent_toplevel = parent_toplevel;
-	}
+	/* set parent toplevel */
+	win->parent_toplevel = parent_toplevel;
 
 	/* set title, rect and style */
 	if (title != RT_NULL)
