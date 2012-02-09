@@ -257,6 +257,7 @@ void rtgui_notebook_remove(struct rtgui_notebook* notebook, rt_uint16_t index)
 
 int rtgui_notebook_get_count(struct rtgui_notebook* notebook)
 {
+	RT_ASSERT(notebook != RT_NULL);
 	return notebook->count;
 }
 
@@ -267,6 +268,12 @@ struct rtgui_widget* rtgui_notebook_get_current(struct rtgui_notebook* notebook)
 		return notebook->childs[notebook->current].widget;
 
 	return RT_NULL;
+}
+
+rt_int16_t rtgui_notebook_get_current_index(struct rtgui_notebook* notebook)
+{
+	RT_ASSERT(notebook != RT_NULL);
+	return notebook->current;
 }
 
 void rtgui_notebook_set_current(struct rtgui_notebook* notebook, struct rtgui_widget* widget)

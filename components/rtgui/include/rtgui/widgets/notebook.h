@@ -35,6 +35,7 @@ void rtgui_notebook_destroy(struct rtgui_notebook* notebook);
 
 void rtgui_notebook_add(struct rtgui_notebook* notebook, const char* label, struct rtgui_widget* child);
 struct rtgui_widget* rtgui_notebook_get_current(struct rtgui_notebook* notebook);
+rt_int16_t rtgui_notebook_get_current_index(struct rtgui_notebook* notebook);
 
 int rtgui_notebook_get_count(struct rtgui_notebook* notebook);
 
