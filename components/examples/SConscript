@@ -12,7 +12,6 @@ demo_view_buffer_animation.c
 demo_view_box.c
 demo_view_button.c
 demo_view_checkbox.c
-demo_view_dc.c
 demo_view_image.c
 demo_view_module.c
 demo_view_label.c
@@ -35,6 +34,7 @@ src = Split("""
 demo_application.c
 demo_view.c
 demo_view_benchmark.c
+demo_view_dc.c
 """)
 
 group = DefineGroup('gui_examples', src, depend = ['RT_USING_RTGUI'])

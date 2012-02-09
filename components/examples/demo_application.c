@@ -68,8 +68,8 @@ static void application_entry(void* parameter)
 	/* 初始化各个例子的视图 */
 	demo_view_benchmark();
 
+	demo_view_dc();
 #if 0
-	demo_view_dc(notebook);
 #ifdef RTGUI_USING_TTF
 	demo_view_ttf(notebook);
 #endif
