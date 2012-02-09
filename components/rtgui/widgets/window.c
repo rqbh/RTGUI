@@ -109,7 +109,7 @@ DEFINE_CLASS_TYPE(win, "win",
 rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_toplevel,
 		                      const char* title,
 							  rtgui_rect_t *rect,
-							  rt_uint8_t style)
+							  rt_uint16_t style)
 {
 	struct rtgui_win* win;
 

@@ -87,7 +87,7 @@ struct rtgui_win
 };
 
 rtgui_win_t* rtgui_win_create(struct rtgui_win *parent_toplevel, const char* title,
-							  rtgui_rect_t *rect, rt_uint8_t flag);
+							  rtgui_rect_t *rect, rt_uint16_t style);
 void rtgui_win_destroy(rtgui_win_t* win);
 
 /** Close window.
