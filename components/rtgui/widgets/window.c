@@ -228,7 +228,7 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
     if (is_modal == RT_TRUE)
     {
-		struct rtgui_object *old_focus;
+		struct rtgui_widget *old_focus;
 		struct rtgui_application *app;
 
 		app = rtgui_application_self();
@@ -467,17 +467,10 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 					RTGUI_OBJECT(win->last_mevent_widget),
 					event);
 
-			if (win->last_mevent_widget != RT_NULL &&
-				rtgui_rect_contains_point(
-						&(win->last_mevent_widget->extent),
-						emouse->x, emouse->y) == RT_EOK)
-			{
-				/* clean last mouse event handled widget */
-				win->last_mevent_widget = RT_NULL;
-			}
+			/* clean last mouse event handled widget */
+			win->last_mevent_widget = RT_NULL;
 		}
-
-		if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win),
+		else if (rtgui_container_dispatch_mouse_event(RTGUI_CONTAINER(win),
 			(struct rtgui_event_mouse*)event) == RT_FALSE)
 		{
 #ifndef RTGUI_USING_SMALL_SIZE
