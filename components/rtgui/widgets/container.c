@@ -288,10 +288,10 @@ rtgui_widget_t* rtgui_container_get_first_child(rtgui_container_t* container)
 }
 
 #ifndef RTGUI_USING_SMALL_SIZE
-void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box)
+void rtgui_container_set_box(rtgui_container_t* container, struct rtgui_box* box)
 {
-	if (container == RT_NULL ||
-		box  == RT_NULL) return;
+	if (container == RT_NULL || box  == RT_NULL)
+        return;
 
 	rtgui_container_add_child(RTGUI_CONTAINER(container), RTGUI_WIDGET(box));
 	rtgui_widget_set_rect(RTGUI_WIDGET(box), &(RTGUI_WIDGET(container)->extent));

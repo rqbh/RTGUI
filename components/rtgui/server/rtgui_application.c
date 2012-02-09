@@ -119,14 +119,15 @@ static void rtgui_event_dump(rt_thread_t tid, rtgui_event_t* event)
 				RTGUI_WIDGET(create->wid)->extent.x1,
 				RTGUI_WIDGET(create->wid)->extent.y1,
 				RTGUI_WIDGET(create->wid)->extent.x2,
-				RTGUI_WIDGET(create->wid)->extent.y2);
+				RTGUI_WIDGET(create->wid)->extent.y2
 #else
 				create->title,
 				create->extent.x1,
 				create->extent.y1,
 				create->extent.x2,
-				create->extent.y2;
+				create->extent.y2
 #endif
+                );
 		}
 		break;
 

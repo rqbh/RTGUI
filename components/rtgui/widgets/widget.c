@@ -400,7 +400,7 @@ rtgui_widget_t* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
 rt_bool_t rtgui_widget_event_handler(struct rtgui_object* object, rtgui_event_t* event)
 {
 #ifndef RTGUI_USING_SMALL_SIZE
-	struct rtgui_widget widget;
+	struct rtgui_widget *widget;
 
 	RT_ASSERT(object != RT_NULL);
 	RT_ASSERT(event != RT_NULL);

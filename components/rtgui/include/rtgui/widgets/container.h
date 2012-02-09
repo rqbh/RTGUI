@@ -45,8 +45,8 @@ void rtgui_container_destroy(rtgui_container_t* container);
 rt_bool_t rtgui_container_event_handler(struct rtgui_object* widget, struct rtgui_event* event);
 
 #ifndef RTGUI_USING_SMALL_SIZE
-struct rtgui_box_t;
-void rtgui_container_set_box(rtgui_container_t* container, rtgui_box_t* box);
+struct rtgui_box;
+void rtgui_container_set_box(struct rtgui_container* container, struct rtgui_box* box);
 #endif
 
 void rtgui_container_hide(rtgui_container_t* container);
