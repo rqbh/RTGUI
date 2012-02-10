@@ -97,6 +97,18 @@ rt_bool_t animation_event_handler(struct rtgui_object* object, rtgui_event_t *ev
 	return RT_FALSE;
 }
 
+static rt_bool_t animation_on_show(struct rtgui_object *object, struct rtgui_event *event)
+{
+	rt_kprintf("animation on show\n");
+	rtgui_timer_start(timer);
+}
+
+static rt_bool_t animation_on_hide(struct rtgui_object *object, struct rtgui_event *event)
+{
+	rt_kprintf("animation on hide\n");
+	rtgui_timer_stop(timer);
+}
+
 rtgui_container_t *demo_view_animation()
 {
 	rtgui_container_t *container;
@@ -107,9 +119,10 @@ rtgui_container_t *demo_view_animation()
 
 	rtgui_font_get_metrics(RTGUI_WIDGET_FONT(RTGUI_WIDGET(container)), "飞线乱飞", &text_rect);
 	rtgui_rect_moveto(&text_rect, 0, 45);
-	/* 启动定时器以触发动画 */
 	timer = rtgui_timer_create(2, RT_TIMER_FLAG_PERIODIC, timeout, (void*)container);
-	rtgui_timer_start(timer);
+
+	rtgui_widget_set_onshow(RTGUI_WIDGET(container), animation_on_show);
+	rtgui_widget_set_onhide(RTGUI_WIDGET(container), animation_on_hide);
 
 	return container;
 }

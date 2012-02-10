@@ -41,19 +41,21 @@ static void _rtgui_widget_constructor(rtgui_widget_t *widget)
 #endif
 
 	/* set parent and toplevel root */
-	widget->parent			= RT_NULL;
-	widget->toplevel		= RT_NULL;
+	widget->parent        = RT_NULL;
+	widget->toplevel      = RT_NULL;
 
 	/* some common event handler */
-	widget->on_focus_in		= RT_NULL;
-	widget->on_focus_out	= RT_NULL;
+	widget->on_focus_in   = RT_NULL;
+	widget->on_focus_out  = RT_NULL;
+	widget->on_show       = RT_NULL;
+	widget->on_hide       = RT_NULL;
 
 #ifndef RTGUI_USING_SMALL_SIZE
-	widget->on_draw 		= RT_NULL;
-	widget->on_mouseclick 	= RT_NULL;
-	widget->on_key 			= RT_NULL;
-	widget->on_size 		= RT_NULL;
-	widget->on_command 		= RT_NULL;
+	widget->on_draw       = RT_NULL;
+	widget->on_mouseclick = RT_NULL;
+	widget->on_key        = RT_NULL;
+	widget->on_size       = RT_NULL;
+	widget->on_command    = RT_NULL;
 #endif
 
 	/* set default event handler */
@@ -228,6 +230,20 @@ void rtgui_widget_set_onunfocus(rtgui_widget_t* widget, rtgui_event_handler_ptr 
 	RT_ASSERT(widget != RT_NULL);
 
 	widget->on_focus_out = handler;
+}
+
+void rtgui_widget_set_onshow(rtgui_widget_t* widget, rtgui_event_handler_ptr handler)
+{
+	RT_ASSERT(widget != RT_NULL);
+
+	widget->on_show = handler;
+}
+
+void rtgui_widget_set_onhide(rtgui_widget_t* widget, rtgui_event_handler_ptr handler)
+{
+	RT_ASSERT(widget != RT_NULL);
+
+	widget->on_hide = handler;
 }
 
 #ifndef RTGUI_USING_SMALL_SIZE
@@ -501,11 +517,15 @@ void rtgui_widget_show(rtgui_widget_t* widget)
 {
 	/* there is no parent or the parent is hide, no show at all */
 	if (widget->parent == RT_NULL ||
-		RTGUI_WIDGET_IS_HIDE(widget->parent)) return;
+			RTGUI_WIDGET_IS_HIDE(widget->parent))
+		return;
 
 	/* update the clip info of widget */
 	RTGUI_WIDGET_UNHIDE(widget);
 	rtgui_widget_update_clip(widget);
+
+	if (widget->on_show != RT_NULL)
+		widget->on_show(RTGUI_OBJECT(widget), RT_NULL);
 }
 
 void rtgui_widget_hide(rtgui_widget_t* widget)
@@ -530,6 +550,9 @@ void rtgui_widget_hide(rtgui_widget_t* widget)
 		/* subtract the external rect */
 		rtgui_topwin_do_clip(RTGUI_WIDGET(parent));
 	}
+
+	if (widget->on_hide != RT_NULL)
+		widget->on_hide(RTGUI_OBJECT(widget), RT_NULL);
 }
 
 rtgui_color_t rtgui_widget_get_parent_foreground(rtgui_widget_t* widget)
