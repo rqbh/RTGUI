@@ -36,12 +36,12 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 置。(Done, 删除了 panel，使得整体以 window 为主)
 
 7, 指定名称的时候不再自己拷贝一份。(我觉得 90% 的情况下名称都是静态的字符串，这
-时用 strdup其实并没有必要。)
+时用 strdup其实并没有必要。)(Deprecated)
 
 8, 添加一些工业控制当中用到的波形、仪表之类的控件。
 
 9, 在 window 中记录焦点控件，键盘事件由 window 直接投送。各个控件不记录焦点控件
-。
+。(Done)
 
 10, 在 widget 中添加 on_show 和 on_hide 事件处理入口。
 
