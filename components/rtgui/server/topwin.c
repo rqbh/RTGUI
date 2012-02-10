@@ -282,6 +282,7 @@ void rtgui_topwin_raise(struct rtgui_win* wid, rt_thread_t sender)
 	RTGUI_EVENT_CLIP_INFO_INIT(&eclip);
 	eclip.wid = RT_NULL;
 
+	topwin = rtgui_topwin_search_in_list(wid, &_rtgui_topwin_show_list);
 	/* the window is already placed in front */
 	if (&(topwin->list) == _rtgui_topwin_show_list.next)
 	{
