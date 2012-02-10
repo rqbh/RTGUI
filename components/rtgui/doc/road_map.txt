@@ -43,7 +43,7 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 9, 在 window 中记录焦点控件，键盘事件由 window 直接投送。各个控件不记录焦点控件
 。(Done)
 
-10, 在 widget 中添加 on_show 和 on_hide 事件处理入口。
+10, 在 widget 中添加 on_show 和 on_hide 事件回调函数。(Done)
 
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
