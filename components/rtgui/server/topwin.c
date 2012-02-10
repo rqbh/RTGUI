@@ -212,21 +212,8 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* win)
 {
 	struct rtgui_event_win event;
 
-	/* activate the raised window */
-	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
-	event.wid = win->wid;
-	rtgui_application_send(win->tid, &(event.parent), sizeof(struct rtgui_event_win));
-
-	/* redraw title */
-	if (win->title != RT_NULL)
-	{
-		win->flag |= WINTITLE_ACTIVATE;
-		rtgui_theme_draw_win(win);
-	}
-
-    if (win->flag & WINTITLE_NOFOCUS)
-        return;
-
+	/* deactive the old focus window firstly, otherwise it will make the new
+	 * window invisible. */
 	if ((rtgui_server_focus_topwin != RT_NULL) && (rtgui_server_focus_topwin != win))
 	{
 		/* deactivate the old focus win  */
@@ -242,6 +229,21 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* win)
 			rtgui_theme_draw_win(rtgui_server_focus_topwin);
 		}
 	}
+
+	/* activate the raised window */
+	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
+	event.wid = win->wid;
+	rtgui_application_send(win->tid, &(event.parent), sizeof(struct rtgui_event_win));
+
+	/* redraw title */
+	if (win->title != RT_NULL)
+	{
+		win->flag |= WINTITLE_ACTIVATE;
+		rtgui_theme_draw_win(win);
+	}
+
+    if (win->flag & WINTITLE_NOFOCUS)
+        return;
 
 	rtgui_server_focus_topwin = win;
 }
@@ -460,7 +462,7 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 	if (topwin != RT_NULL)
 	{
 		int dx, dy;
-		rtgui_rect_t rect; /* the old topwin coverage area */
+		rtgui_rect_t old_rect; /* the old topwin coverage area */
 		struct rtgui_list_node* node;
 
 		/* send status ok */
@@ -470,14 +472,14 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 		dx = event->x - topwin->extent.x1;
 		dy = event->y - topwin->extent.y1;
 
-		rect = topwin->extent;
+		old_rect = topwin->extent;
 		/* move window rect */
 		rtgui_rect_moveto(&(topwin->extent), dx, dy);
 
 		/* move window title */
 		if (topwin->title != RT_NULL)
 		{
-			rect = RTGUI_WIDGET(topwin->title)->extent;
+			old_rect = RTGUI_WIDGET(topwin->title)->extent;
 			rtgui_widget_move_to_logic(RTGUI_WIDGET(topwin->title), dx, dy);
 		}
 
@@ -493,9 +495,13 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 		/* update windows clip info */
 		rtgui_topwin_update_clip();
 
+		/* update old window coverage area */
+		rtgui_topwin_redraw(&old_rect);
+
 		/* update top window title */
-		if (topwin->title != RT_NULL) rtgui_theme_draw_win(topwin);
-		if (rtgui_rect_is_intersect(&rect, &(topwin->extent)) != RT_EOK)
+		if (topwin->title != RT_NULL)
+			rtgui_theme_draw_win(topwin);
+		if (rtgui_rect_is_intersect(&old_rect, &(topwin->extent)) != RT_EOK)
 		{
 			/*
 			 * the old rect is not intersect with moved rect,
@@ -506,9 +512,6 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 			epaint.wid = topwin->wid;
 			rtgui_application_send(topwin->tid, &(epaint.parent), sizeof(epaint));
 		}
-
-		/* update old window coverage area */
-		rtgui_topwin_redraw(&rect);
 	}
 	else
 	{
@@ -613,6 +616,29 @@ static void rtgui_topwin_update_clip()
 	}
 }
 
+static void _rtgui_topwin_redraw_recursive(struct rtgui_rect *rect,
+										   struct rtgui_event_paint *epaint,
+										   struct rtgui_list_node *win_list)
+{
+	struct rtgui_topwin *topwin;
+
+	if (win_list->next != RT_NULL)
+		_rtgui_topwin_redraw_recursive(rect, epaint, win_list->next);
+
+	topwin = rtgui_list_entry(win_list, struct rtgui_topwin, list);
+	if (rtgui_rect_is_intersect(rect, &(topwin->extent)) == RT_EOK)
+	{
+		epaint->wid = topwin->wid;
+		rtgui_application_send(topwin->tid, &(epaint->parent), sizeof(*epaint));
+
+		/* draw title */
+		if (topwin->title != RT_NULL)
+		{
+			rtgui_theme_draw_win(topwin);
+		}
+	}
+}
+
 static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 {
 	struct rtgui_list_node* node;
@@ -620,23 +646,8 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 	RTGUI_EVENT_PAINT_INIT(&epaint);
 	epaint.wid = RT_NULL;
 
-	rtgui_list_foreach(node, &_rtgui_topwin_show_list)
-	{
-		struct rtgui_topwin* wnd = rtgui_list_entry(node, struct rtgui_topwin, list);
-
-		if (rtgui_rect_is_intersect(rect, &(wnd->extent)) == RT_EOK)
-		{
-			/* draw window */
-			epaint.wid = wnd->wid;
-			rtgui_application_send(wnd->tid, &(epaint.parent), sizeof(epaint));
-
-			/* draw title */
-			if (wnd->title != RT_NULL)
-			{
-				rtgui_theme_draw_win(wnd);
-			}
-		}
-	}
+	if(_rtgui_topwin_show_list.next != RT_NULL)
+		_rtgui_topwin_redraw_recursive(rect, &epaint, _rtgui_topwin_show_list.next);
 }
 
 void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mouse* event)
@@ -734,10 +745,10 @@ void rtgui_topwin_remove_monitor_rect(struct rtgui_win* wid, rtgui_rect_t* rect)
  */
 void rtgui_topwin_do_clip(rtgui_widget_t* widget)
 {
-	rtgui_widget_t* wid;
-	struct rtgui_rect* rect;
-	struct rtgui_topwin* topwin;
-	struct rtgui_list_node* node;
+	struct rtgui_win       * wid;
+	struct rtgui_rect      * rect;
+	struct rtgui_topwin    * topwin;
+	struct rtgui_list_node * node;
 
 	/* get toplevel wid */
 	wid = widget->toplevel;
@@ -748,7 +759,7 @@ void rtgui_topwin_do_clip(rtgui_widget_t* widget)
 	{
 		topwin = rtgui_list_entry(node, struct rtgui_topwin, list);
 
-		if (topwin->wid == (rtgui_win_t*)(wid) ||
+		if (topwin->wid == wid ||
 			RTGUI_WIDGET(topwin->title) == widget) break; /* it's self window, break */
 
 		/* get extent */
