@@ -162,8 +162,8 @@ rt_bool_t window_focus(void)
 
 	/* 非模态显示窗口 */
 	rtgui_widget_focus(RTGUI_WIDGET(main_win));//设定主窗体获取焦点
-	rtgui_win_show(main_win, RT_FALSE);
 	rtgui_win_show(picture_win,RT_FALSE);
+	rtgui_win_show(main_win, RT_FALSE);
 
 	return RT_TRUE;
 }

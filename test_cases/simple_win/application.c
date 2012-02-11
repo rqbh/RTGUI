@@ -11,7 +11,6 @@
 /*#include "test_cases.h"*/
 
 struct rtgui_application* app;
-struct rtgui_win *win1;
 
 rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event)
 {
@@ -23,11 +22,12 @@ rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event
 
 void create_wins(void)
 {
-	rtgui_label_t *label;
-	rtgui_rect_t rect = {40, 40, 200, 80};
+	struct rtgui_win *win1, *win2;
+	struct rtgui_label *label;
+	struct rtgui_rect rect = {40, 40, 200, 80};
 
 	win1 = rtgui_win_create(RT_NULL,
-		"test window", &rect, RTGUI_WIN_STYLE_DEFAULT | RTGUI_WIN_STYLE_DESTROY_ON_CLOSE);
+		"test window", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rtgui_win_set_onclose(win1, on_window_close);
 
@@ -44,6 +44,22 @@ void create_wins(void)
 
 	rt_kprintf("win1 terminated\n");
 	/*rtgui_win_destroy(win1);*/
+
+	rect.x1 = 20;
+	rect.y1 = 80;
+	rect.x2 = 180;
+	rect.y2 = 90;
+	win2 = rtgui_win_create(RT_NULL,
+		"test window2", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rtgui_win_set_onclose(win2, on_window_close);
+	rtgui_win_show(win2, RT_FALSE);
+	rtgui_win_show(win1, RT_FALSE);
+
+	rtgui_application_run(app);
+
+	rtgui_win_destroy(win1);
+	rtgui_win_destroy(win2);
 }
 
 void rt_init_thread_entry(void* parameter)
