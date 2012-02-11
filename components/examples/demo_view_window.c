@@ -1,7 +1,7 @@
 /*
  * 程序清单：窗口演示
  *
- * 这个例子会先创建出一个演示用的view，当点击上面的按钮时会不同的模式创建窗口
+ * 这个例子会先创建出一个演示用的container，当点击上面的按钮时会不同的模式创建窗口
  */
 
 #include <rtgui/rtgui.h>
@@ -31,12 +31,12 @@ static rt_bool_t normal_window_onclose(struct rtgui_win *win,
     return RT_TRUE;
 }
 
-static void create_normal_win(struct rtgui_application *app)
+static void create_normal_win(void)
 {
 	rtgui_rect_t rect = {30, 40, 150, 80};
 
-	normal_window = rtgui_win_create(RTGUI_TOPLEVEL(app),
-		"普通窗口", &rect, RTGUI_WIN_STYLE_DEFAULT);
+	normal_window = rtgui_win_create(RT_NULL, "普通窗口",
+									 &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rect.x1 += 20;
 	rect.x2 -= 5;
@@ -268,18 +268,18 @@ static void demo_stdalonewin_onbutton(struct rtgui_widget* widget, rtgui_event_t
 	rtgui_win_destroy(win);
 }
 
-rtgui_container_t* demo_view_window(struct rtgui_application *app)
+rtgui_container_t* demo_view_window(void)
 {
 	rtgui_rect_t  rect;
-	rtgui_container_t* view;
+	rtgui_container_t* container;
 	rtgui_button_t *button;
 
 	/* 创建一个演示用的视图 */
-	view = demo_view(app, "Window Demo");
+	container = demo_view("Window Demo");
 
-    create_normal_win(app);
+    create_normal_win();
 
-	demo_view_get_rect(view, &rect);
+	demo_view_get_rect(container, &rect);
 	rect.x1 += 5;
 	rect.x2 = rect.x1 + 100;
 	rect.y1 += 5;
@@ -287,11 +287,11 @@ rtgui_container_t* demo_view_window(struct rtgui_application *app)
 	/* 创建按钮用于显示正常窗口 */
 	button = rtgui_button_create("Normal Win");
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	rtgui_container_add_child(RTGUI_CONTAINER(container), RTGUI_WIDGET(button));
 	/* 设置onbutton为demo_win_onbutton函数 */
 	rtgui_button_set_onbutton(button, demo_normal_window_onbutton);
 
-	demo_view_get_rect(view, &rect);
+	demo_view_get_rect(container, &rect);
 	rect.x1 += 5;
 	rect.x2 = rect.x1 + 100;
 	rect.y1 += 5 + 25;
@@ -299,11 +299,11 @@ rtgui_container_t* demo_view_window(struct rtgui_application *app)
 	/* 创建按钮用于显示一个自动关闭的窗口 */
 	button = rtgui_button_create("Auto Win");
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	rtgui_container_add_child(RTGUI_CONTAINER(container), RTGUI_WIDGET(button));
 	/* 设置onbutton为demo_autowin_onbutton函数 */
 	rtgui_button_set_onbutton(button, demo_autowin_onbutton);
 
-	demo_view_get_rect(view, &rect);
+	demo_view_get_rect(container, &rect);
 	rect.x1 += 5;
 	rect.x2 = rect.x1 + 100;
 	rect.y1 += 5 + 25 + 25;
@@ -311,11 +311,11 @@ rtgui_container_t* demo_view_window(struct rtgui_application *app)
 	/* 创建按钮用于触发一个模式窗口 */
 	button = rtgui_button_create("Modal Win");
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	rtgui_container_add_child(RTGUI_CONTAINER(container), RTGUI_WIDGET(button));
 	/* 设置onbutton为demo_modalwin_onbutton函数 */
 	rtgui_button_set_onbutton(button, demo_modalwin_onbutton);
 
-	demo_view_get_rect(view, &rect);
+	demo_view_get_rect(container, &rect);
 	rect.x1 += 5;
 	rect.x2 = rect.x1 + 100;
 	rect.y1 += 5 + 25 + 25 + 25;
@@ -323,7 +323,7 @@ rtgui_container_t* demo_view_window(struct rtgui_application *app)
 	/* 创建按钮用于触发一个不包含标题的窗口 */
 	button = rtgui_button_create("NoTitle Win");
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	rtgui_container_add_child(RTGUI_CONTAINER(container), RTGUI_WIDGET(button));
 	/* 设置onbutton为demo_ntitlewin_onbutton函数 */
 	rtgui_button_set_onbutton(button, demo_ntitlewin_onbutton);
 
@@ -333,8 +333,8 @@ rtgui_container_t* demo_view_window(struct rtgui_application *app)
 	button = rtgui_button_create("Stand Alone Win");
 	rtgui_widget_set_rect(RTGUI_WIDGET(button), &rect);
 
-	rtgui_container_add_child(RTGUI_CONTAINER(view), RTGUI_WIDGET(button));
+	rtgui_container_add_child(RTGUI_CONTAINER(container), RTGUI_WIDGET(button));
 	rtgui_button_set_onbutton(button, demo_stdalonewin_onbutton);
 
-	return view;
+	return container;
 }

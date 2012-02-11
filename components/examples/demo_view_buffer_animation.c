@@ -91,15 +91,27 @@ static rt_bool_t animation_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 	return RT_FALSE;
 }
 
-rtgui_container_t *demo_view_buffer_animation(rtgui_workbench_t* workbench)
+static rt_bool_t animation_on_show(struct rtgui_object *object, struct rtgui_event *event)
 {
-	rtgui_container_t *view;
+	rt_kprintf("buffer animation on show\n");
+	rtgui_timer_start(timer);
+}
 
-	view = demo_view(workbench, "DC 缓冲区动画");
-	if (view != RT_NULL)
-		rtgui_object_set_event_handler(RTGUI_WIDGET(view), animation_event_handler);
+static rt_bool_t animation_on_hide(struct rtgui_object *object, struct rtgui_event *event)
+{
+	rt_kprintf("buffer animation on hide\n");
+	rtgui_timer_stop(timer);
+}
 
-	rtgui_font_get_metrics(RTGUI_WIDGET_FONT(RTGUI_WIDGET(view)), "缓冲动画", &text_rect);
+struct rtgui_container *demo_view_buffer_animation(void)
+{
+	struct rtgui_container *container;
+
+	container= demo_view("DC 缓冲区动画");
+	if (container!= RT_NULL)
+		rtgui_object_set_event_handler(RTGUI_WIDGET(container), animation_event_handler);
+
+	rtgui_font_get_metrics(RTGUI_WIDGET_FONT(RTGUI_WIDGET(container)), "缓冲动画", &text_rect);
 	if (dc_buffer == RT_NULL)
 	{
 		rtgui_rect_t rect;
@@ -109,7 +121,7 @@ rtgui_container_t *demo_view_buffer_animation(rtgui_workbench_t* workbench)
 
 		/* 创建 DC Buffer，长 50，宽 50 */
 		dc_buffer = rtgui_dc_buffer_create(rtgui_rect_width(rect), rtgui_rect_height(rect));
-		RTGUI_DC_FC(dc_buffer) = RTGUI_WIDGET_BACKGROUND(RTGUI_WIDGET(view));
+		RTGUI_DC_FC(dc_buffer) = RTGUI_WIDGET_BACKGROUND(RTGUI_WIDGET(container));
 		rtgui_dc_fill_rect(dc_buffer, &rect);
 		RTGUI_DC_FC(dc_buffer) = black;
 		rect.x1 = 1; rect.y1 = 1;
@@ -117,8 +129,10 @@ rtgui_container_t *demo_view_buffer_animation(rtgui_workbench_t* workbench)
 	}
 
 	/* 启动定时器以触发动画 */
-	timer = rtgui_timer_create(1, RT_TIMER_FLAG_PERIODIC, timeout, (void*)view);
-	rtgui_timer_start(timer);
+	timer = rtgui_timer_create(1, RT_TIMER_FLAG_PERIODIC, timeout, (void*)container);
 
-	return view;
+	rtgui_widget_set_onshow(RTGUI_WIDGET(container), animation_on_show);
+	rtgui_widget_set_onhide(RTGUI_WIDGET(container), animation_on_hide);
+
+	return container;
 }

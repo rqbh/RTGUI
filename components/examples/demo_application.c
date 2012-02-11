@@ -77,12 +77,12 @@ static void application_entry(void* parameter)
 	demo_view_dc_buffer();
 #endif
 	demo_view_animation();
-#if 0
 #ifndef RTGUI_USING_SMALL_SIZE
 	demo_view_buffer_animation();
-	// demo_view_instrument_panel();
+	demo_view_instrument_panel();
 #endif
 	demo_view_window();
+#if 0
 	demo_view_label();
 	demo_view_button();
 	demo_view_checkbox();
