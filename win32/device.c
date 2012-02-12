@@ -66,7 +66,7 @@ rt_err_t rt_device_init_all()
 	struct rt_list_node* node;
 	rt_err_t (*init)(rt_device_t dev);
 
-	rt_list_foreach(node, &(_device_list))
+	rt_list_foreach(node, &(_device_list), next)
 	{
 		device = rt_list_entry(node, struct rt_device, list);
 		/* get device init handler */
@@ -102,7 +102,7 @@ rt_device_t rt_device_find(const char* name)
 	register rt_err_t result;
 	struct rt_list_node* node;
 
-	rt_list_foreach(node, &(_device_list))
+	rt_list_foreach(node, &(_device_list), next)
 	{
 		device = rt_list_entry(node, struct rt_device, list);
 		if (strcmp(device->name, name) == 0)

@@ -60,7 +60,9 @@ struct rtgui_win
 	struct rtgui_toplevel parent;
 
     /* parent window. RT_NULL if the window is a top level window */
-	struct rtgui_win *parent_toplevel;
+	struct rtgui_win *parent_window;
+	struct rtgui_win *slibing_window;
+	struct rtgui_win *child_window;
 
 	/* the widget that will grab the focus in current window */
 	struct rtgui_widget *focused_widget;
@@ -89,7 +91,7 @@ struct rtgui_win
 	rt_uint32_t user_data;
 };
 
-rtgui_win_t* rtgui_win_create(struct rtgui_win *parent_toplevel, const char* title,
+rtgui_win_t* rtgui_win_create(struct rtgui_win *parent_window, const char* title,
 							  rtgui_rect_t *rect, rt_uint16_t style);
 void rtgui_win_destroy(rtgui_win_t* win);
 

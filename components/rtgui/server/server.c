@@ -202,8 +202,10 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     {
 		/* window event */
     case RTGUI_EVENT_WIN_CREATE:
-        rtgui_application_ack(event, RTGUI_STATUS_OK);
-        rtgui_topwin_add((struct rtgui_event_win_create*)event);
+        if (rtgui_topwin_add((struct rtgui_event_win_create*)event) == RT_EOK)
+			rtgui_application_ack(event, RTGUI_STATUS_OK);
+		else
+			rtgui_application_ack(event, RTGUI_STATUS_ERROR);
         break;
 
     case RTGUI_EVENT_WIN_DESTROY:

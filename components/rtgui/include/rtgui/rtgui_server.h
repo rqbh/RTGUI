@@ -53,8 +53,10 @@ struct rtgui_topwin
 	/* the extent information */
 	rtgui_rect_t extent;
 
-	/* the top window list */
-	rtgui_list_t list;
+	/* we need to iterate the topwin list with usual order(get target window)
+	 * or reversely(painting). So it's better to use a double linked list */
+	struct rt_list_node list;
+	struct rt_list_node child_list;
 
 	/* the monitor rect list */
 	rtgui_list_t monitor_list;

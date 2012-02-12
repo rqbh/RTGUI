@@ -72,7 +72,8 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 	rt_free(win->title);
 }
 
-static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
+static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *parent_window,
+											 struct rtgui_win *win)
 {
 	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
@@ -80,10 +81,11 @@ static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
 		RTGUI_EVENT_WIN_CREATE_INIT(&ecreate);
 
 		/* send win create event to server */
-		ecreate.wid         = win;
-		ecreate.parent.user	= win->style;
+		ecreate.parent_window = parent_window;
+		ecreate.wid           = win;
+		ecreate.parent.user	  = win->style;
 #ifndef RTGUI_USING_SMALL_SIZE
-		ecreate.extent      = RTGUI_WIDGET(win)->extent;
+		ecreate.extent        = RTGUI_WIDGET(win)->extent;
 		rt_strncpy((char*)ecreate.title, (char*)win->title, RTGUI_NAME_MAX);
 #endif
 
@@ -107,7 +109,7 @@ DEFINE_CLASS_TYPE(win, "win",
 	_rtgui_win_destructor,
 	sizeof(struct rtgui_win));
 
-rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_toplevel,
+rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
 		                      const char* title,
 							  rtgui_rect_t *rect,
 							  rt_uint16_t style)
@@ -120,7 +122,7 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_toplevel,
 		return RT_NULL;
 
 	/* set parent toplevel */
-	win->parent_toplevel = parent_toplevel;
+	win->parent_window = parent_window;
 
 	/* set title, rect and style */
 	if (title != RT_NULL)
@@ -131,7 +133,7 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_toplevel,
 	rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 	win->style = style;
 
-	if (_rtgui_win_create_in_server(win) == RT_FALSE)
+	if (_rtgui_win_create_in_server(parent_window, win) == RT_FALSE)
 	{
 		goto __on_err;
 	}
@@ -201,7 +203,7 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 	/* if it does not register into server, create it in server */
 	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
-		if (_rtgui_win_create_in_server(win) == RT_FALSE)
+		if (_rtgui_win_create_in_server(win->parent_window, win) == RT_FALSE)
 			return exit_code;
 	}
 

@@ -72,7 +72,10 @@ rt_inline int rt_list_isempty(const rt_list_t *l)
 #define rt_list_entry(node, type, member) \
     ((type *)((char *)(node) - (unsigned long)(&((type *)0)->member)))
 
-#define rt_list_foreach(node, list)	\
-	for ((node) = (list)->next; (node) != list; (node) = (node)->next)
+/* the direction can only be next or prev. If you want to iterate the list in
+ * normal order, use next. If you want to iterate the list with reverse order,
+ * use prev.*/
+#define rt_list_foreach(node, list, direction)	\
+	for ((node) = (list)->direction; (node) != list; (node) = (node)->direction)
 
 #endif

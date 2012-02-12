@@ -92,7 +92,7 @@ rt_thread_t rt_thread_self(void)
 	rt_thread_t thread;
 
 	SDL_mutexP(_thread_list_mutex);
-	rt_list_foreach(node, &(_thread_list))
+	rt_list_foreach(node, &(_thread_list), next)
 	{
 		thread = rt_list_entry(node, struct rt_thread, tlist);
 
@@ -186,7 +186,7 @@ rt_thread_t rt_thread_find(char* name)
 	struct rt_list_node* node;
 
 	SDL_mutexP(_thread_list_mutex);
-	rt_list_foreach(node, &(_thread_list))
+	rt_list_foreach(node, &(_thread_list), next)
 	{
 		thread = rt_list_entry(node, struct rt_thread, tlist);
 		if (strncmp(thread->name, name, RT_NAME_MAX) == 0)
