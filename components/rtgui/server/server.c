@@ -25,8 +25,6 @@
 static struct rt_thread *rtgui_server_tid;
 static struct rtgui_application *rtgui_server_application;
 
-extern struct rtgui_topwin* rtgui_server_focus_topwin;
-
 void rtgui_server_handle_update(struct rtgui_event_update_end* event)
 {
 	struct rtgui_graphic_driver* driver;
@@ -100,10 +98,10 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 	{
 		event->wid = wnd->wid;
 
-		if (rtgui_server_focus_topwin != wnd)
+		if (rtgui_topwin_get_focus() != wnd)
 		{
 			/* raise this window */
-			rtgui_topwin_activate_win(wnd);
+			rtgui_topwin_raise(wnd->wid);
 		}
 
 		if (wnd->title != RT_NULL &&
@@ -174,9 +172,11 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
 
 	/* todo: handle input method and global shortcut */
 
-	wnd = rtgui_server_focus_topwin;
-	if (wnd != RT_NULL && wnd->flag & WINTITLE_ACTIVATE)
+	wnd = rtgui_topwin_get_focus();
+	if (wnd != RT_NULL)
 	{
+		RT_ASSERT(wnd->flag & WINTITLE_ACTIVATE)
+
 		/* send to focus window */
 		event->wid = wnd->wid;
 

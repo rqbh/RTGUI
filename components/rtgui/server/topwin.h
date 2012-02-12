@@ -28,7 +28,7 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event);
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid);
 
 /* raise window to front */
-void rtgui_topwin_raise(struct rtgui_win* wid, rt_thread_t sender);
+void rtgui_topwin_raise(struct rtgui_win* wid);
 
 /* show a window */
 void rtgui_topwin_show(struct rtgui_event_win* event);
@@ -42,8 +42,8 @@ void rtgui_topwin_resize(struct rtgui_win* wid, rtgui_rect_t* r);
 /* get window at (x, y) */
 struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y);
 
-void rtgui_topwin_activate_win(struct rtgui_topwin* win);
-void rtgui_topwin_deactivate_win(struct rtgui_topwin* win);
+//void rtgui_topwin_activate_win(struct rtgui_topwin* win);
+//void rtgui_topwin_deactivate_win(struct rtgui_topwin* win);
 
 /* window title */
 void rtgui_topwin_title_ondraw(struct rtgui_topwin* win);
@@ -55,5 +55,7 @@ void rtgui_topwin_remove_monitor_rect(struct rtgui_win* wid, rtgui_rect_t* rect)
 
 void rtgui_topwin_do_clip(rtgui_widget_t* widget);
 
+/* get the topwin that is currently focused */
+struct rtgui_topwin* rtgui_topwin_get_focus(void);
 #endif
 
