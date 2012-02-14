@@ -50,13 +50,16 @@ void rtgui_topwin_init()
 		"topwin", 1, RT_IPC_FLAG_FIFO);
 }
 
-static struct rtgui_topwin*
-rtgui_topwin_search_in_list(struct rtgui_win* wid, struct rt_list_node* list)
+static struct rtgui_topwin* rtgui_topwin_search_in_list(struct rtgui_win* wid,
+														struct rt_list_node* list)
 {
+	/* TODO: use a cache to speed up the search. */
 	struct rt_list_node* node;
 	struct rtgui_topwin* topwin;
 
-	/* search in list */
+	/* the action is tend to operate on the top most window. So we search in a
+	 * depth first order.
+	 */
 	rt_list_foreach(node, list, next)
 	{
 		topwin = rt_list_entry(node, struct rtgui_topwin, list);
@@ -66,6 +69,10 @@ rtgui_topwin_search_in_list(struct rtgui_win* wid, struct rt_list_node* list)
 		{
 			return topwin;
 		}
+
+		topwin = rtgui_topwin_search_in_list(wid, &topwin->child_list);
+		if (topwin != RT_NULL)
+			return topwin;
 	}
 
 	return RT_NULL;
@@ -77,7 +84,8 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 	struct rtgui_topwin* topwin;
 
 	topwin = rtgui_malloc(sizeof(struct rtgui_topwin));
-	if (topwin == RT_NULL) return -RT_ERROR;
+	if (topwin == RT_NULL)
+		return -RT_ERROR;
 
 	topwin->wid 	= event->wid;
 #ifdef RTGUI_USING_SMALL_SIZE
@@ -86,6 +94,9 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 	topwin->extent 	= event->extent;
 #endif
 	topwin->tid 	= event->parent.sender;
+
+	rt_list_init(&topwin->list);
+	rt_list_init(&topwin->child_list);
 
 	topwin->flag 	= 0;
 	if (event->parent.user & RTGUI_WIN_STYLE_NO_TITLE) topwin->flag |= WINTITLE_NO;
