@@ -50,8 +50,7 @@ rt_inline void rt_list_remove(rt_list_t *n)
 	n->next->prev = n->prev;
 	n->prev->next = n->next;
 
-	n->next = 0;
-	n->prev = 0;
+	rt_list_init(n);
 }
 
 /**

@@ -18,7 +18,6 @@
 #include <rtgui/widgets/widget.h>
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/container.h>
-extern void rtgui_topwin_do_clip(rtgui_widget_t* widget);
 
 static void _rtgui_widget_constructor(rtgui_widget_t *widget)
 {
@@ -403,7 +402,7 @@ struct rtgui_win* rtgui_widget_get_toplevel(rtgui_widget_t* widget)
 		r = r->parent;
 
 	/* set toplevel */
-	widget->toplevel = r;
+	widget->toplevel = RTGUI_WIN(r);
 
 	return RTGUI_WIN(r);
 }
@@ -462,14 +461,9 @@ void rtgui_widget_update_clip(rtgui_widget_t* widget)
 	if (widget == RT_NULL || RTGUI_WIDGET_IS_HIDE(widget)) return;
 
 	parent = widget->parent;
-	/* if there is no parent, do not update clip (please use toplevel widget API) */
+	/* if there is no parent, there is no clip to update. */
 	if (parent == RT_NULL)
 	{
-		if (RTGUI_IS_TOPLEVEL(widget))
-		{
-			/* if it's toplevel widget, update it by toplevel function */
-			rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(widget));
-		}
 		return;
 	}
 
@@ -546,9 +540,6 @@ void rtgui_widget_hide(rtgui_widget_t* widget)
 
 		/* union widget rect */
 		rtgui_region_union_rect(&(parent->clip), &(parent->clip), &(widget->extent));
-
-		/* subtract the external rect */
-		rtgui_topwin_do_clip(RTGUI_WIDGET(parent));
 	}
 
 	if (widget->on_hide != RT_NULL)

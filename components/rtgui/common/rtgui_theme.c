@@ -64,6 +64,9 @@ void rtgui_theme_draw_win(struct rtgui_topwin* win)
 	dc = rtgui_dc_begin_drawing(RTGUI_WIDGET(win->title));
 	if (dc == RT_NULL) return;
 
+	rt_kprintf("window(%s) active:%d",
+			   win->title->title, !!(win->flag & WINTITLE_ACTIVATE));
+
 	/* get rect */
 	rtgui_widget_get_rect(RTGUI_WIDGET(win->title), &rect);
 

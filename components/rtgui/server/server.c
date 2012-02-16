@@ -101,7 +101,7 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 		if (rtgui_topwin_get_focus() != wnd)
 		{
 			/* raise this window */
-			rtgui_topwin_raise(wnd->wid);
+			rtgui_topwin_activate_win(wnd);
 		}
 
 		if (wnd->title != RT_NULL &&
