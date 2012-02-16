@@ -532,6 +532,8 @@ rt_inline rt_bool_t _rtgui_application_dest_handle(
 	{
 		if (dest_object->event_handler != RT_NULL)
 			return dest_object->event_handler(RTGUI_OBJECT(dest_object), event);
+		else
+			return RT_FALSE;
 	}
 	else
 	{
@@ -572,8 +574,8 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 			if (app->modal_object != RT_NULL &&
 				dest_object != app->modal_object)
 			{
-				rt_kprintf("discard event %s that is not sent to modal object\n",
-						   event_string[event->type]);
+//				rt_kprintf("discard event %s that is not sent to modal object\n",
+//						   event_string[event->type]);
 			}
 			else
 			{
