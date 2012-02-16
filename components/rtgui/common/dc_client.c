@@ -161,7 +161,7 @@ struct rtgui_dc* rtgui_dc_client_create(rtgui_widget_t* owner)
 			RTGUI_EVENT_UPDATE_BEGIN_INIT(&(eupdate));
 			eupdate.rect = RTGUI_WIDGET(top)->extent;
 
-			rtgui_application_send(top->server, (struct rtgui_event*)&eupdate, sizeof(eupdate));
+			rtgui_server_post_event((struct rtgui_event*)&eupdate, sizeof(eupdate));
 #endif
 		}
 	}
@@ -229,7 +229,7 @@ static rt_bool_t rtgui_dc_client_fini(struct rtgui_dc* dc)
 			RTGUI_EVENT_UPDATE_END_INIT(&(eupdate));
 			eupdate.rect = owner->extent;
 
-			rtgui_application_send(top->server, (struct rtgui_event*)&eupdate, sizeof(eupdate));
+			rtgui_server_post_event((struct rtgui_event*)&eupdate, sizeof(eupdate));
 #endif
 		}
 	}
