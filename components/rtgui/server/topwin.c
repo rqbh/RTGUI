@@ -106,14 +106,14 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 	}
 	else
 	{
-		topwin->parent  = rtgui_topwin_search_in_list(event->parent_window, &_rtgui_topwin_list);
-		rt_list_insert_before(&topwin->parent->child_list, &topwin->list);
+		topwin->parent = rtgui_topwin_search_in_list(event->parent_window, &_rtgui_topwin_list);
 		if (topwin->parent == RT_NULL)
 		{
 			/* parent does not exist. Orphan window? */
 			rtgui_free(topwin);
 			return -RT_ERROR;
 		}
+		rt_list_insert_before(&topwin->parent->child_list, &topwin->list);
 	}
 
 	rt_list_init(&topwin->child_list);
@@ -157,6 +157,18 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 	rtgui_list_init(&topwin->monitor_list);
 
 	return RT_EOK;
+}
+
+static struct rtgui_topwin* _rtgui_topwin_get_top_parent(struct rtgui_topwin *topwin)
+{
+	struct rtgui_topwin *topparent;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	topparent = topwin;
+	while (topparent->parent != RT_NULL)
+		topparent = topwin->parent;
+	return topparent;
 }
 
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
@@ -253,6 +265,33 @@ static void _rtgui_topwin_activate_next(void)
 	}
 }
 
+static void _rtgui_topwin_deactivate(struct rtgui_topwin *topwin)
+{
+	struct rtgui_event_win event;
+	struct rtgui_topwin *node;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	RTGUI_EVENT_WIN_DEACTIVATE_INIT(&event);
+	event.wid = topwin->wid;
+	rtgui_application_send(topwin->tid,
+			&event.parent, sizeof(struct rtgui_event_win));
+
+	/* redraw title */
+	if (topwin->title != RT_NULL)
+	{
+		topwin->flag &= ~WINTITLE_ACTIVATE;
+		rtgui_theme_draw_win(topwin);
+	}
+
+	/* deactivate recursively */
+	rt_list_foreach(node, &topwin->list, next)
+	{
+		struct rtgui_topwin *child_topwin = get_topwin_from_list(node);
+		_rtgui_topwin_deactivate(child_topwin);
+	}
+}
+
 /* activate a win
  * - deactivate the old focus win
  * - activate a win
@@ -260,8 +299,7 @@ static void _rtgui_topwin_activate_next(void)
  */
 void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 {
-	struct rtgui_event_win event;
-	struct rtgui_topwin *old_focus_topwin;
+	struct rtgui_topwin *old_focus_topwin, *topparent;
 
 	RT_ASSERT(topwin != RT_NULL);
 
@@ -283,27 +321,20 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 
 	if (old_focus_topwin != RT_NULL)
 	{
-		/* deactive the old focus window firstly, otherwise it will make the new
+		/* deactivate the old focus window firstly, otherwise it will make the new
 		 * window invisible. */
-		RTGUI_EVENT_WIN_DEACTIVATE_INIT(&event);
-		event.wid = old_focus_topwin->wid;
-		rtgui_application_send(old_focus_topwin->tid,
-				&event.parent, sizeof(struct rtgui_event_win));
-
-		/* redraw title */
-		if (old_focus_topwin->title != RT_NULL)
-		{
-			old_focus_topwin->flag &= ~WINTITLE_ACTIVATE;
-			rtgui_theme_draw_win(old_focus_topwin);
-		}
+		_rtgui_topwin_deactivate(old_focus_topwin);
 	}
 
-	/* remove node from hidden list */
-	rt_list_remove(&(topwin->list));
-	/* add node to show list */
-	rt_list_insert_after(&_rtgui_topwin_list, &(topwin->list));
+	/* move the whole tree */
+	topparent = _rtgui_topwin_get_top_parent(topwin);
 
-	_rtgui_topwin_only_activate(topwin);
+	/* remove node from hidden list */
+	rt_list_remove(&(topparent->list));
+	/* add node to show list */
+	rt_list_insert_after(&_rtgui_topwin_list, &(topparent->list));
+
+	_rtgui_topwin_only_activate(topparent);
 }
 
 #if 0
