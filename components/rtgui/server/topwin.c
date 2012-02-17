@@ -305,7 +305,7 @@ static void _rtgui_topwin_deactivate(struct rtgui_topwin *topwin)
 	}
 
 	/* deactivate recursively */
-	rt_list_foreach(node, &topwin->list, next)
+	rt_list_foreach(node, &topwin->child_list, next)
 	{
 		struct rtgui_topwin *child_topwin = get_topwin_from_list(node);
 		_rtgui_topwin_deactivate(child_topwin);
