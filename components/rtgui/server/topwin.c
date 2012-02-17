@@ -25,10 +25,11 @@
  * which all the windows have the WINTITLE_SHOWN flag set. Second part is the
  * hidden list, in which all the windows don't have WINTITLE_SHOWN flag.
  *
- * The first item of shown list is always the active window which will have the
- * focus. The order of this list is the order of the windows. Thus, the first
- * item is the top most window and the last item is the bottom window. Top
- * window can always clip the window beneath it when the two overlapping.
+ * The active window is the one that would recieve kbd events. It should always
+ * in the first tree. The order of this list is the order of the windows.
+ * Thus, the first item is the top most window and the last item is the bottom
+ * window. Top window can always clip the window beneath it when the two
+ * overlapping.
  *
  * If you do not want to handle the kbd event in a window, let the parent to
  * handle it.
@@ -337,17 +338,6 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 
 	RT_ASSERT(topwin != RT_NULL);
 
-	/* If there is only one shown window, don't deactivate the old one. */
-	if ((_rtgui_topwin_list.next == &topwin->list &&
-		_rtgui_topwin_list.prev == &topwin->list) ||
-		(_rtgui_topwin_list.next == &topwin->list &&
-		 !(get_topwin_from_list(topwin->list.next)->flag & WINTITLE_SHOWN))
-	   )
-	{
-		_rtgui_topwin_only_activate(topwin);
-		return;
-	}
-
 	old_focus_topwin = rtgui_topwin_get_focus();
 
 	if (old_focus_topwin == topwin)
@@ -503,9 +493,6 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 	}
 
-	/* send status ok */
-	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
-
 	/* get the delta move x, y */
 	dx = event->x - topwin->extent.x1;
 	dy = event->y - topwin->extent.y1;
@@ -550,6 +537,9 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 		epaint.wid = topwin->wid;
 		rtgui_application_send(topwin->tid, &(epaint.parent), sizeof(epaint));
 	}
+
+	/* send status ok */
+	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 }
 
 /*
@@ -599,19 +589,29 @@ void rtgui_topwin_resize(struct rtgui_win* wid, rtgui_rect_t* rect)
 	rtgui_topwin_redraw(rtgui_region_extents(&region));
 }
 
+static struct rtgui_topwin* _rtgui_topwin_get_focus_from_list(struct rt_list_node *list)
+{
+	struct rt_list_node *node;
+
+	RT_ASSERT(list != RT_NULL);
+
+	rt_list_foreach(node, list, next)
+	{
+		struct rtgui_topwin *child = get_topwin_from_list(node);
+		if (child->flag & WINTITLE_ACTIVATE)
+			return child;
+
+		child = _rtgui_topwin_get_focus_from_list(&child->child_list);
+		if (child != RT_NULL)
+			return child;
+	}
+
+	return RT_NULL;
+}
+
 struct rtgui_topwin* rtgui_topwin_get_focus(void)
 {
-	struct rtgui_topwin *child;
-
-	if (rt_list_isempty(&_rtgui_topwin_list) ||
-		!(get_topwin_from_list(_rtgui_topwin_list.next)->flag & WINTITLE_SHOWN))
-		return RT_NULL;
-
-	child = get_topwin_from_list(_rtgui_topwin_list.next);
-	while (!rt_list_isempty(&child->child_list))
-		child = get_topwin_from_list(child->child_list.next);
-
-	return child;
+	return _rtgui_topwin_get_focus_from_list(&_rtgui_topwin_list);
 }
 
 struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y)
