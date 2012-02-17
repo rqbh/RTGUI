@@ -228,7 +228,9 @@ static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
 	struct rtgui_event_win event;
 
 	RT_ASSERT(topwin != RT_NULL);
-	RT_ASSERT(topwin->flag & WINTITLE_SHOWN);
+
+	if (!(topwin->flag & WINTITLE_SHOWN))
+		return;
 
 	topwin->flag |= WINTITLE_ACTIVATE;
 
