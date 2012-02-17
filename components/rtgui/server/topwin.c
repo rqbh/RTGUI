@@ -220,14 +220,14 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 	return -RT_ERROR;
 }
 
-/* neither deactivate the old focus nor change _rtgui_topwin_list.
- * Suitable to be called when the first item is the window to be activated
- * already. */
-static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
+/* similar to _rtgui_topwin_only_activate, but it share the event with outside
+ * world. This will reduce the stack consumption*/
+static void _rtgui_topwin_only_activate_do(struct rtgui_topwin *topwin, struct rtgui_event_win *event)
 {
-	struct rtgui_event_win event;
+	struct rt_list_node *node;
 
 	RT_ASSERT(topwin != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
 
 	if (!(topwin->flag & WINTITLE_SHOWN))
 		return;
@@ -237,18 +237,35 @@ static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
 	/* update clip info */
 	rtgui_topwin_update_clip();
 
-	/* activate the raised window */
-	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
-	event.wid = topwin->wid;
-	rtgui_application_send(topwin->tid, &(event.parent), sizeof(struct rtgui_event_win));
+	event->wid = topwin->wid;
+	rtgui_application_send(topwin->tid, &(event->parent), sizeof(struct rtgui_event_win));
 
 	/* redraw title */
 	if (topwin->title != RT_NULL)
 	{
 		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(topwin->title));
-		topwin->flag |= WINTITLE_ACTIVATE;
 		rtgui_theme_draw_win(topwin);
 	}
+
+	rt_list_foreach(node, &topwin->child_list, prev)
+	{
+		struct rtgui_topwin *child = get_topwin_from_list(node);
+		_rtgui_topwin_only_activate_do(topwin, event);
+	}
+}
+
+/* neither deactivate the old focus nor change _rtgui_topwin_list.
+ * Suitable to be called when the first item is the window to be activated
+ * already. */
+static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
+{
+	struct rtgui_event_win event;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	/* activate the raised window */
+	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
+	_rtgui_topwin_only_activate_do(topwin, &event);
 }
 
 static void _rtgui_topwin_activate_next(void)
@@ -270,9 +287,10 @@ static void _rtgui_topwin_activate_next(void)
 static void _rtgui_topwin_deactivate(struct rtgui_topwin *topwin)
 {
 	struct rtgui_event_win event;
-	struct rtgui_topwin *node;
+	struct rt_list_node *node;
 
 	RT_ASSERT(topwin != RT_NULL);
+	RT_ASSERT(topwin->tid != RT_NULL);
 
 	RTGUI_EVENT_WIN_DEACTIVATE_INIT(&event);
 	event.wid = topwin->wid;
