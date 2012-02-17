@@ -611,7 +611,18 @@ static struct rtgui_topwin* _rtgui_topwin_get_focus_from_list(struct rt_list_nod
 
 struct rtgui_topwin* rtgui_topwin_get_focus(void)
 {
+#if 1
+	// debug code
+	struct rtgui_topwin *topwin = _rtgui_topwin_get_focus_from_list(&_rtgui_topwin_list);
+
+	if (topwin != RT_NULL)
+		RT_ASSERT(get_topwin_from_list(_rtgui_topwin_list.next) ==
+				  _rtgui_topwin_get_top_parent(topwin));
+
+	return topwin;
+#else
 	return _rtgui_topwin_get_focus_from_list(&_rtgui_topwin_list);
+#endif
 }
 
 struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y)
