@@ -171,6 +171,23 @@ static struct rtgui_topwin* _rtgui_topwin_get_top_parent(struct rtgui_topwin *to
 	return topparent;
 }
 
+/* a hidden parent will hide it's children. Top level window can be shown at
+ * any time. */
+static rt_bool_t _rtgui_topwin_could_show(struct rtgui_topwin *topwin)
+{
+	struct rtgui_topwin *parent;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	parent = topwin->parent;
+	while (parent != RT_NULL)
+	{
+		if (!(parent->flag & WINTITLE_SHOWN))
+			return RT_FALSE;
+	}
+	return RT_TRUE;
+}
+
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 {
 	struct rtgui_topwin* topwin;
@@ -243,7 +260,6 @@ static void _rtgui_topwin_only_activate_do(struct rtgui_topwin *topwin, struct r
 	/* redraw title */
 	if (topwin->title != RT_NULL)
 	{
-		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(topwin->title));
 		rtgui_theme_draw_win(topwin);
 	}
 
@@ -272,7 +288,6 @@ static void _rtgui_topwin_activate_next(void)
 {
 	if (!rt_list_isempty(&_rtgui_topwin_list))
 	{
-		struct rtgui_event_win wevent;
 		struct rtgui_topwin *topwin;
 		/* get the topwin */
 		topwin = rt_list_entry(_rtgui_topwin_list.next,
@@ -357,34 +372,50 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 	_rtgui_topwin_only_activate(topparent);
 }
 
-#if 0
-/* the only way to deactivate a window is to activate a new window. So not need
- * to deactivate a window explictly */
-/*
- * deactivate a win
- * - deactivate the win
- * - redraw win title
+/* map func to the topwin tree in preorder.
+ *
+ * Remember that we are in a embedded system so write the @param func memory
+ * efficiently.
  */
-void rtgui_topwin_deactivate_win(struct rtgui_topwin* win)
+rt_inline void _rtgui_topwin_preorder_map(struct rtgui_topwin *topwin, void (*func)(struct rtgui_topwin*))
 {
-	/* deactivate win */
-	struct rtgui_event_win event;
-	RTGUI_EVENT_WIN_DEACTIVATE_INIT(&event);
-	event.wid = win->wid;
-	rtgui_application_send(win->tid,
-		&event.parent, sizeof(struct rtgui_event_win));
+	struct rt_list_node *child;
 
-	win->flag &= ~WINTITLE_ACTIVATE;
-	rtgui_theme_draw_win(win);
+	RT_ASSERT(topwin != RT_NULL);
+	RT_ASSERT(func != RT_NULL);
 
-	if (rtgui_server_focus_topwin == win)
+	func(topwin);
+
+	rt_list_foreach(child, &topwin->child_list, next)
+		_rtgui_topwin_preorder_map(get_topwin_from_list(child), func);
+}
+
+rt_inline void _rtgui_topwin_mark_shown(struct rtgui_topwin *topwin)
+{
+	topwin->flag |= WINTITLE_SHOWN;
+	if (topwin->title != RT_NULL)
 	{
-		rtgui_server_focus_topwin = RT_NULL;
+		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(topwin->title));
 	}
 }
-#endif
 
-/* show a window */
+rt_inline void _rtgui_topwin_mark_hidden(struct rtgui_topwin *topwin)
+{
+	topwin->flag &= ~WINTITLE_SHOWN;
+	if (topwin->title != RT_NULL)
+	{
+		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(topwin->title));
+	}
+}
+
+/** show a window
+ *
+ * If any parent window in the hierarchy tree is hidden, this window won't be
+ * shown. If this window could be shown, all the child windows will be shown as
+ * well.
+ *
+ * Top level window(parent == RT_NULL) can always be shown.
+ */
 void rtgui_topwin_show(struct rtgui_event_win* event)
 {
 	struct rtgui_topwin* topwin;
@@ -399,7 +430,12 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		return;
 	}
 
-	topwin->flag |= WINTITLE_SHOWN;
+	if (!_rtgui_topwin_could_show(topwin))
+		return;
+
+	/* we have to mark all the child windows as shown or the
+	 * rtgui_topwin_activate_win won't activate them. */
+	_rtgui_topwin_preorder_map(topwin, _rtgui_topwin_mark_shown);
 	rtgui_topwin_activate_win(topwin);
 
 	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
@@ -411,6 +447,7 @@ void rtgui_topwin_hide(struct rtgui_event_win* event)
 	struct rtgui_topwin* topwin;
 	struct rtgui_topwin *old_focus_topwin = rtgui_topwin_get_focus();
 	struct rtgui_win* wid = event->wid;
+	struct rt_list_node *containing_list;
 
 	/* find in show list */
 	topwin = rtgui_topwin_search_in_list(wid, &_rtgui_topwin_list);
@@ -427,14 +464,15 @@ void rtgui_topwin_hide(struct rtgui_event_win* event)
 
 	old_focus_topwin = rtgui_topwin_get_focus();
 
-	topwin->flag &= ~WINTITLE_SHOWN;
-	if (topwin->title != RT_NULL)
-	{
-		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(topwin->title));
-	}
+	_rtgui_topwin_preorder_map(topwin, _rtgui_topwin_mark_hidden);
+
+	if (topwin->parent == RT_NULL)
+		containing_list = &_rtgui_topwin_list;
+	else
+		containing_list = &topwin->parent->child_list;
 
 	rt_list_remove(&topwin->list);
-	rt_list_insert_before(&_rtgui_topwin_list, &topwin->list);
+	rt_list_insert_before(containing_list, &topwin->list);
 
 	/* update clip info */
 	rtgui_topwin_update_clip();
@@ -522,7 +560,6 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 void rtgui_topwin_resize(struct rtgui_win* wid, rtgui_rect_t* rect)
 {
 	struct rtgui_topwin* topwin;
-	struct rtgui_rect extent;
 	struct rtgui_region region;
 
 	/* find in show list */
