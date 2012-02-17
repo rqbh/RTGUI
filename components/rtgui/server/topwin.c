@@ -266,7 +266,7 @@ static void _rtgui_topwin_only_activate_do(struct rtgui_topwin *topwin, struct r
 	rt_list_foreach(node, &topwin->child_list, prev)
 	{
 		struct rtgui_topwin *child = get_topwin_from_list(node);
-		_rtgui_topwin_only_activate_do(topwin, event);
+		_rtgui_topwin_only_activate_do(child, event);
 	}
 }
 
@@ -602,11 +602,17 @@ void rtgui_topwin_resize(struct rtgui_win* wid, rtgui_rect_t* rect)
 
 struct rtgui_topwin* rtgui_topwin_get_focus(void)
 {
+	struct rtgui_topwin *child;
+
 	if (rt_list_isempty(&_rtgui_topwin_list) ||
 		!(get_topwin_from_list(_rtgui_topwin_list.next)->flag & WINTITLE_SHOWN))
 		return RT_NULL;
-	else
-		return get_topwin_from_list(_rtgui_topwin_list.next);
+
+	child = get_topwin_from_list(_rtgui_topwin_list.next);
+	while (!rt_list_isempty(&child->child_list))
+		child = get_topwin_from_list(child->child_list.next);
+
+	return child;
 }
 
 struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y)
