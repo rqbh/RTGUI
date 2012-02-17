@@ -179,8 +179,7 @@ static rt_bool_t _rtgui_topwin_could_show(struct rtgui_topwin *topwin)
 
 	RT_ASSERT(topwin != RT_NULL);
 
-	parent = topwin->parent;
-	while (parent != RT_NULL)
+	for (parent = topwin->parent; parent != RT_NULL; parent = parent->parent)
 	{
 		if (!(parent->flag & WINTITLE_SHOWN))
 			return RT_FALSE;
