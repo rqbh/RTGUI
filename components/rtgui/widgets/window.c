@@ -306,14 +306,20 @@ void rtgui_win_move(struct rtgui_win* win, int x, int y)
 	struct rtgui_event_win_move emove;
 	RTGUI_EVENT_WIN_MOVE_INIT(&emove);
 
-	if (win == RT_NULL) return;
+	if (win == RT_NULL)
+		return;
+
+	/* move window to logic position */
+	rtgui_widget_move_to_logic(RTGUI_WIDGET(win),
+		x - RTGUI_WIDGET(win)->extent.x1,
+		y - RTGUI_WIDGET(win)->extent.y1);
 
 	if (win->flag & RTGUI_WIN_FLAG_CONNECTED)
 	{
 		/* set win hide firstly */
 		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(win));
 
-		emove.wid 	= win;
+		emove.wid	= win;
 		emove.x		= x;
 		emove.y		= y;
 		if (rtgui_server_post_event_sync(RTGUI_EVENT(&emove),
@@ -322,11 +328,6 @@ void rtgui_win_move(struct rtgui_win* win, int x, int y)
 			return;
 		}
 	}
-
-	/* move window to logic position */
-	rtgui_widget_move_to_logic(RTGUI_WIDGET(win),
-		x - RTGUI_WIDGET(win)->extent.x1,
-		y - RTGUI_WIDGET(win)->extent.y1);
 
 	/* set window visible */
 	RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
