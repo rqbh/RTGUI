@@ -47,7 +47,7 @@ static void application_entry(void* parameter)
 	/* create a full screen window */
 	rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &rect);
 
-	win = rtgui_win_create(RT_NULL, "demo_win", &rect, RTGUI_WIN_STYLE_NO_BORDER);
+	win = rtgui_win_create(RT_NULL, "demo_win", &rect, RTGUI_WIN_STYLE_NO_BORDER | RTGUI_WIN_STYLE_NO_TITLE);
 	if (win == RT_NULL)
 	{
 		rtgui_application_destroy(app);
