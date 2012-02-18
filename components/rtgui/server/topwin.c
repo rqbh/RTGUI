@@ -747,26 +747,34 @@ static void rtgui_topwin_update_clip(void)
 	}
 }
 
-static void rtgui_topwin_redraw(struct rtgui_rect* rect)
+static void _rtgui_topwin_redraw_tree(struct rt_list_node *list,
+									  struct rtgui_rect* rect,
+									  struct rtgui_event_paint *epaint)
 {
-	struct rt_list_node* node;
-	struct rtgui_event_paint epaint;
-	RTGUI_EVENT_PAINT_INIT(&epaint);
-	epaint.wid = RT_NULL;
+	struct rt_list_node *node;
 
-	/* redraw the windows from bottom to top */
-	rt_list_foreach(node, &_rtgui_topwin_list, prev)
+	RT_ASSERT(list != RT_NULL);
+	RT_ASSERT(rect != RT_NULL);
+	RT_ASSERT(epaint != RT_NULL);
+
+	/* skip the hidden windows */
+	rt_list_foreach(node, list, prev)
+	{
+		if (get_topwin_from_list(node)->flag & WINTITLE_SHOWN)
+			break;
+	}
+
+	for (; node != list; node = node->prev)
 	{
 		struct rtgui_topwin *topwin;
 
-		topwin = rt_list_entry(node, struct rtgui_topwin, list);
+		topwin = get_topwin_from_list(node);
 
-		// TODO: we can optimize a little by skipping the hidden window firstly.
-		if (topwin->flag & WINTITLE_SHOWN &&
-			rtgui_rect_is_intersect(rect, &(topwin->extent)) == RT_EOK)
+		//FIXME: intersect with clip?
+		if (rtgui_rect_is_intersect(rect, &(topwin->extent)) == RT_EOK)
 		{
-			epaint.wid = topwin->wid;
-			rtgui_application_send(topwin->tid, &(epaint.parent), sizeof(epaint));
+			epaint->wid = topwin->wid;
+			rtgui_application_send(topwin->tid, &(epaint->parent), sizeof(*epaint));
 
 			/* draw title */
 			if (topwin->title != RT_NULL)
@@ -774,7 +782,18 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 				rtgui_theme_draw_win(topwin);
 			}
 		}
+
+		_rtgui_topwin_redraw_tree(&topwin->child_list, rect, epaint);
 	}
+}
+
+static void rtgui_topwin_redraw(struct rtgui_rect* rect)
+{
+	struct rtgui_event_paint epaint;
+	RTGUI_EVENT_PAINT_INIT(&epaint);
+	epaint.wid = RT_NULL;
+
+	_rtgui_topwin_redraw_tree(&_rtgui_topwin_list, rect, &epaint);
 }
 
 void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mouse* event)
