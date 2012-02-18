@@ -421,6 +421,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 	struct rtgui_topwin *topwin, *topchild;
 	struct rtgui_win* wid = event->wid;
 	struct rtgui_event_paint epaint;
+	struct rt_list_node *win_level;
 
 	RTGUI_EVENT_PAINT_INIT(&epaint);
 
@@ -433,8 +434,19 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		return;
 	}
 
+	topwin->flag |= WINTITLE_SHOWN;
+
+	/* insert it into proper place so get_topmost_child could return right
+	 * value */
+	if (topwin->parent == RT_NULL)
+		win_level = &_rtgui_topwin_list;
+	else
+		win_level = &topwin->parent->child_list;
+	rt_list_remove(&topwin->list);
+	rt_list_insert_after(win_level, &topwin->list);
+
 	topchild = _rtgui_topwin_get_topmost_child(topwin);
-	RT_ASSERT(topwin != RT_NULL);
+	RT_ASSERT(topchild != RT_NULL);
 
 	rtgui_topwin_activate_win(topchild);
 
