@@ -51,8 +51,6 @@ void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mou
 void rtgui_topwin_append_monitor_rect(struct rtgui_win* wid, rtgui_rect_t* rect);
 void rtgui_topwin_remove_monitor_rect(struct rtgui_win* wid, rtgui_rect_t* rect);
 
-void rtgui_topwin_do_clip(struct rtgui_topwin*);
-
 /* get the topwin that is currently focused */
 struct rtgui_topwin* rtgui_topwin_get_focus(void);
 #endif

@@ -192,7 +192,7 @@ struct rtgui_event_clip_info
 	_RTGUI_EVENT_WIN_ELEMENTS
 
 	/* the number of rects */
-	rt_uint32_t num_rect;
+	//rt_uint32_t num_rect;
 
 	/* rtgui_rect_t *rects */
 };
