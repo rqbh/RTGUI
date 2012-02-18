@@ -426,15 +426,12 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 
 	/* find in hide list */
 	topwin = rtgui_topwin_search_in_list(wid, &_rtgui_topwin_list);
-	if (topwin == RT_NULL)
+	if (topwin == RT_NULL ||
+		!_rtgui_topwin_could_show(topwin))
 	{
-		/* there is no such a window recorded */
 		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
 		return;
 	}
-
-	if (!_rtgui_topwin_could_show(topwin))
-		return;
 
 	topchild = _rtgui_topwin_get_topmost_child(topwin);
 	RT_ASSERT(topwin != RT_NULL);
