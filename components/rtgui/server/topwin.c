@@ -253,6 +253,9 @@ static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
 
 	RT_ASSERT(topwin != RT_NULL);
 
+	if (topwin->flag & WINTITLE_NOFOCUS)
+		return;
+
 	/* activate the raised window */
 	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
 
@@ -273,17 +276,18 @@ static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
 
 static void _rtgui_topwin_activate_next(void)
 {
-	if (!rt_list_isempty(&_rtgui_topwin_list))
-	{
-		struct rtgui_topwin *topwin;
-		/* get the topwin */
-		topwin = rt_list_entry(_rtgui_topwin_list.next,
-				struct rtgui_topwin, list);
-		if (!(topwin->flag & WINTITLE_SHOWN))
-			return;
+	struct rtgui_topwin *topwin;
 
-		_rtgui_topwin_only_activate(topwin);
-	}
+	if (rt_list_isempty(&_rtgui_topwin_list) ||
+		get_topwin_from_list(_rtgui_topwin_list.next)->flag & WINTITLE_NOFOCUS)
+		return;
+
+	/* get the topwin */
+	topwin = get_topwin_from_list(_rtgui_topwin_list.next);
+	if (!(topwin->flag & WINTITLE_SHOWN))
+		return;
+
+	_rtgui_topwin_only_activate(topwin);
 }
 
 static void _rtgui_topwin_deactivate(struct rtgui_topwin *topwin)
@@ -331,6 +335,9 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 	struct rtgui_topwin *old_focus_topwin;
 
 	RT_ASSERT(topwin != RT_NULL);
+
+	if (topwin->flag & WINTITLE_NOFOCUS)
+		return;
 
 	old_focus_topwin = rtgui_topwin_get_focus();
 
