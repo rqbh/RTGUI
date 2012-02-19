@@ -491,7 +491,9 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 		break;
 
 	case RTGUI_EVENT_KBD:
-		if (win->focused_widget != RT_NULL &&
+		/* if I have the focus, don't handle it. Otherwise it will cause a
+		 * infinite recursion. */
+		if (win->focused_widget != RT_NULL && win->focused_widget != RTGUI_WIDGET(win) &&
 			RTGUI_OBJECT(win->focused_widget)->event_handler != RT_NULL)
 			RTGUI_OBJECT(win->focused_widget)->event_handler(RTGUI_OBJECT(win->focused_widget), event);
 		break;
