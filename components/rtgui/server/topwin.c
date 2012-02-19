@@ -25,14 +25,14 @@
  * which all the windows have the WINTITLE_SHOWN flag set. Second part is the
  * hidden list, in which all the windows don't have WINTITLE_SHOWN flag.
  *
- * The active window is the one that would recieve kbd events. It should always
+ * The active window is the one that would receive kbd events. It should always
  * in the first tree. The order of this list is the order of the windows.
  * Thus, the first item is the top most window and the last item is the bottom
  * window. Top window can always clip the window beneath it when the two
- * overlapping.
- *
- * If you do not want to handle the kbd event in a window, let the parent to
- * handle it.
+ * overlapping. Child window can always clip it's parent. Slibing windows can
+ * clip each other with the same rule as this list. Thus, each child list is
+ * the same as _rtgui_topwin_list. This forms the hierarchy tree structure of
+ * all windows.
  *
  * The hidden list have no specific order.
  */
