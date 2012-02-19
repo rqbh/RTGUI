@@ -174,9 +174,15 @@ static struct rtgui_topwin* _rtgui_topwin_get_top_parent(struct rtgui_topwin *to
 
 static struct rtgui_topwin* _rtgui_topwin_get_topmost_child(struct rtgui_topwin *topwin)
 {
-	while (!rt_list_isempty(&topwin->child_list))
+	while (!(rt_list_isempty(&topwin->child_list)) &&
+		   !(get_topwin_from_list(topwin->child_list.next)->flag & WINTITLE_SHOWN))
 		topwin = get_topwin_from_list(topwin->child_list.next);
 	return topwin;
+}
+
+static struct rtgui_topwin* _rtgui_topwin_get_topmost_window(void)
+{
+	return _rtgui_topwin_get_topmost_child(get_topwin_from_list(_rtgui_topwin_list.next));
 }
 
 /* a hidden parent will hide it's children. Top level window can be shown at
@@ -195,53 +201,64 @@ static rt_bool_t _rtgui_topwin_could_show(struct rtgui_topwin *topwin)
 	return RT_TRUE;
 }
 
+static void _rtgui_topwin_remove_tree(struct rtgui_topwin *topwin,
+									  struct rtgui_region *region)
+{
+	struct rt_list_node *node;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	rt_list_foreach(node, &topwin->child_list, next)
+		_rtgui_topwin_remove_tree(get_topwin_from_list(node), region);
+
+	/* remove node from list */
+	rt_list_remove(&(topwin->list));
+
+	if (topwin->title != RT_NULL)
+		rtgui_region_union_rect(region, region, &RTGUI_WIDGET(topwin->title)->extent);
+	else
+		rtgui_region_union_rect(region, region, &topwin->extent);
+
+	/* free the monitor rect list, topwin node and title */
+	while (topwin->monitor_list.next != RT_NULL)
+	{
+		struct rtgui_mouse_monitor* monitor = rtgui_list_entry(topwin->monitor_list.next,
+				struct rtgui_mouse_monitor, list);
+
+		topwin->monitor_list.next = topwin->monitor_list.next->next;
+		rtgui_free(monitor);
+	}
+
+	/* destroy win title */
+	rtgui_wintitle_destroy(topwin->title);
+	topwin->title = RT_NULL;
+
+	rtgui_free(topwin);
+}
+
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 {
-	struct rtgui_topwin* topwin;
+	struct rtgui_topwin *topwin, *next_focus;
+	struct rtgui_region region;
 
 	/* find the topwin node */
 	topwin = rtgui_topwin_search_in_list(wid, &_rtgui_topwin_list);
 
-	if (topwin)
-	{
-		struct rtgui_topwin *old_focus_topwin = rtgui_topwin_get_focus();
+	if (topwin == RT_NULL)
+		return -RT_ERROR;
 
-		/* remove node from list */
-		rt_list_remove(&(topwin->list));
+	rtgui_region_init(&region);
 
-		if (topwin->flag & WINTITLE_SHOWN)
-		{
-			rtgui_topwin_update_clip();
+	_rtgui_topwin_remove_tree(topwin, &region);
+	next_focus = _rtgui_topwin_get_topmost_window();
+	rtgui_topwin_activate_win(next_focus);
 
-			/* redraw the old rect */
-			rtgui_topwin_redraw(&(topwin->extent));
+	rtgui_topwin_update_clip();
 
-			if (old_focus_topwin == topwin)
-			{
-				_rtgui_topwin_activate_next();
-			}
-		}
+	/* redraw the old rect */
+	rtgui_topwin_redraw(rtgui_region_extents(&region));
 
-		/* free the monitor rect list, topwin node and title */
-		while (topwin->monitor_list.next != RT_NULL)
-		{
-			struct rtgui_mouse_monitor* monitor = rtgui_list_entry(topwin->monitor_list.next,
-				struct rtgui_mouse_monitor, list);
-
-			topwin->monitor_list.next = topwin->monitor_list.next->next;
-			rtgui_free(monitor);
-		}
-
-		/* destroy win title */
-		rtgui_wintitle_destroy(topwin->title);
-		topwin->title = RT_NULL;
-
-		rtgui_free(topwin);
-
-		return RT_EOK;
-	}
-
-	return -RT_ERROR;
+	return RT_EOK;
 }
 
 /* neither deactivate the old focus nor change _rtgui_topwin_list.
@@ -731,7 +748,7 @@ static void rtgui_topwin_update_clip(void)
 			rtgui_graphic_driver_get_default()->height);
 
 	/* from top to bottom. */
-	top = _rtgui_topwin_get_topmost_child(get_topwin_from_list(_rtgui_topwin_list.next));
+	top = _rtgui_topwin_get_topmost_window();
 
 	while (top != RT_NULL)
 	{
