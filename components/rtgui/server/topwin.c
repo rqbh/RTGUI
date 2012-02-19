@@ -325,14 +325,15 @@ static void _rtgui_topwin_move_whole_tree2top(struct rtgui_topwin *topwin)
 	rt_list_insert_after(&_rtgui_topwin_list, &(topparent->list));
 }
 
-/* activate a win
- * - deactivate the old focus win
+/* activate a win means:
+ * - deactivate the old focus win if any
+ * - raise the window to the front of it's siblings
  * - activate a win
- * - draw win title
  */
 void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 {
 	struct rtgui_topwin *old_focus_topwin;
+	struct rt_list_node *win_level;
 
 	RT_ASSERT(topwin != RT_NULL);
 
@@ -351,7 +352,14 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 		_rtgui_topwin_deactivate(old_focus_topwin);
 	}
 
+	/* raise it */
 	_rtgui_topwin_move_whole_tree2top(topwin);
+	if (topwin->parent == RT_NULL)
+		win_level = &_rtgui_topwin_list;
+	else
+		win_level = &topwin->parent->child_list;
+	rt_list_remove(&topwin->list);
+	rt_list_insert_after(win_level, &topwin->list);
 
 	_rtgui_topwin_only_activate(topwin);
 }
@@ -418,10 +426,9 @@ static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_ev
  */
 void rtgui_topwin_show(struct rtgui_event_win* event)
 {
-	struct rtgui_topwin *topwin, *topchild;
+	struct rtgui_topwin *topwin;
 	struct rtgui_win* wid = event->wid;
 	struct rtgui_event_paint epaint;
-	struct rt_list_node *win_level;
 
 	RTGUI_EVENT_PAINT_INIT(&epaint);
 
@@ -436,19 +443,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 
 	topwin->flag |= WINTITLE_SHOWN;
 
-	/* insert it into proper place so get_topmost_child could return right
-	 * value */
-	if (topwin->parent == RT_NULL)
-		win_level = &_rtgui_topwin_list;
-	else
-		win_level = &topwin->parent->child_list;
-	rt_list_remove(&topwin->list);
-	rt_list_insert_after(win_level, &topwin->list);
-
-	topchild = _rtgui_topwin_get_topmost_child(topwin);
-	RT_ASSERT(topchild != RT_NULL);
-
-	rtgui_topwin_activate_win(topchild);
+	rtgui_topwin_activate_win(topwin);
 
 	rtgui_topwin_update_clip();
 	_rtgui_topwin_show_tree(topwin, &epaint);
