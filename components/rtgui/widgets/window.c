@@ -418,13 +418,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 	case RTGUI_EVENT_WIN_DEACTIVATE:
 		if (win->flag & RTGUI_WIN_FLAG_MODAL)
 		{
-			/* do not deactivate a modal win, re-send win-show event */
-			struct rtgui_event_win_show eshow;
-			RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
-			eshow.wid = win;
-
-			rtgui_server_post_event(RTGUI_EVENT(&eshow),
-									sizeof(struct rtgui_event_win_show));
+			rt_kprintf("RTGUI error: server try to deactivate a modal window\n");
 		}
 		else
 		{
