@@ -174,8 +174,10 @@ static struct rtgui_topwin* _rtgui_topwin_get_top_parent(struct rtgui_topwin *to
 
 static struct rtgui_topwin* _rtgui_topwin_get_topmost_child(struct rtgui_topwin *topwin)
 {
+	RT_ASSERT(topwin != RT_NULL);
+
 	while (!(rt_list_isempty(&topwin->child_list)) &&
-		   !(get_topwin_from_list(topwin->child_list.next)->flag & WINTITLE_SHOWN))
+		   get_topwin_from_list(topwin->child_list.next)->flag & WINTITLE_SHOWN)
 		topwin = get_topwin_from_list(topwin->child_list.next);
 	return topwin;
 }
@@ -342,6 +344,21 @@ static void _rtgui_topwin_move_whole_tree2top(struct rtgui_topwin *topwin)
 	rt_list_insert_after(&_rtgui_topwin_list, &(topparent->list));
 }
 
+static void _rtgui_topwin_raise_topwin_in_tree(struct rtgui_topwin *topwin)
+{
+	struct rt_list_node *win_level;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	_rtgui_topwin_move_whole_tree2top(topwin);
+	if (topwin->parent == RT_NULL)
+		win_level = &_rtgui_topwin_list;
+	else
+		win_level = &topwin->parent->child_list;
+	rt_list_remove(&topwin->list);
+	rt_list_insert_after(win_level, &topwin->list);
+}
+
 /* activate a win means:
  * - deactivate the old focus win if any
  * - raise the window to the front of it's siblings
@@ -350,12 +367,15 @@ static void _rtgui_topwin_move_whole_tree2top(struct rtgui_topwin *topwin)
 void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 {
 	struct rtgui_topwin *old_focus_topwin;
-	struct rt_list_node *win_level;
 
 	RT_ASSERT(topwin != RT_NULL);
 
 	if (topwin->flag & WINTITLE_NOFOCUS)
+	{
+		/* just raise it, not affect others. */
+		_rtgui_topwin_raise_topwin_in_tree(topwin);
 		return;
+	}
 
 	old_focus_topwin = rtgui_topwin_get_focus();
 
@@ -369,15 +389,7 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 		_rtgui_topwin_deactivate(old_focus_topwin);
 	}
 
-	/* raise it */
-	_rtgui_topwin_move_whole_tree2top(topwin);
-	if (topwin->parent == RT_NULL)
-		win_level = &_rtgui_topwin_list;
-	else
-		win_level = &topwin->parent->child_list;
-	rt_list_remove(&topwin->list);
-	rt_list_insert_after(win_level, &topwin->list);
-
+	_rtgui_topwin_raise_topwin_in_tree(topwin);
 	_rtgui_topwin_only_activate(topwin);
 }
 
@@ -700,9 +712,7 @@ struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y)
 	return _rtgui_topwin_get_wnd_from_tree(&_rtgui_topwin_list, x, y);
 }
 
-/* clip region from topwin, and the windows beneath it. eclip is used to reduce
- * stack usage.
- */
+/* clip region from topwin, and the windows beneath it. */
 rt_inline void _rtgui_topwin_clip_to_region(struct rtgui_region *region,
 										    struct rtgui_topwin *topwin)
 {
