@@ -240,7 +240,7 @@ static void _rtgui_topwin_remove_tree(struct rtgui_topwin *topwin,
 
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 {
-	struct rtgui_topwin *topwin, *next_focus;
+	struct rtgui_topwin *topwin;
 	struct rtgui_region region;
 
 	/* find the topwin node */
@@ -252,10 +252,13 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 	rtgui_region_init(&region);
 
 	_rtgui_topwin_remove_tree(topwin, &region);
-	next_focus = _rtgui_topwin_get_topmost_window();
-	rtgui_topwin_activate_win(next_focus);
+	if (topwin->flag & WINTITLE_SHOWN)
+		rtgui_topwin_update_clip();
 
-	rtgui_topwin_update_clip();
+	if (rtgui_topwin_get_focus() == topwin)
+	{
+		_rtgui_topwin_activate_next();
+	}
 
 	/* redraw the old rect */
 	rtgui_topwin_redraw(rtgui_region_extents(&region));
@@ -279,9 +282,6 @@ static void _rtgui_topwin_only_activate(struct rtgui_topwin *topwin)
 	RTGUI_EVENT_WIN_ACTIVATE_INIT(&event);
 
 	topwin->flag |= WINTITLE_ACTIVATE;
-
-	/* update clip info */
-	rtgui_topwin_update_clip();
 
 	event.wid = topwin->wid;
 	rtgui_application_send(topwin->tid, &(event.parent), sizeof(struct rtgui_event_win));
@@ -309,6 +309,8 @@ static void _rtgui_topwin_activate_next(void)
 	_rtgui_topwin_only_activate(topwin);
 }
 
+/* this function does not update the clip(to avoid doubel clipping). So if the
+ * tree has changed, make sure it has already updated outside. */
 static void _rtgui_topwin_deactivate(struct rtgui_topwin *topwin)
 {
 	struct rtgui_event_win event;
@@ -374,6 +376,9 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 	{
 		/* just raise it, not affect others. */
 		_rtgui_topwin_raise_topwin_in_tree(topwin);
+
+		/* update clip info */
+		rtgui_topwin_update_clip();
 		return;
 	}
 
@@ -382,6 +387,10 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 	if (old_focus_topwin == topwin)
 		return;
 
+	_rtgui_topwin_raise_topwin_in_tree(topwin);
+	/* update clip info */
+	rtgui_topwin_update_clip();
+
 	if (old_focus_topwin != RT_NULL)
 	{
 		/* deactivate the old focus window firstly, otherwise it will make the new
@@ -389,7 +398,6 @@ void rtgui_topwin_activate_win(struct rtgui_topwin* topwin)
 		_rtgui_topwin_deactivate(old_focus_topwin);
 	}
 
-	_rtgui_topwin_raise_topwin_in_tree(topwin);
 	_rtgui_topwin_only_activate(topwin);
 }
 
@@ -472,10 +480,9 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 
 	topwin->flag |= WINTITLE_SHOWN;
 
-	rtgui_topwin_activate_win(topwin);
-
-	rtgui_topwin_update_clip();
 	_rtgui_topwin_show_tree(topwin, &epaint);
+
+	rtgui_topwin_activate_win(topwin);
 
 	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 }
