@@ -50,9 +50,6 @@ static void create_normal_win(void)
 
 	rtgui_widget_set_rect(RTGUI_WIDGET(normal_window_label), &rect);
 
-	rtgui_container_add_child(RTGUI_CONTAINER(normal_window),
-                         RTGUI_WIDGET(normal_window_label));
-
     rtgui_win_set_onclose(normal_window,
                           normal_window_onclose);
 }
@@ -136,7 +133,6 @@ static void demo_autowin_onbutton(struct rtgui_widget* widget, rtgui_event_t* ev
 		rect.y1 += 5;
 		rect.y2 = rect.y1 + 20;
 		rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
-		rtgui_container_add_child(RTGUI_CONTAINER(msgbox), RTGUI_WIDGET(label));
 
 		/* 设置关闭窗口时的动作 */
 		rtgui_win_set_onclose(msgbox, auto_window_close);
