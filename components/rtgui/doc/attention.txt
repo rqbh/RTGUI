@@ -1,0 +1,5 @@
+1, 对同一 window 销毁两次会引起 segfault。同时，如果在创建时设置了
+RTGUI_WIN_STYLE_DESTROY_ON_CLOSE，close 窗口之后不要再去销毁窗口。
+
+2, 所有的 window 由 topwin 进行管理，用户不要在指定创建具有父窗口的子窗口之后在
+把这个窗口加为父窗口的 child。这可能会导致子窗口无法显示。
