@@ -222,6 +222,16 @@ static void _rtgui_topwin_remove_tree(struct rtgui_topwin *topwin,
 		rtgui_region_union_rect(region, region, &RTGUI_WIDGET(topwin->title)->extent);
 	else
 		rtgui_region_union_rect(region, region, &topwin->extent);
+}
+
+static void _rtgui_topwin_free_tree(struct rtgui_topwin *topwin)
+{
+	struct rt_list_node *node;
+
+	RT_ASSERT(topwin != RT_NULL);
+
+	rt_list_foreach(node, &topwin->child_list, next)
+		_rtgui_topwin_free_tree(get_topwin_from_list(node));
 
 	/* free the monitor rect list, topwin node and title */
 	while (topwin->monitor_list.next != RT_NULL)
@@ -242,7 +252,7 @@ static void _rtgui_topwin_remove_tree(struct rtgui_topwin *topwin,
 
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 {
-	struct rtgui_topwin *topwin;
+	struct rtgui_topwin *topwin, *old_focus;
 	struct rtgui_region region;
 
 	/* find the topwin node */
@@ -253,17 +263,21 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 
 	rtgui_region_init(&region);
 
+	old_focus = rtgui_topwin_get_focus();
+
 	_rtgui_topwin_remove_tree(topwin, &region);
 	if (topwin->flag & WINTITLE_SHOWN)
 		rtgui_topwin_update_clip();
 
-	if (rtgui_topwin_get_focus() == topwin)
+	if (old_focus == topwin)
 	{
 		_rtgui_topwin_activate_next();
 	}
 
 	/* redraw the old rect */
 	rtgui_topwin_redraw(rtgui_region_extents(&region));
+
+	_rtgui_topwin_free_tree(topwin);
 
 	return RT_EOK;
 }
