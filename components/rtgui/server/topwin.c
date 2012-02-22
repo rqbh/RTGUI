@@ -184,7 +184,10 @@ static struct rtgui_topwin* _rtgui_topwin_get_topmost_child_shown(struct rtgui_t
 
 static struct rtgui_topwin* _rtgui_topwin_get_topmost_window_shown(void)
 {
-	return _rtgui_topwin_get_topmost_child(get_topwin_from_list(_rtgui_topwin_list.next));
+	if (!(get_topwin_from_list(_rtgui_topwin_list.next)->flag & WINTITLE_SHOWN))
+		return RT_NULL;
+	else
+		return _rtgui_topwin_get_topmost_child(get_topwin_from_list(_rtgui_topwin_list.next));
 }
 
 /* a hidden parent will hide it's children. Top level window can be shown at
