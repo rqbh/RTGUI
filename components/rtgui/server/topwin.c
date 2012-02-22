@@ -172,7 +172,7 @@ static struct rtgui_topwin* _rtgui_topwin_get_top_parent(struct rtgui_topwin *to
 	return topparent;
 }
 
-static struct rtgui_topwin* _rtgui_topwin_get_topmost_child(struct rtgui_topwin *topwin)
+static struct rtgui_topwin* _rtgui_topwin_get_topmost_child_shown(struct rtgui_topwin *topwin)
 {
 	RT_ASSERT(topwin != RT_NULL);
 
@@ -182,7 +182,7 @@ static struct rtgui_topwin* _rtgui_topwin_get_topmost_child(struct rtgui_topwin 
 	return topwin;
 }
 
-static struct rtgui_topwin* _rtgui_topwin_get_topmost_window(void)
+static struct rtgui_topwin* _rtgui_topwin_get_topmost_window_shown(void)
 {
 	return _rtgui_topwin_get_topmost_child(get_topwin_from_list(_rtgui_topwin_list.next));
 }
@@ -763,7 +763,7 @@ static void rtgui_topwin_update_clip(void)
 			rtgui_graphic_driver_get_default()->height);
 
 	/* from top to bottom. */
-	top = _rtgui_topwin_get_topmost_window();
+	top = _rtgui_topwin_get_topmost_window_shown();
 
 	while (top != RT_NULL)
 	{
