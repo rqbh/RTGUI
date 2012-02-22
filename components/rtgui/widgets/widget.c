@@ -18,6 +18,7 @@
 #include <rtgui/widgets/widget.h>
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/container.h>
+#include <rtgui/widgets/notebook.h>
 
 static void _rtgui_widget_constructor(rtgui_widget_t *widget)
 {
@@ -504,6 +505,10 @@ void rtgui_widget_update_clip(rtgui_widget_t* widget)
 
 			rtgui_widget_update_clip(child);
 		}
+	}
+	else if (RTGUI_IS_NOTEBOOK(widget))
+	{
+		rtgui_widget_update_clip(rtgui_notebook_get_current(RTGUI_NOTEBOOK(widget)));
 	}
 }
 
