@@ -463,6 +463,7 @@ static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_ev
 	RT_ASSERT(topwin != RT_NULL);
 	RT_ASSERT(epaint != RT_NULL);
 
+	_rtgui_topwin_raise_topwin_in_tree(topwin);
 	/* we have to mark the _all_ tree before update_clip because update_clip
 	 * will stop as hidden windows */
 	_rtgui_topwin_preorder_map(topwin, _rtgui_topwin_mark_shown);
@@ -485,7 +486,7 @@ static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_ev
  */
 void rtgui_topwin_show(struct rtgui_event_win* event)
 {
-	struct rtgui_topwin *topwin;
+	struct rtgui_topwin *topwin, *old_focus;
 	struct rtgui_win* wid = event->wid;
 	struct rtgui_event_paint epaint;
 
@@ -500,9 +501,18 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		return;
 	}
 
+	old_focus = rtgui_topwin_get_focus();
+
 	_rtgui_topwin_show_tree(topwin, &epaint);
 
-	rtgui_topwin_activate_win(topwin);
+	/* we don't want double clipping(bare rtgui_topwin_activate_win will clip),
+	 * so we have to do deactivate/activate manually. */
+	if (old_focus != RT_NULL &&
+		old_focus != topwin)
+	{
+		_rtgui_topwin_deactivate(old_focus);
+		_rtgui_topwin_only_activate(topwin);
+	}
 
 	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 }
