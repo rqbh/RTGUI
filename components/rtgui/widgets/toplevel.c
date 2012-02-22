@@ -82,8 +82,6 @@ rt_bool_t rtgui_toplevel_event_handler(struct rtgui_object* object, rtgui_event_
 	return RT_FALSE;
 }
 
-#include <rtgui/driver.h> /* to get screen rect */
-
 void rtgui_toplevel_update_clip(rtgui_toplevel_t* top)
 {
 	rtgui_container_t* view;
