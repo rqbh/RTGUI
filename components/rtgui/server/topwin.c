@@ -478,8 +478,6 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		return;
 	}
 
-	topwin->flag |= WINTITLE_SHOWN;
-
 	_rtgui_topwin_show_tree(topwin, &epaint);
 
 	rtgui_topwin_activate_win(topwin);
