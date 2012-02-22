@@ -82,7 +82,7 @@ struct rtgui_dc* rtgui_dc_hw_create(rtgui_widget_t* owner)
 		if (RTGUI_WIDGET_IS_HIDE(widget))
 		{
 			RTGUI_WIDGET_DC_SET_UNVISIBLE(owner);
-			break;
+			return RT_NULL;
 		}
 
 		widget = widget->parent;

@@ -48,14 +48,11 @@ struct rtgui_dc* rtgui_dc_begin_drawing(rtgui_widget_t* owner)
 {
 	RT_ASSERT(owner != RT_NULL);
 
-	if ((rtgui_region_is_flat(&owner->clip) == RT_EOK) && 
+	if ((rtgui_region_is_flat(&owner->clip) == RT_EOK) &&
 		rtgui_rect_is_equal(&(owner->extent), &(owner->clip.extents)) == RT_EOK)
-	{
-		/* use hardware DC */
 		return rtgui_dc_hw_create(owner);
-	}
-
-	return rtgui_dc_client_create(owner);
+	else
+		return rtgui_dc_client_create(owner);
 }
 
 void rtgui_dc_end_drawing(struct rtgui_dc* dc)
@@ -63,7 +60,7 @@ void rtgui_dc_end_drawing(struct rtgui_dc* dc)
 	dc->engine->fini(dc);
 }
 
-const struct rtgui_dc_engine dc_client_engine = 
+const struct rtgui_dc_engine dc_client_engine =
 {
 	rtgui_dc_client_draw_point,
 	rtgui_dc_client_draw_color_point,
@@ -116,7 +113,7 @@ struct rtgui_dc* rtgui_dc_client_create(rtgui_widget_t* owner)
 		if (RTGUI_WIDGET_IS_HIDE(widget))
 		{
 			RTGUI_WIDGET_DC_SET_UNVISIBLE(owner);
-			break;
+			return RT_NULL;
 		}
 
 		widget = widget->parent;
@@ -141,8 +138,11 @@ struct rtgui_dc* rtgui_dc_client_create(rtgui_widget_t* owner)
 #endif
 		}
 	}
-	else if (RTGUI_IS_APPLICATION(owner->toplevel) ||
-		RTGUI_IS_WIN(owner->toplevel))
+	else if (RTGUI_IS_APPLICATION(owner->toplevel))
+	{
+		RT_ASSERT(0);
+	}
+	else if (RTGUI_IS_WIN(owner->toplevel))
 	{
 		rtgui_toplevel_t* top = RTGUI_TOPLEVEL(owner->toplevel);
 		top->drawing ++;
