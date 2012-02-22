@@ -195,7 +195,11 @@ rt_bool_t rtgui_win_close(struct rtgui_win* win)
 
 rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 {
+	struct rtgui_event_win_show eshow;
 	rt_base_t exit_code = -1;
+
+	RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
+	eshow.wid = win;
 
 	if (win == RT_NULL)
 		return exit_code;
@@ -207,27 +211,16 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 			return exit_code;
 	}
 
-	if (RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)))
+	if (rtgui_server_post_event_sync(RTGUI_EVENT(&eshow),
+									 sizeof(struct rtgui_event_win_show)
+			) != RT_EOK)
 	{
-		/* send show message to server */
-		struct rtgui_event_win_show eshow;
-
-		RTGUI_EVENT_WIN_SHOW_INIT(&eshow);
-		eshow.wid = win;
-
-		if (rtgui_server_post_event_sync(RTGUI_EVENT(&eshow),
-										 sizeof(struct rtgui_event_win_show)
-				) != RT_EOK)
-		{
-			rt_kprintf("show win failed\n");
-			return exit_code;
-		}
-
-		/* set window unhidden */
-		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
+		rt_kprintf("show win failed\n");
+		return exit_code;
 	}
-	else
-		rtgui_widget_update(RTGUI_WIDGET(win));
+
+	/* set window unhidden */
+	RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
 
     if (is_modal == RT_TRUE)
     {
@@ -428,7 +421,7 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 				RTGUI_WIDGET(object)->on_draw(object, event);
 			else
 #endif
-				rtgui_win_ondraw(win);
+				rtgui_widget_update(RTGUI_WIDGET(win));
 
 			if (win->on_deactivate != RT_NULL)
 			{
