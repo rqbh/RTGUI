@@ -424,6 +424,7 @@ rt_inline void _rtgui_topwin_mark_hidden(struct rtgui_topwin *topwin)
 	{
 		RTGUI_WIDGET_HIDE(RTGUI_WIDGET(topwin->title));
 	}
+	RTGUI_WIDGET_HIDE(RTGUI_WIDGET(topwin->wid));
 }
 
 rt_inline void _rtgui_topwin_mark_shown(struct rtgui_topwin *topwin)
