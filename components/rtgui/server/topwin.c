@@ -147,7 +147,6 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 		rtgui_widget_set_rect(RTGUI_WIDGET(topwin->title), &rect);
 
 		/* update clip info */
-		rtgui_toplevel_update_clip(RTGUI_TOPLEVEL(topwin->title));
 		rtgui_region_subtract_rect(&(RTGUI_WIDGET(topwin->title)->clip),
 			&(RTGUI_WIDGET(topwin->title)->clip),
 			&(topwin->extent));
