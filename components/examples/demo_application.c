@@ -32,10 +32,10 @@ static rt_bool_t demo_application_event_handler(struct rtgui_object* object, str
 	return rtgui_application_event_handler(object, event);
 }
 
+struct rtgui_win *main_win;
 static void application_entry(void* parameter)
 {
 	struct rtgui_application *app;
-	struct rtgui_win *win;
 	struct rtgui_rect rect;
 
 	app = rtgui_application_create(rt_thread_self(), "gui_demo");
@@ -47,8 +47,8 @@ static void application_entry(void* parameter)
 	/* create a full screen window */
 	rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &rect);
 
-	win = rtgui_win_create(RT_NULL, "demo_win", &rect, RTGUI_WIN_STYLE_NO_BORDER | RTGUI_WIN_STYLE_NO_TITLE);
-	if (win == RT_NULL)
+	main_win = rtgui_win_create(RT_NULL, "demo_win", &rect, RTGUI_WIN_STYLE_NO_BORDER | RTGUI_WIN_STYLE_NO_TITLE);
+	if (main_win == RT_NULL)
 	{
 		rtgui_application_destroy(app);
 		return;
@@ -58,12 +58,12 @@ static void application_entry(void* parameter)
 	the_notebook = rtgui_notebook_create(&rect, RTGUI_NOTEBOOK_NOTAB);
 	if (the_notebook == RT_NULL)
 	{
-		rtgui_win_destroy(win);
+		rtgui_win_destroy(main_win);
 		rtgui_application_destroy(app);
 		return;
 	}
 
-	rtgui_container_add_child(RTGUI_CONTAINER(win), RTGUI_WIDGET(the_notebook));
+	rtgui_container_add_child(RTGUI_CONTAINER(main_win), RTGUI_WIDGET(the_notebook));
 
 	/* 初始化各个例子的视图 */
 	demo_view_benchmark();
@@ -112,7 +112,7 @@ static void application_entry(void* parameter)
 #endif
 #endif
 
-	rtgui_win_show(win, RT_FALSE);
+	rtgui_win_show(main_win, RT_FALSE);
 
 	/* 执行工作台事件循环 */
 	rtgui_application_run(app);

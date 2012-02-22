@@ -36,7 +36,7 @@ static void create_normal_win(void)
 {
 	rtgui_rect_t rect = {30, 40, 150, 80};
 
-	normal_window = rtgui_win_create(main_win, "普通窗口",
+	normal_window = rtgui_win_create(RT_NULL, "普通窗口",
 									 &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rect.x1 += 20;
