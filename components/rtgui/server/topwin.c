@@ -426,19 +426,22 @@ rt_inline void _rtgui_topwin_mark_hidden(struct rtgui_topwin *topwin)
 	}
 }
 
-/* show the window tree. @param epaint can be initialized outside and reduce stack
- * usage. */
-static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_event_paint *epaint)
+rt_inline void _rtgui_topwin_mark_shown(struct rtgui_topwin *topwin)
 {
-	struct rt_list_node *node;
-
-	RT_ASSERT(topwin != RT_NULL);
-	RT_ASSERT(epaint != RT_NULL);
-
 	topwin->flag |= WINTITLE_SHOWN;
 	if (topwin->title != RT_NULL)
 	{
 		RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(topwin->title));
+	}
+	RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(topwin->wid));
+}
+
+static void _rtgui_topwin_draw_tree(struct rtgui_topwin *topwin, struct rtgui_event_paint *epaint)
+{
+	struct rt_list_node *node;
+
+	if (topwin->title != RT_NULL)
+	{
 		rtgui_theme_draw_win(topwin);
 	}
 
@@ -447,8 +450,27 @@ static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_ev
 
 	rt_list_foreach(node, &topwin->child_list, prev)
 	{
-		_rtgui_topwin_show_tree(get_topwin_from_list(node), epaint);
+		_rtgui_topwin_draw_tree(get_topwin_from_list(node), epaint);
 	}
+}
+
+/* show the window tree. @param epaint can be initialized outside and reduce stack
+ * usage. */
+static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_event_paint *epaint)
+{
+	RT_ASSERT(topwin != RT_NULL);
+	RT_ASSERT(epaint != RT_NULL);
+
+	/* we have to mark the _all_ tree before update_clip because update_clip
+	 * will stop as hidden windows */
+	_rtgui_topwin_preorder_map(topwin, _rtgui_topwin_mark_shown);
+
+	// TODO: if all the window is shown already, there is no need to
+	// update_clip. But since we use peorder_map, it seems it's a bit difficult
+	// to tell whether @param topwin and it's children are all shown.
+	rtgui_topwin_update_clip();
+
+	_rtgui_topwin_draw_tree(topwin, epaint);
 }
 
 /** show a window
