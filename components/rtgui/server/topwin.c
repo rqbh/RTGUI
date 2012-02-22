@@ -321,10 +321,11 @@ static void _rtgui_topwin_deactivate(struct rtgui_topwin *topwin)
 	rtgui_application_send(topwin->tid,
 			&event.parent, sizeof(struct rtgui_event_win));
 
+	topwin->flag &= ~WINTITLE_ACTIVATE;
+
 	/* redraw title */
 	if (topwin->title != RT_NULL)
 	{
-		topwin->flag &= ~WINTITLE_ACTIVATE;
 		rtgui_theme_draw_win(topwin);
 	}
 }
