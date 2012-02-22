@@ -187,7 +187,7 @@ static struct rtgui_topwin* _rtgui_topwin_get_topmost_window_shown(void)
 	if (!(get_topwin_from_list(_rtgui_topwin_list.next)->flag & WINTITLE_SHOWN))
 		return RT_NULL;
 	else
-		return _rtgui_topwin_get_topmost_child(get_topwin_from_list(_rtgui_topwin_list.next));
+		return _rtgui_topwin_get_topmost_child_shown(get_topwin_from_list(_rtgui_topwin_list.next));
 }
 
 /* a hidden parent will hide it's children. Top level window can be shown at
@@ -300,13 +300,8 @@ static void _rtgui_topwin_activate_next(void)
 {
 	struct rtgui_topwin *topwin;
 
-	if (rt_list_isempty(&_rtgui_topwin_list) ||
-		get_topwin_from_list(_rtgui_topwin_list.next)->flag & WINTITLE_NOFOCUS)
-		return;
-
-	/* get the topwin */
-	topwin = get_topwin_from_list(_rtgui_topwin_list.next);
-	if (!(topwin->flag & WINTITLE_SHOWN))
+	topwin = _rtgui_topwin_get_topmost_window_shown();
+	if (topwin == RT_NULL)
 		return;
 
 	_rtgui_topwin_only_activate(topwin);
