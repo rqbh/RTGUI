@@ -246,7 +246,7 @@ struct rtgui_event_kbd
 
 struct rtgui_event_command
 {
-	struct rtgui_event parent;
+        _RTGUI_EVENT_WIN_ELEMENTS
 
 	/* command type */
 	rt_int32_t type;
@@ -312,6 +312,6 @@ struct rtgui_event_resize
 };
 #define RTGUI_EVENT_RESIZE_INIT(e) RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_RESIZE)
 
-#undef _RTGUI_EVENT_WIN_ELEMENT
+#undef _RTGUI_EVENT_WIN_ELEMENTS
 
 #endif

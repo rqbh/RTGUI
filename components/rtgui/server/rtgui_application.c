@@ -599,6 +599,14 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 		}
 		break;
 
+        case RTGUI_EVENT_COMMAND:
+                {
+                        struct rtgui_event_command *ecmd = (struct rtgui_event_command*)event;
+
+                        if (ecmd->wid != RT_NULL)
+                                return _rtgui_application_dest_handle(app, event);
+                }
+
 	default:
 		return rtgui_object_event_handler(object, event);
 	}
