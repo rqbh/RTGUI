@@ -56,15 +56,17 @@ static void timeout(struct rtgui_timer* timer, void* parameter)
 	rtgui_dc_end_drawing(dc);
 }
 
-static rt_bool_t animation_event_handler(rtgui_widget_t* widget, rtgui_event_t *event)
+static rt_bool_t animation_event_handler(struct rtgui_object *object, rtgui_event_t *event)
 {
+	struct rtgui_widget *widget = RTGUI_WIDGET(object);
+
 	if (event->type == RTGUI_EVENT_PAINT)
 	{
 		struct rtgui_dc* dc;
 		rtgui_rect_t rect;
 
 		/* 因为用的是demo view，上面本身有一部分控件，所以在绘图时先要让demo view先绘图 */
-		rtgui_container_event_handler(widget, event);
+		rtgui_container_event_handler(object, event);
 
 		/* 获得控件所属的DC */
 		dc = rtgui_dc_begin_drawing(widget);
@@ -85,7 +87,7 @@ static rt_bool_t animation_event_handler(rtgui_widget_t* widget, rtgui_event_t *
 	else
 	{
 		/* 调用默认的事件处理函数 */
-		return rtgui_container_event_handler(widget, event);
+		return rtgui_container_event_handler(object, event);
 	}
 
 	return RT_FALSE;
@@ -95,12 +97,16 @@ static rt_bool_t animation_on_show(struct rtgui_object *object, struct rtgui_eve
 {
 	rt_kprintf("buffer animation on show\n");
 	rtgui_timer_start(timer);
+
+	return RT_TRUE;
 }
 
 static rt_bool_t animation_on_hide(struct rtgui_object *object, struct rtgui_event *event)
 {
 	rt_kprintf("buffer animation on hide\n");
 	rtgui_timer_stop(timer);
+
+	return RT_TRUE;
 }
 
 struct rtgui_container *demo_view_buffer_animation(void)
@@ -109,7 +115,7 @@ struct rtgui_container *demo_view_buffer_animation(void)
 
 	container= demo_view("DC 缓冲区动画");
 	if (container!= RT_NULL)
-		rtgui_object_set_event_handler(RTGUI_WIDGET(container), animation_event_handler);
+		rtgui_object_set_event_handler(RTGUI_OBJECT(container), animation_event_handler);
 
 	rtgui_font_get_metrics(RTGUI_WIDGET_FONT(RTGUI_WIDGET(container)), "缓冲动画", &text_rect);
 	if (dc_buffer == RT_NULL)

@@ -64,7 +64,7 @@ void _draw_default(struct rtgui_object *object, rtgui_event_t* event)
 	rtgui_dc_end_drawing(dc);
 }
 
-rt_bool_t benchmark_event_handler(struct rtgui_obect *object, rtgui_event_t *event)
+rt_bool_t benchmark_event_handler(struct rtgui_object *object, rtgui_event_t *event)
 {
 	if (event->type == RTGUI_EVENT_PAINT)
 	{
@@ -105,7 +105,7 @@ rtgui_container_t *demo_view_benchmark(void)
 {
 	srand(100);
 	container = demo_view("ªÊÕº≤‚ ‘");
-	rtgui_object_set_event_handler(RTGUI_WIDGET(container), benchmark_event_handler);
+	rtgui_object_set_event_handler(RTGUI_OBJECT(container), benchmark_event_handler);
 
 	return container;
 }

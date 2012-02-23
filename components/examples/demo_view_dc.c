@@ -35,7 +35,7 @@ rt_bool_t dc_event_handler(struct rtgui_object* object, rtgui_event_t *event)
 		 * 因为用的是demo view，上面本身有一部分控件，所以在绘图时先要让demo view
 		 * 先绘图
 		 */
-		rtgui_container_event_handler(widget, event);
+		rtgui_container_event_handler(RTGUI_OBJECT(widget), event);
 
 		/************************************************************************/
 		/* 下面的是DC的操作                                                     */
@@ -186,7 +186,7 @@ rtgui_container_t *demo_view_dc(void)
 	view = demo_view("DC Demo");
 	if (view != RT_NULL)
 		/* 设置成自己的事件处理函数 */
-		rtgui_object_set_event_handler(RTGUI_WIDGET(view), dc_event_handler);
+		rtgui_object_set_event_handler(RTGUI_OBJECT(view), dc_event_handler);
 
 	return view;
 }
