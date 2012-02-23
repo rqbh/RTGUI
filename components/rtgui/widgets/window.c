@@ -27,11 +27,12 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 {
 	RTGUI_WIDGET(win)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
 	/* init window attribute */
-	win->on_activate	= RT_NULL;
-	win->on_deactivate	= RT_NULL;
-	win->on_close		= RT_NULL;
-	win->title			= RT_NULL;
-	win->modal_code		= RTGUI_MODAL_OK;
+	win->on_activate   = RT_NULL;
+	win->on_deactivate = RT_NULL;
+	win->on_close      = RT_NULL;
+	win->on_key        = RT_NULL;
+	win->title         = RT_NULL;
+	win->modal_code    = RTGUI_MODAL_OK;
 
 	/* initialize last mouse event handled widget */
 	win->last_mevent_widget = RT_NULL;
@@ -221,6 +222,9 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 	/* set window unhidden */
 	RTGUI_WIDGET_UNHIDE(RTGUI_WIDGET(win));
+
+	if (win->focused_widget == RT_NULL)
+		rtgui_widget_focus(RTGUI_WIDGET(win));
 
     if (is_modal == RT_TRUE)
     {
@@ -484,11 +488,29 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 		break;
 
 	case RTGUI_EVENT_KBD:
-		/* if I have the focus, don't handle it. Otherwise it will cause a
-		 * infinite recursion. */
-		if (win->focused_widget != RT_NULL && win->focused_widget != RTGUI_WIDGET(win) &&
-			RTGUI_OBJECT(win->focused_widget)->event_handler != RT_NULL)
-			RTGUI_OBJECT(win->focused_widget)->event_handler(RTGUI_OBJECT(win->focused_widget), event);
+		/* we should dispatch key event firstly */
+		if (!(win->flag & RTGUI_WIN_FLAG_HANDLE_KEY))
+		{
+			rt_bool_t res = RT_FALSE;
+			/* we should dispatch the key event just once. Once entered the
+			 * dispatch mode, we should swtich to key handling mode. */
+			win->flag |= RTGUI_WIN_FLAG_HANDLE_KEY;
+
+			/* dispatch the key event */
+			if (win->focused_widget != RT_NULL &&
+					RTGUI_OBJECT(win->focused_widget)->event_handler != RT_NULL)
+				res = RTGUI_OBJECT(win->focused_widget)->event_handler(
+						RTGUI_OBJECT(win->focused_widget), event);
+			win->flag &= ~RTGUI_WIN_FLAG_HANDLE_KEY;
+			return res;
+		}
+		else
+		{
+			/* in key handling mode(it may reach here in
+			 * win->focused_widget->event_handler call) */
+			if (win->on_key != RT_NULL)
+				return win->on_key(RTGUI_OBJECT(win), event);
+		}
 		break;
 
 	default:
@@ -549,6 +571,14 @@ void rtgui_win_set_onclose(rtgui_win_t* win, rtgui_event_handler_ptr handler)
 	if (win != RT_NULL)
 	{
 		win->on_close = handler;
+	}
+}
+
+void rtgui_win_set_onkey(rtgui_win_t* win, rtgui_event_handler_ptr handler)
+{
+	if (win != RT_NULL)
+	{
+		win->on_key = handler;
 	}
 }
 

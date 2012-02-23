@@ -42,13 +42,22 @@ DECLARE_CLASS_TYPE(win);
 
 enum rtgui_win_flag
 {
-	RTGUI_WIN_FLAG_INIT           = 0x00,   /* init state              */
-	RTGUI_WIN_FLAG_MODAL		  = 0x01,	/* modal mode window	   */
-	RTGUI_WIN_FLAG_CLOSED		  = 0x02,	/* window is closed		   */
-	RTGUI_WIN_FLAG_ACTIVATE	      = 0x04,	/* window is activated	   */
-	RTGUI_WIN_FLAG_UNDER_MODAL	  = 0x08,   /* window is under modal
-											   show(modaled by other)  */
-	RTGUI_WIN_FLAG_CONNECTED      = 0x10    /* connected to server */
+	RTGUI_WIN_FLAG_INIT        = 0x00,  /* init state              */
+	RTGUI_WIN_FLAG_MODAL	   = 0x01,	/* modal mode window	   */
+	RTGUI_WIN_FLAG_CLOSED	   = 0x02,	/* window is closed		   */
+	RTGUI_WIN_FLAG_ACTIVATE	   = 0x04,	/* window is activated	   */
+	RTGUI_WIN_FLAG_UNDER_MODAL = 0x08,  /* window is under modal
+										   show(modaled by other)  */
+	RTGUI_WIN_FLAG_CONNECTED   = 0x10,  /* connected to server */
+	/* window is event_key dispatcher(dispatch it to the focused widget in
+	 * current window) _and_ a key handler(it should be able to handle keys
+	 * such as ESC). Both of dispatching and handling are in the same
+	 * function(rtgui_win_event_handler). So we have to distinguish between the
+	 * two modes.
+	 *
+	 * If this flag is set, we are in key-handling mode.
+	 */
+	RTGUI_WIN_FLAG_HANDLE_KEY  = 0x20
 };
 
 struct rtgui_win_title;
@@ -86,6 +95,14 @@ struct rtgui_win
 	rt_bool_t (*on_activate)	(struct rtgui_object* widget, struct rtgui_event* event);
 	rt_bool_t (*on_deactivate)	(struct rtgui_object* widget, struct rtgui_event* event);
 	rt_bool_t (*on_close)		(struct rtgui_object* widget, struct rtgui_event* event);
+	/* the key is sent to the focused widget by default. If the focused widget
+	 * and all of it's parents didn't handle the key event, it will be handled
+	 * by @func on_key
+	 *
+	 * If you want to handle key event on your own, it's better to overload
+	 * this function other than handle EVENT_KBD in event_handler.
+	 */
+	rt_bool_t (*on_key)		    (struct rtgui_object* widget, struct rtgui_event* event);
 
 	/* reserved user data */
 	rt_uint32_t user_data;
@@ -124,6 +141,7 @@ void rtgui_win_set_box(rtgui_win_t* win, rtgui_box_t* box);
 void rtgui_win_set_onactivate(rtgui_win_t* win, rtgui_event_handler_ptr handler);
 void rtgui_win_set_ondeactivate(rtgui_win_t* win, rtgui_event_handler_ptr handler);
 void rtgui_win_set_onclose(rtgui_win_t* win, rtgui_event_handler_ptr handler);
+void rtgui_win_set_onkey(rtgui_win_t* win, rtgui_event_handler_ptr handler);
 
 rt_bool_t rtgui_win_event_handler(struct rtgui_object* win, struct rtgui_event* event);
 

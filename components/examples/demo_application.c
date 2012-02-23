@@ -7,29 +7,23 @@
 
 struct rtgui_notebook *the_notebook;
 
-static rt_bool_t demo_application_event_handler(struct rtgui_object* object, struct rtgui_event* event)
+static rt_bool_t demo_handle_key(struct rtgui_object* object, struct rtgui_event* event)
 {
-	/* 我们目前只对按键事件感兴趣。*/
-	if (event->type == RTGUI_EVENT_KBD)
-	{
-		struct rtgui_event_kbd* ekbd = (struct rtgui_event_kbd*)event;
+	struct rtgui_event_kbd* ekbd = (struct rtgui_event_kbd*)event;
 
-		if (ekbd->type == RTGUI_KEYDOWN)
+	if (ekbd->type == RTGUI_KEYDOWN)
+	{
+		if (ekbd->key == RTGUIK_RIGHT)
 		{
-			if (ekbd->key == RTGUIK_RIGHT)
-			{
-				demo_view_next(RT_NULL, RT_NULL);
-				return RT_TRUE;
-			}
-			else if (ekbd->key == RTGUIK_LEFT)
-			{
-				demo_view_prev(RT_NULL, RT_NULL);
-				return RT_TRUE;
-			}
+			demo_view_next(RT_NULL, RT_NULL);
+			return RT_TRUE;
+		}
+		else if (ekbd->key == RTGUIK_LEFT)
+		{
+			demo_view_prev(RT_NULL, RT_NULL);
+			return RT_TRUE;
 		}
 	}
-
-	return rtgui_application_event_handler(object, event);
 }
 
 struct rtgui_win *main_win;
@@ -42,8 +36,6 @@ static void application_entry(void* parameter)
 	if (app == RT_NULL)
 		return;
 
-	rtgui_object_set_event_handler(RTGUI_OBJECT(app), demo_application_event_handler);
-
 	/* create a full screen window */
 	rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &rect);
 
@@ -54,6 +46,8 @@ static void application_entry(void* parameter)
 		rtgui_application_destroy(app);
 		return;
 	}
+
+	rtgui_win_set_onkey(main_win, demo_handle_key);
 
 	/* create a no title notebook that we can switch demo on it easily. */
 	the_notebook = rtgui_notebook_create(&rect, RTGUI_NOTEBOOK_NOTAB);
