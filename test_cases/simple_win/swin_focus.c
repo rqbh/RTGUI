@@ -1,6 +1,7 @@
 #include <rtthread.h>
 
 #include <rtgui/rtgui.h>
+#include <rtgui/region.h>
 #include <rtgui/rtgui_system.h>
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/label.h>
@@ -155,15 +156,19 @@ rt_bool_t window_focus(void)
             RTGUI_WIN_STYLE_NO_TITLE|RTGUI_WIN_STYLE_NO_BORDER|RTGUI_WIN_STYLE_NO_FOCUS);
     //创建窗口，没有标题栏，没有最小化窗口，也不能获取焦点
 	/* 添加windows的事件*/
-	rtgui_container_add_child(RTGUI_CONTAINER(main_win),
-			RTGUI_WIDGET(picture_win));
+	/* all of the windows are managed by topwin. Never set a window as other
+	 * window's child.
+	 *
+	 *rtgui_container_add_child(RTGUI_CONTAINER(main_win),
+	 *        RTGUI_WIDGET(picture_win));
+     */
 	rtgui_object_set_event_handler(RTGUI_OBJECT(picture_win),
 			picture_win_onpaint);
 
 	/* 非模态显示窗口 */
 	rtgui_widget_focus(RTGUI_WIDGET(main_win));//设定主窗体获取焦点
-	rtgui_win_show(picture_win,RT_FALSE);
 	rtgui_win_show(main_win, RT_FALSE);
+	rtgui_win_show(picture_win,RT_FALSE);
 
 	return RT_TRUE;
 }

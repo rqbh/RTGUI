@@ -25,8 +25,6 @@
 static struct rt_thread *rtgui_server_tid;
 static struct rtgui_application *rtgui_server_application;
 
-extern struct rtgui_topwin* rtgui_server_focus_topwin;
-
 void rtgui_server_handle_update(struct rtgui_event_update_end* event)
 {
 	struct rtgui_graphic_driver* driver;
@@ -100,7 +98,7 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 	{
 		event->wid = wnd->wid;
 
-		if (rtgui_server_focus_topwin != wnd)
+		if (rtgui_topwin_get_focus() != wnd)
 		{
 			/* raise this window */
 			rtgui_topwin_activate_win(wnd);
@@ -174,9 +172,11 @@ void rtgui_server_handle_kbd(struct rtgui_event_kbd* event)
 
 	/* todo: handle input method and global shortcut */
 
-	wnd = rtgui_server_focus_topwin;
-	if (wnd != RT_NULL && wnd->flag & WINTITLE_ACTIVATE)
+	wnd = rtgui_topwin_get_focus();
+	if (wnd != RT_NULL)
 	{
+		RT_ASSERT(wnd->flag & WINTITLE_ACTIVATE)
+
 		/* send to focus window */
 		event->wid = wnd->wid;
 
@@ -202,12 +202,15 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     {
 		/* window event */
     case RTGUI_EVENT_WIN_CREATE:
-        rtgui_application_ack(event, RTGUI_STATUS_OK);
-        rtgui_topwin_add((struct rtgui_event_win_create*)event);
+        if (rtgui_topwin_add((struct rtgui_event_win_create*)event) == RT_EOK)
+			rtgui_application_ack(event, RTGUI_STATUS_OK);
+		else
+			rtgui_application_ack(event, RTGUI_STATUS_ERROR);
         break;
 
     case RTGUI_EVENT_WIN_DESTROY:
-		if (last_monitor_topwin->wid == ((struct rtgui_event_win*)event)->wid)
+		if (last_monitor_topwin != RT_NULL &&
+			last_monitor_topwin->wid == ((struct rtgui_event_win*)event)->wid)
 				last_monitor_topwin = RT_NULL;
         if (rtgui_topwin_remove(((struct rtgui_event_win*)event)->wid) == RT_EOK)
             rtgui_application_ack(event, RTGUI_STATUS_OK);

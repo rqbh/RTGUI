@@ -27,7 +27,9 @@ enum
 	WINTITLE_CLOSEBOX	= 0x08,
 	WINTITLE_MOVE		= 0x0C,
 	WINTITLE_CB_PRESSED	= 0x10,
-	WINTITLE_NOFOCUS	= 0x20
+	WINTITLE_NOFOCUS	= 0x20,
+	/* window is hidden by default */
+	WINTITLE_SHOWN      = 0x40
 };
 
 #define WINTITLE_HEIGHT			20
@@ -53,8 +55,12 @@ struct rtgui_topwin
 	/* the extent information */
 	rtgui_rect_t extent;
 
-	/* the top window list */
-	rtgui_list_t list;
+	struct rtgui_topwin *parent;
+
+	/* we need to iterate the topwin list with usual order(get target window)
+	 * or reversely(painting). So it's better to use a double linked list */
+	struct rt_list_node list;
+	struct rt_list_node child_list;
 
 	/* the monitor rect list */
 	rtgui_list_t monitor_list;

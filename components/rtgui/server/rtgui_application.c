@@ -113,20 +113,21 @@ static void rtgui_event_dump(rt_thread_t tid, rtgui_event_t* event)
 		{
 			struct rtgui_event_win_create *create = (struct rtgui_event_win_create*)event;
 
-			rt_kprintf(" win: %s at (x1:%d, y1:%d, x2:%d, y2:%d)",
+			rt_kprintf(" win: %s at (x1:%d, y1:%d, x2:%d, y2:%d), addr: %p",
 #ifdef RTGUI_USING_SMALL_SIZE
 				create->wid->title,
 				RTGUI_WIDGET(create->wid)->extent.x1,
 				RTGUI_WIDGET(create->wid)->extent.y1,
 				RTGUI_WIDGET(create->wid)->extent.x2,
-				RTGUI_WIDGET(create->wid)->extent.y2
+				RTGUI_WIDGET(create->wid)->extent.y2,
 #else
 				create->title,
 				create->extent.x1,
 				create->extent.y1,
 				create->extent.x2,
-				create->extent.y2
+				create->extent.y2,
 #endif
+				create->wid
                 );
 		}
 		break;
@@ -532,6 +533,8 @@ rt_inline rt_bool_t _rtgui_application_dest_handle(
 	{
 		if (dest_object->event_handler != RT_NULL)
 			return dest_object->event_handler(RTGUI_OBJECT(dest_object), event);
+		else
+			return RT_FALSE;
 	}
 	else
 	{
@@ -572,8 +575,8 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 			if (app->modal_object != RT_NULL &&
 				dest_object != app->modal_object)
 			{
-				rt_kprintf("discard event %s that is not sent to modal object\n",
-						   event_string[event->type]);
+//				rt_kprintf("discard event %s that is not sent to modal object\n",
+//						   event_string[event->type]);
 			}
 			else
 			{

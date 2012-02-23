@@ -13,7 +13,8 @@
  */
 #include <rtgui/rtgui_system.h>
 #include <rtgui/widgets/toplevel.h>
-extern void rtgui_topwin_do_clip(rtgui_widget_t* widget);
+#include <rtgui/widgets/window.h>
+#include <rtgui/widgets/title.h>
 
 static void _rtgui_toplevel_constructor(rtgui_toplevel_t *toplevel)
 {
@@ -21,7 +22,10 @@ static void _rtgui_toplevel_constructor(rtgui_toplevel_t *toplevel)
 	rtgui_object_set_event_handler(RTGUI_OBJECT(toplevel), rtgui_toplevel_event_handler);
 
 	/* set toplevel to self */
-	RTGUI_WIDGET(toplevel)->toplevel = RTGUI_WIDGET(toplevel);
+	if (RTGUI_IS_WINTITLE(toplevel))
+		RTGUI_WIDGET(toplevel)->toplevel = (struct rtgui_win*)toplevel;
+	else
+		RTGUI_WIDGET(toplevel)->toplevel = RTGUI_WIN(toplevel);
 
 	/* init toplevel property */
 	toplevel->drawing = 0;
@@ -78,28 +82,13 @@ rt_bool_t rtgui_toplevel_event_handler(struct rtgui_object* object, rtgui_event_
 	return RT_FALSE;
 }
 
-#include <rtgui/driver.h> /* to get screen rect */
-
 void rtgui_toplevel_update_clip(rtgui_toplevel_t* top)
 {
 	rtgui_container_t* view;
 	struct rtgui_list_node* node;
-	rtgui_rect_t screen_rect;
 
-	if (top == RT_NULL) return;
-
-	/* reset toplevel widget clip to extent */
-	rtgui_region_reset(&(RTGUI_WIDGET(top)->clip), &(RTGUI_WIDGET(top)->extent));
-
-	/* subtract the screen rect */
-	screen_rect.x1 = screen_rect.y1 = 0;
-	screen_rect.x2 = rtgui_graphic_driver_get_default()->width;
-	screen_rect.y2 = rtgui_graphic_driver_get_default()->height;
-	rtgui_region_intersect_rect(&(RTGUI_WIDGET(top)->clip), &(RTGUI_WIDGET(top)->clip),
-		&screen_rect);
-
-	/* subtract the external rect */
-	rtgui_topwin_do_clip(RTGUI_WIDGET(top));
+	if (top == RT_NULL)
+		return;
 
 	/* update the clip info of each child */
 	view = RTGUI_CONTAINER(top);
