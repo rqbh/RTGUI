@@ -21,23 +21,6 @@ struct rtgui_dc;
 struct rtgui_event;
 struct rtgui_widget;
 
-struct rtgui_thread
-{
-	/* the thread id */
-	rt_thread_t tid;
-
-	/* the message queue of thread */
-	rt_mq_t mq;
-
-	/* the owner of thread */
-	struct rtgui_widget* widget;
-	/* event buffer */
-	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
-
-	/* on idle event handler */
-	void (*on_idle)(struct rtgui_widget* widget, struct rtgui_event *event);
-};
-typedef struct rtgui_thread rtgui_thread_t;
 struct rtgui_timer;
 typedef void (*rtgui_timeout_func)(struct rtgui_timer* timer, void* parameter);
 

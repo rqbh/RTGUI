@@ -17,6 +17,8 @@
 #include <rtgui/rtgui.h>
 #include <rtgui/kbddef.h>
 
+/* NOTE: if you create a new event type, remember to add it into the union
+ * rtgui_event_generic */
 enum _rtgui_event_type
 {
 	/* window event */
@@ -320,4 +322,31 @@ struct rtgui_event_resize
 
 #undef _RTGUI_EVENT_WIN_ELEMENTS
 
+union rtgui_event_generic
+{
+	struct rtgui_event base;
+	struct rtgui_event_win win_base;
+	struct rtgui_event_win_create win_create;
+	struct rtgui_event_win_move win_move;
+	struct rtgui_event_win_resize win_resize;
+	struct rtgui_event_win_destroy win_destroy;
+	struct rtgui_event_win_show win_show;
+	struct rtgui_event_win_hide win_hide;
+	struct rtgui_event_win_activate win_activate;
+	struct rtgui_event_win_deactivate win_deactivate;
+	struct rtgui_event_win_close win_close;
+	struct rtgui_event_win_modal_enter win_modal_enter;
+	struct rtgui_event_update_begin update_begin;
+	struct rtgui_event_update_end update_end;
+	struct rtgui_event_monitor monitor;
+	struct rtgui_event_paint paint;
+	struct rtgui_event_timer timer;
+	struct rtgui_event_clip_info clip_info;
+	struct rtgui_event_mouse mouse;
+	struct rtgui_event_kbd kbd;
+	struct rtgui_event_command command;
+	struct rtgui_event_scrollbar scrollbar;
+	struct rtgui_event_focused focused;
+	struct rtgui_event_resize resize;
+};
 #endif

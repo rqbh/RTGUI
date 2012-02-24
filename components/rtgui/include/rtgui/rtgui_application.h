@@ -16,6 +16,7 @@
 
 #include <rtthread.h>
 #include <rtgui/rtgui.h>
+#include <rtgui/event.h>
 #include <rtgui/rtgui_system.h>
 
 DECLARE_CLASS_TYPE(application);
@@ -58,7 +59,7 @@ struct rtgui_application
 	/* the message queue of thread */
 	rt_mq_t mq;
 	/* event buffer */
-	rt_uint8_t event_buffer[RTGUI_EVENT_BUFFER_SIZE];
+	rt_uint8_t event_buffer[sizeof(union rtgui_event_generic)];
 
 	/* if not RT_NULL, the application is modaled by modal_object. If is
 	 * RT_NULL, nothing modals. */

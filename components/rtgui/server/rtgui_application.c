@@ -274,7 +274,7 @@ struct rtgui_application* rtgui_application_create(
 	/* set user thread */
 	tid->user_data = (rt_uint32_t)app;
 
-	app->mq = rt_mq_create("rtgui", RTGUI_EVENT_BUFFER_SIZE, 32, RT_IPC_FLAG_FIFO);
+	app->mq = rt_mq_create("rtgui", sizeof(union rtgui_event_generic), 32, RT_IPC_FLAG_FIFO);
 	if (app->mq == RT_NULL)
 	{
 		rt_kprintf("mq err\n");
@@ -632,7 +632,7 @@ rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 	{
 		if (app->on_idle != RT_NULL)
 		{
-			result = rtgui_application_recv_nosuspend(event, RTGUI_EVENT_BUFFER_SIZE);
+			result = rtgui_application_recv_nosuspend(event, sizeof(union rtgui_event_generic));
 			if (result == RT_EOK)
 				RTGUI_OBJECT(app)->event_handler(RTGUI_OBJECT(app), event);
 			else if (result == -RT_ETIMEOUT)
@@ -640,7 +640,7 @@ rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 		}
 		else
 		{
-			result = rtgui_application_recv(event, RTGUI_EVENT_BUFFER_SIZE);
+			result = rtgui_application_recv(event, sizeof(union rtgui_event_generic));
 			if (result == RT_EOK)
 				RTGUI_OBJECT(app)->event_handler(RTGUI_OBJECT(app), event);
 		}
