@@ -520,8 +520,9 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 
 	/* we don't want double clipping(bare rtgui_topwin_activate_win will clip),
 	 * so we have to do deactivate/activate manually. */
-	if (old_focus != RT_NULL &&
-		old_focus != topwin)
+	if (old_focus == RT_NULL)
+		_rtgui_topwin_only_activate(topwin);
+	else if (old_focus != topwin)
 	{
 		_rtgui_topwin_deactivate(old_focus);
 		_rtgui_topwin_only_activate(topwin);
