@@ -229,6 +229,10 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
     if (is_modal == RT_TRUE)
     {
 		struct rtgui_application *app;
+		struct rtgui_event_win_modal_enter emodal;
+
+		RTGUI_EVENT_WIN_MODAL_ENTER_INIT(&emodal);
+		emodal.wid = win;
 
 		app = rtgui_application_self();
 		RT_ASSERT(app != RT_NULL);
@@ -236,6 +240,11 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 		win->flag |= RTGUI_WIN_FLAG_MODAL;
 
 		win->in_modal = RT_TRUE;
+
+		if (rtgui_server_post_event_sync(&emodal, sizeof(emodal))
+				!= RT_EOK)
+			return exit_code;
+
 		app->modal_object = RTGUI_OBJECT(win);
 
 		exit_code = _rtgui_application_event_loop(app, &(win->in_modal));

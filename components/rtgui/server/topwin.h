@@ -37,9 +37,12 @@ void rtgui_topwin_hide(struct rtgui_event_win* event);
 void rtgui_topwin_move(struct rtgui_event_win_move* event);
 /* resize a window */
 void rtgui_topwin_resize(struct rtgui_win* wid, rtgui_rect_t* r);
+/* a window is entering modal mode */
+rt_err_t rtgui_topwin_modal_enter(struct rtgui_event_win_modal_enter* event);
 
 /* get window at (x, y) */
 struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y);
+struct rtgui_topwin* rtgui_topwin_get_wnd_no_modaled(int x, int y);
 
 //void rtgui_topwin_deactivate_win(struct rtgui_topwin* win);
 

@@ -33,6 +33,7 @@ const char *event_string[] =
 	"WIN_CLOSE",			/* close a window 		*/
 	"WIN_MOVE",				/* move a window 		*/
 	"WIN_RESIZE", 			/* resize a window 		*/
+	"WIN_MODAL_ENTER", 			/* a window modals		*/
 
 	"SET_WM", 				/* set window manager	*/
 
@@ -145,6 +146,7 @@ static void rtgui_event_dump(rt_thread_t tid, rtgui_event_t* event)
 	case RTGUI_EVENT_WIN_ACTIVATE:
 	case RTGUI_EVENT_WIN_DEACTIVATE:
 	case RTGUI_EVENT_WIN_SHOW:
+	case RTGUI_EVENT_WIN_MODAL_ENTER:
 		{
 			struct rtgui_event_win *win = (struct rtgui_event_win *)event;
 

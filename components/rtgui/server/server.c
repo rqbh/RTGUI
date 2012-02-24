@@ -93,7 +93,7 @@ void rtgui_server_handle_mouse_btn(struct rtgui_event_mouse* event)
 #endif
 
 	/* get the wnd which contains the mouse */
-	wnd = rtgui_topwin_get_wnd(event->x, event->y);
+	wnd = rtgui_topwin_get_wnd_no_modaled(event->x, event->y);
 	if (wnd != RT_NULL)
 	{
 		event->wid = wnd->wid;
@@ -128,7 +128,7 @@ void rtgui_server_handle_mouse_motion(struct rtgui_event_mouse* event)
 	/* re-init mouse event */
 	RTGUI_EVENT_MOUSE_MOTION_INIT(event);
 
-	win = rtgui_topwin_get_wnd(event->x, event->y);
+	win = rtgui_topwin_get_wnd_no_modaled(event->x, event->y);
 	if (win != RT_NULL && win->monitor_list.next != RT_NULL)
 	{
 		// FIXME:
@@ -229,6 +229,13 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
     case RTGUI_EVENT_WIN_MOVE:
         rtgui_topwin_move((struct rtgui_event_win_move*)event);
         break;
+
+	case RTGUI_EVENT_WIN_MODAL_ENTER:
+		if (rtgui_topwin_modal_enter((struct rtgui_event_win_modal_enter*)event) == RT_EOK)
+			rtgui_application_ack(event, RTGUI_STATUS_OK);
+		else
+			rtgui_application_ack(event, RTGUI_STATUS_ERROR);
+		break;
 
     case RTGUI_EVENT_WIN_RESIZE:
         rtgui_topwin_resize(((struct rtgui_event_win_resize*)event)->wid,

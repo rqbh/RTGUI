@@ -20,48 +20,52 @@
 enum _rtgui_event_type
 {
 	/* window event */
-	RTGUI_EVENT_WIN_CREATE,			/* create a window 		*/
-	RTGUI_EVENT_WIN_DESTROY,		/* destroy a window 	*/
-	RTGUI_EVENT_WIN_SHOW,			/* show a window 		*/
-	RTGUI_EVENT_WIN_HIDE,			/* hide a window 		*/
-	RTGUI_EVENT_WIN_ACTIVATE, 		/* activate a window 	*/
-	RTGUI_EVENT_WIN_DEACTIVATE,		/* deactivate a window 	*/
-	RTGUI_EVENT_WIN_CLOSE,			/* close a window 		*/
-	RTGUI_EVENT_WIN_MOVE,			/* move a window 		*/
-	RTGUI_EVENT_WIN_RESIZE, 		/* resize a window 		*/
+	RTGUI_EVENT_WIN_CREATE,            /* create a window       */
+	RTGUI_EVENT_WIN_DESTROY,           /* destroy a window      */
+	RTGUI_EVENT_WIN_SHOW,              /* show a window         */
+	RTGUI_EVENT_WIN_HIDE,              /* hide a window         */
+	RTGUI_EVENT_WIN_ACTIVATE,          /* activate a window     */
+	RTGUI_EVENT_WIN_DEACTIVATE,        /* deactivate a window   */
+	RTGUI_EVENT_WIN_CLOSE,             /* close a window        */
+	RTGUI_EVENT_WIN_MOVE,              /* move a window         */
+	RTGUI_EVENT_WIN_RESIZE,            /* resize a window       */
+	RTGUI_EVENT_WIN_MODAL_ENTER,       /* the window is entering modal mode.
+										  This event should be sent after the
+										  window got setup and before the
+										  application got setup. */
 
 	/* WM event */
-	RTGUI_EVENT_SET_WM,				/* set window manager   */
+	RTGUI_EVENT_SET_WM,                /* set window manager    */
 
-	RTGUI_EVENT_UPDATE_BEGIN,		/* update a rect 		*/
-	RTGUI_EVENT_UPDATE_END,			/* update a rect 		*/
-	RTGUI_EVENT_MONITOR_ADD,		/* add a monitor rect 	*/
-	RTGUI_EVENT_MONITOR_REMOVE,		/* remove a monitor rect*/
-	RTGUI_EVENT_PAINT,				/* paint on screen 		*/
-	RTGUI_EVENT_TIMER,				/* timer 				*/
+	RTGUI_EVENT_UPDATE_BEGIN,          /* update a rect         */
+	RTGUI_EVENT_UPDATE_END,            /* update a rect         */
+	RTGUI_EVENT_MONITOR_ADD,           /* add a monitor rect    */
+	RTGUI_EVENT_MONITOR_REMOVE,        /* remove a monitor rect */
+	RTGUI_EVENT_PAINT,                 /* paint on screen       */
+	RTGUI_EVENT_TIMER,                 /* timer                 */
 
 	/* clip rect information */
-	RTGUI_EVENT_CLIP_INFO,			/* clip rect info		*/
+	RTGUI_EVENT_CLIP_INFO,             /* clip rect info        */
 
 	/* mouse and keyboard event */
-	RTGUI_EVENT_MOUSE_MOTION,		/* mouse motion */
-	RTGUI_EVENT_MOUSE_BUTTON,		/* mouse button info 	*/
-	RTGUI_EVENT_KBD,				/* keyboard info		*/
+	RTGUI_EVENT_MOUSE_MOTION,          /* mouse motion          */
+	RTGUI_EVENT_MOUSE_BUTTON,          /* mouse button info     */
+	RTGUI_EVENT_KBD,                   /* keyboard info         */
 
 	/* user command event */
-	RTGUI_EVENT_COMMAND,			/* user command 		*/
+	RTGUI_EVENT_COMMAND,               /* user command          */
 
 	/* widget event */
-	RTGUI_EVENT_FOCUSED,			/* widget focused       */
-	RTGUI_EVENT_SCROLLED,           /* scroll bar scrolled  */
-	RTGUI_EVENT_RESIZE,				/* widget resize 		*/
+	RTGUI_EVENT_FOCUSED,               /* widget focused        */
+	RTGUI_EVENT_SCROLLED,              /* scroll bar scrolled   */
+	RTGUI_EVENT_RESIZE,                /* widget resize         */
 };
 typedef enum _rtgui_event_type rtgui_event_type;
 
 enum {
-	RTGUI_STATUS_OK = 0,		/* status ok 		*/
-	RTGUI_STATUS_ERROR,			/* generic error 	*/
-	RTGUI_STATUS_NRC,			/* no resource 		*/
+	RTGUI_STATUS_OK = 0,        /* status ok         */
+	RTGUI_STATUS_ERROR,         /* generic error     */
+	RTGUI_STATUS_NRC,           /* no resource       */
 };
 
 struct rtgui_event
@@ -125,23 +129,25 @@ struct rtgui_event_win_resize
 	rtgui_rect_t rect;
 };
 
-#define	rtgui_event_win_destroy 	rtgui_event_win
-#define	rtgui_event_win_show 		rtgui_event_win
-#define	rtgui_event_win_hide 		rtgui_event_win
-#define	rtgui_event_win_activate	rtgui_event_win
-#define rtgui_event_win_deactivate 	rtgui_event_win
-#define rtgui_event_win_close 		rtgui_event_win
+#define rtgui_event_win_destroy      rtgui_event_win
+#define rtgui_event_win_show         rtgui_event_win
+#define rtgui_event_win_hide         rtgui_event_win
+#define rtgui_event_win_activate     rtgui_event_win
+#define rtgui_event_win_deactivate   rtgui_event_win
+#define rtgui_event_win_close        rtgui_event_win
+#define rtgui_event_win_modal_enter  rtgui_event_win
 
 /* window event init */
-#define RTGUI_EVENT_WIN_CREATE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_CREATE)
-#define RTGUI_EVENT_WIN_DESTROY_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_DESTROY)
-#define RTGUI_EVENT_WIN_SHOW_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_SHOW)
-#define RTGUI_EVENT_WIN_HIDE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_HIDE)
-#define RTGUI_EVENT_WIN_ACTIVATE_INIT(e)	RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_ACTIVATE)
-#define RTGUI_EVENT_WIN_DEACTIVATE_INIT(e)	RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_DEACTIVATE)
-#define RTGUI_EVENT_WIN_CLOSE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_CLOSE)
-#define RTGUI_EVENT_WIN_MOVE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_MOVE)
-#define RTGUI_EVENT_WIN_RESIZE_INIT(e)		RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_RESIZE)
+#define RTGUI_EVENT_WIN_CREATE_INIT(e)      RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_CREATE)
+#define RTGUI_EVENT_WIN_DESTROY_INIT(e)     RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_DESTROY)
+#define RTGUI_EVENT_WIN_SHOW_INIT(e)        RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_SHOW)
+#define RTGUI_EVENT_WIN_HIDE_INIT(e)        RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_HIDE)
+#define RTGUI_EVENT_WIN_ACTIVATE_INIT(e)    RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_ACTIVATE)
+#define RTGUI_EVENT_WIN_DEACTIVATE_INIT(e)  RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_DEACTIVATE)
+#define RTGUI_EVENT_WIN_CLOSE_INIT(e)       RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_CLOSE)
+#define RTGUI_EVENT_WIN_MOVE_INIT(e)        RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_MOVE)
+#define RTGUI_EVENT_WIN_RESIZE_INIT(e)      RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_RESIZE)
+#define RTGUI_EVENT_WIN_MODAL_ENTER_INIT(e) RTGUI_EVENT_INIT(&((e)->parent), RTGUI_EVENT_WIN_MODAL_ENTER)
 
 /*
  * RTGUI Other Event

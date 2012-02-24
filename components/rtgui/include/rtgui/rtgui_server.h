@@ -21,21 +21,25 @@
 /* top window definitions in server */
 enum
 {
-	WINTITLE_NO			= 0x01,
-	WINTITLE_BORDER		= 0x02,
-	WINTITLE_ACTIVATE	= 0x04,
-	WINTITLE_CLOSEBOX	= 0x08,
-	WINTITLE_MOVE		= 0x0C,
-	WINTITLE_CB_PRESSED	= 0x10,
-	WINTITLE_NOFOCUS	= 0x20,
+	WINTITLE_NO         =  0x01,
+	WINTITLE_BORDER     =  0x02,
+	WINTITLE_ACTIVATE   =  0x04,
+	WINTITLE_CLOSEBOX   =  0x08,
+	WINTITLE_MOVE       =  0x0C,
+	WINTITLE_CB_PRESSED =  0x10,
+	WINTITLE_NOFOCUS    =  0x20,
 	/* window is hidden by default */
-	WINTITLE_SHOWN      = 0x40
+	WINTITLE_SHOWN      =  0x40,
+	/* window is modaled by other window */
+	WINTITLE_MODALED    =  0x80,
+	/* window is modaling other window */
+	WINTITLE_MODALING   = 0x100
 };
 
-#define WINTITLE_HEIGHT			20
-#define WINTITLE_CB_WIDTH		16
-#define WINTITLE_CB_HEIGHT		16
-#define WINTITLE_BORDER_SIZE	2
+#define WINTITLE_HEIGHT         20
+#define WINTITLE_CB_WIDTH       16
+#define WINTITLE_CB_HEIGHT      16
+#define WINTITLE_BORDER_SIZE    2
 
 struct rtgui_topwin
 {

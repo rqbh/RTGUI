@@ -531,12 +531,29 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
 }
 
+static void _rtgui_topwin_clear_modal_tree(struct rtgui_topwin *topwin)
+{
+	struct rt_list_node *node;
+
+	RT_ASSERT(topwin != RT_NULL);
+	RT_ASSERT(topwin->parent != RT_NULL);
+
+	while (topwin->parent != RT_NULL)
+	{
+		rt_list_foreach(node, &topwin->parent->child_list, next)
+			get_topwin_from_list(node)->flag &= ~WINTITLE_MODALED;
+		topwin = topwin->parent;
+	}
+	/* clear the modal flag of the root window */
+	topwin->flag &= ~WINTITLE_MODALED;
+}
+
 /* hide a window */
 void rtgui_topwin_hide(struct rtgui_event_win* event)
 {
-	struct rtgui_topwin* topwin;
+	struct rtgui_topwin *topwin;
 	struct rtgui_topwin *old_focus_topwin = rtgui_topwin_get_focus();
-	struct rtgui_win* wid = event->wid;
+	struct rtgui_win    *wid = event->wid;
 	struct rt_list_node *containing_list;
 
 	/* find in show list */
@@ -569,6 +586,12 @@ void rtgui_topwin_hide(struct rtgui_event_win* event)
 
 	/* redraw the old rect */
 	rtgui_topwin_redraw(&(topwin->extent));
+
+	if (topwin->flag & WINTITLE_MODALING)
+	{
+		_rtgui_topwin_clear_modal_tree(topwin);
+		topwin->flag &= ~WINTITLE_MODALING;
+	}
 
 	if (old_focus_topwin == topwin)
 	{
@@ -726,7 +749,9 @@ struct rtgui_topwin* rtgui_topwin_get_focus(void)
 #endif
 }
 
-static struct rtgui_topwin* _rtgui_topwin_get_wnd_from_tree(struct rt_list_node *list, int x, int y)
+static struct rtgui_topwin* _rtgui_topwin_get_wnd_from_tree(struct rt_list_node *list,
+															int x, int y,
+															rt_bool_t exclude_modaled)
 {
 	struct rt_list_node *node;
 	struct rtgui_topwin *topwin, *target;
@@ -740,9 +765,12 @@ static struct rtgui_topwin* _rtgui_topwin_get_wnd_from_tree(struct rt_list_node 
 			break;
 
 		/* if higher window have this point, return it */
-		target = _rtgui_topwin_get_wnd_from_tree(&topwin->child_list, x, y);
+		target = _rtgui_topwin_get_wnd_from_tree(&topwin->child_list, x, y, exclude_modaled);
 		if (target != RT_NULL)
 			return target;
+
+		if (exclude_modaled && (topwin->flag & WINTITLE_MODALED))
+			break;
 
 		if ((topwin->title != RT_NULL) &&
 			rtgui_rect_contains_point(&(RTGUI_WIDGET(topwin->title)->extent), x, y) == RT_EOK)
@@ -760,7 +788,12 @@ static struct rtgui_topwin* _rtgui_topwin_get_wnd_from_tree(struct rt_list_node 
 
 struct rtgui_topwin* rtgui_topwin_get_wnd(int x, int y)
 {
-	return _rtgui_topwin_get_wnd_from_tree(&_rtgui_topwin_list, x, y);
+	return _rtgui_topwin_get_wnd_from_tree(&_rtgui_topwin_list, x, y, RT_FALSE);
+}
+
+struct rtgui_topwin* rtgui_topwin_get_wnd_no_modaled(int x, int y)
+{
+	return _rtgui_topwin_get_wnd_from_tree(&_rtgui_topwin_list, x, y, RT_TRUE);
 }
 
 /* clip region from topwin, and the windows beneath it. */
@@ -883,6 +916,42 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 	epaint.wid = RT_NULL;
 
 	_rtgui_topwin_redraw_tree(&_rtgui_topwin_list, rect, &epaint);
+}
+
+/* a window enter modal mode will modal all the sibling window and parent
+ * window all along to the root window(which parent is RT_NULL). If a root
+ * window modals, there is nothing to do here.*/
+rt_err_t rtgui_topwin_modal_enter(struct rtgui_event_win_modal_enter* event)
+{
+	struct rtgui_topwin *topwin, *parent_top;
+	struct rt_list_node *node;
+
+	topwin = rtgui_topwin_search_in_list(event->wid, &_rtgui_topwin_list);
+
+	if (topwin == RT_NULL)
+		return -RT_ERROR;
+
+	if (topwin->parent == RT_NULL)
+		return RT_EOK;
+
+	parent_top = topwin->parent;
+
+	/* modal window should be on top already */
+	RT_ASSERT(get_topwin_from_list(parent_top->child_list.next) == topwin);
+
+	while (parent_top != RT_NULL)
+	{
+		rt_list_foreach(node, &parent_top->child_list, next)
+			get_topwin_from_list(node)->flag |= WINTITLE_MODALED;
+		parent_top->flag |= WINTITLE_MODALED;
+
+		parent_top = parent_top->parent;
+	}
+
+	topwin->flag &= ~WINTITLE_MODALED;
+	topwin->flag |= WINTITLE_MODALING;
+
+	return RT_EOK;
 }
 
 void rtgui_topwin_title_onmouse(struct rtgui_topwin* win, struct rtgui_event_mouse* event)
