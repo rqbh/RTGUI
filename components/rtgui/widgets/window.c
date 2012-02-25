@@ -241,8 +241,8 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 		win->in_modal = RT_TRUE;
 
-		if (rtgui_server_post_event_sync(&emodal, sizeof(emodal))
-				!= RT_EOK)
+		if (rtgui_server_post_event_sync((struct rtgui_event*)&emodal,
+										 sizeof(emodal)) != RT_EOK)
 			return exit_code;
 
 		app->modal_object = RTGUI_OBJECT(win);
@@ -510,6 +510,11 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 					RTGUI_OBJECT(win->focused_widget)->event_handler != RT_NULL)
 				res = RTGUI_OBJECT(win->focused_widget)->event_handler(
 						RTGUI_OBJECT(win->focused_widget), event);
+
+			/* if the focused widget doesn't handle it, I will handle it. */
+			if (res != RT_TRUE && win->on_key != RT_NULL)
+				res = win->on_key(RTGUI_OBJECT(win), event);
+
 			win->flag &= ~RTGUI_WIN_FLAG_HANDLE_KEY;
 			return res;
 		}
@@ -519,6 +524,8 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 			 * win->focused_widget->event_handler call) */
 			if (win->on_key != RT_NULL)
 				return win->on_key(RTGUI_OBJECT(win), event);
+			else
+				return RT_FALSE;
 		}
 		break;
 
