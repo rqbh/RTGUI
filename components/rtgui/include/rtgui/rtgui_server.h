@@ -15,6 +15,7 @@
 #define __RTGUI_SERVER_H__
 
 #include <rtgui/list.h>
+#include <rtgui/dlist.h>
 
 /* RTGUI server definitions */
 
@@ -63,8 +64,8 @@ struct rtgui_topwin
 
 	/* we need to iterate the topwin list with usual order(get target window)
 	 * or reversely(painting). So it's better to use a double linked list */
-	struct rt_list_node list;
-	struct rt_list_node child_list;
+	struct rtgui_dlist_node list;
+	struct rtgui_dlist_node child_list;
 
 	/* the monitor rect list */
 	rtgui_list_t monitor_list;

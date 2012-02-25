@@ -14,10 +14,7 @@
 #ifndef __RTGUI_TOPWIN_H__
 #define __RTGUI_TOPWIN_H__
 
-#include <rtthread.h>
-#include <list.h>
 #include <rtgui/rtgui.h>
-#include <rtgui/list.h>
 #include <rtgui/region.h>
 #include <rtgui/event.h>
 #include <rtgui/widgets/title.h>
