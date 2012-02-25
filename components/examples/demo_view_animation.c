@@ -100,13 +100,17 @@ rt_bool_t animation_event_handler(struct rtgui_object* object, rtgui_event_t *ev
 static rt_bool_t animation_on_show(struct rtgui_object *object, struct rtgui_event *event)
 {
 	rt_kprintf("animation on show\n");
-	rtgui_timer_start(timer);
+	if (timer != RT_NULL)
+		rtgui_timer_start(timer);
+	return RT_TRUE;
 }
 
 static rt_bool_t animation_on_hide(struct rtgui_object *object, struct rtgui_event *event)
 {
 	rt_kprintf("animation on hide\n");
-	rtgui_timer_stop(timer);
+	if (timer != RT_NULL)
+		rtgui_timer_stop(timer);
+	return RT_TRUE;
 }
 
 rtgui_container_t *demo_view_animation()

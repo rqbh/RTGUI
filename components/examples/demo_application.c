@@ -77,7 +77,6 @@ static void application_entry(void* parameter)
 	demo_view_instrument_panel();
 #endif
 	demo_view_window();
-#if 0
 	demo_view_label();
 	demo_view_button();
 	demo_view_checkbox();
@@ -85,6 +84,7 @@ static void application_entry(void* parameter)
 	demo_view_scrollbar();
 	demo_view_radiobox();
 	demo_view_textbox();
+#if 0
 	demo_view_listbox();
 	demo_view_menu();
 	demo_view_listctrl();
