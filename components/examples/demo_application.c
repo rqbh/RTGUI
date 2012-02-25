@@ -24,6 +24,7 @@ static rt_bool_t demo_handle_key(struct rtgui_object* object, struct rtgui_event
 			return RT_TRUE;
 		}
 	}
+	return RT_TRUE;
 }
 
 struct rtgui_win *main_win;

@@ -17,9 +17,14 @@ void demo_view_next(struct rtgui_object *object, struct rtgui_event *event)
 
 void demo_view_prev(struct rtgui_object *object, struct rtgui_event *event)
 {
-	rtgui_notebook_set_current_by_index(the_notebook,
-			(rtgui_notebook_get_current_index(the_notebook) - 1) %
-			rtgui_notebook_get_count(the_notebook));
+	rt_int16_t cur_idx = rtgui_notebook_get_current_index(the_notebook);
+
+	if (cur_idx == 0)
+		rtgui_notebook_set_current_by_index(the_notebook,
+			rtgui_notebook_get_count(the_notebook) - 1);
+	else
+		rtgui_notebook_set_current_by_index(the_notebook,
+			--cur_idx);
 }
 
 rtgui_container_t* demo_view(const char *title)
