@@ -167,9 +167,12 @@ static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t*
 	/* submenu is activate */
 	if (menu->items[menu->items_list->current_item].type == RTGUI_ITEM_SUBMENU)
 	{
-		/* if sub menu activated, not hide menu */
+		/* if sub menu activated, not hide menu. But we cannot use the
+		 * activated flag as criteria since the old window is deactivated
+		 * before the new window got activated. But the window will be shown in
+		 * this context, so use 'is not hide'. */
 		if (menu->sub_menu != RT_NULL &&
-			rtgui_win_is_activated(RTGUI_WIN(menu->sub_menu)) == RT_TRUE)
+			!RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(menu->sub_menu)))
 			return RT_TRUE;
 	}
 
