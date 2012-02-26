@@ -26,6 +26,7 @@
 static void _rtgui_win_constructor(rtgui_win_t *win)
 {
 	RTGUI_WIDGET(win)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
+	win->parent_window = RT_NULL;
 	/* init window attribute */
 	win->on_activate   = RT_NULL;
 	win->on_deactivate = RT_NULL;
@@ -33,6 +34,7 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 	win->on_key        = RT_NULL;
 	win->title         = RT_NULL;
 	win->modal_code    = RTGUI_MODAL_OK;
+	win->in_modal      = RT_FALSE;
 
 	/* initialize last mouse event handled widget */
 	win->last_mevent_widget = RT_NULL;

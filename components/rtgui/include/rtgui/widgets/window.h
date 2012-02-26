@@ -70,8 +70,6 @@ struct rtgui_win
 
     /* parent window. RT_NULL if the window is a top level window */
 	struct rtgui_win *parent_window;
-	struct rtgui_win *slibing_window;
-	struct rtgui_win *child_window;
 
 	/* the widget that will grab the focus in current window */
 	struct rtgui_widget *focused_widget;
