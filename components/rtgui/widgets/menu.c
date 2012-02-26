@@ -94,7 +94,10 @@ static void _rtgui_menu_onitem(struct rtgui_widget* widget, struct rtgui_event* 
 	}
 }
 
-static void _rtgui_menu_item_ondraw(struct rtgui_listctrl *list, struct rtgui_dc* dc, rtgui_rect_t* rect, rt_uint16_t index)
+static void _rtgui_menu_item_ondraw(struct rtgui_listctrl *list,
+									struct rtgui_dc* dc,
+									rtgui_rect_t* rect,
+									rt_uint16_t index)
 {
 	rtgui_rect_t item_rect;
 	struct rtgui_menu_item* item;
@@ -142,7 +145,7 @@ static void _rtgui_menu_item_ondraw(struct rtgui_listctrl *list, struct rtgui_dc
 	}
 }
 
-DEFINE_CLASS_TYPE(menu, "menu", 
+DEFINE_CLASS_TYPE(menu, "menu",
 	RTGUI_WIN_TYPE,
 	_rtgui_menu_constructor,
 	_rtgui_menu_destructor,
@@ -156,7 +159,8 @@ static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t*
 	{
 		/* whether click on parent menu */
 		if (rtgui_win_is_activated(RTGUI_WIN(menu->parent_menu)) == RT_TRUE &&
-			menu->parent_menu->items[menu->parent_menu->items_list->current_item].submenu == (struct rtgui_menu_item_t *)menu->items)
+			menu->parent_menu->items[menu->parent_menu->items_list->current_item].submenu
+				== (struct rtgui_menu_item_t *)menu->items)
 			return RT_TRUE;
 	}
 
@@ -164,7 +168,7 @@ static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t*
 	if (menu->items[menu->items_list->current_item].type == RTGUI_ITEM_SUBMENU)
 	{
 		/* if sub menu activated, not hide menu */
-		if (menu->sub_menu != RT_NULL && 
+		if (menu->sub_menu != RT_NULL &&
 			rtgui_win_is_activated(RTGUI_WIN(menu->sub_menu)) == RT_TRUE)
 			return RT_TRUE;
 	}
@@ -188,8 +192,8 @@ static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t*
 	return RT_TRUE;
 }
 
-struct rtgui_menu* rtgui_menu_create(const char* title, struct rtgui_menu* parent_menu, 
-	const struct rtgui_menu_item* items, rt_uint16_t count)
+struct rtgui_menu* rtgui_menu_create(const char* title, struct rtgui_menu* parent_menu,
+									 const struct rtgui_menu_item* items, rt_uint16_t count)
 {
 	rtgui_rect_t rect = {0, 0, 100, 100};
     struct rtgui_menu* menu;
@@ -205,7 +209,7 @@ struct rtgui_menu* rtgui_menu_create(const char* title, struct rtgui_menu* paren
 		rtgui_widget_set_rect(RTGUI_WIDGET(menu), &rect);
 		rtgui_rect_inflate(&rect, -1);
 		/* create menu item list */
-		menu->items_list = rtgui_listctrl_create((rt_uint32_t)items, count, &rect, _rtgui_menu_item_ondraw); 
+		menu->items_list = rtgui_listctrl_create((rt_uint32_t)items, count, &rect, _rtgui_menu_item_ondraw);
 		RTGUI_WIDGET_BACKGROUND(RTGUI_WIDGET(menu->items_list)) = rtgui_theme_default_bc();
 		rtgui_container_add_child(RTGUI_CONTAINER(menu), RTGUI_WIDGET(menu->items_list));
 		rtgui_listctrl_set_onitem(menu->items_list, _rtgui_menu_onitem);
@@ -238,7 +242,8 @@ void rtgui_menu_pop(struct rtgui_menu* menu, int x, int y)
 	rtgui_rect_t rect;
 	struct rtgui_event_resize eresize;
 
-	if (menu == RT_NULL) return;
+	if (menu == RT_NULL)
+		return;
 
 	/* set window extent */
 	rect.x1 = 0; rect.y1 = 0;
