@@ -85,9 +85,9 @@ static void application_entry(void* parameter)
 	demo_view_scrollbar();
 	demo_view_radiobox();
 	demo_view_textbox();
-#if 0
 	demo_view_listbox();
 	demo_view_menu();
+#if 0
 	demo_view_listctrl();
 	demo_view_combobox();
 	demo_view_slider();
