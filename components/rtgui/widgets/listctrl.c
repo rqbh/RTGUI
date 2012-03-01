@@ -359,7 +359,7 @@ rt_bool_t rtgui_listctrl_event_handler(struct rtgui_widget* widget, struct rtgui
     return rtgui_widget_event_handler(RTGUI_OBJECT(widget), event);
 }
 
-rtgui_listctrl_t* rtgui_listctrl_create(rt_uint32_t items, rt_uint16_t count, rtgui_rect_t *rect, 
+rtgui_listctrl_t* rtgui_listctrl_create(rt_uint32_t items, rt_uint16_t count, rtgui_rect_t *rect,
 										rtgui_onitem_draw_t ondraw)
 {
 	struct rtgui_listctrl* ctrl = RT_NULL;
@@ -394,7 +394,7 @@ void rtgui_listctrl_set_onitem(rtgui_listctrl_t* ctrl, rtgui_onitem_func_t func)
 void rtgui_listctrl_set_items(rtgui_listctrl_t* ctrl, rt_uint32_t items, rt_uint16_t count)
 {
 	rtgui_rect_t rect;
-	
+
 	ctrl->items = items;
 	ctrl->items_count = count;
 	ctrl->current_item = 0;
