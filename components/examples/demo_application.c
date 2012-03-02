@@ -87,10 +87,10 @@ static void application_entry(void* parameter)
 	demo_view_textbox();
 	demo_view_listbox();
 	demo_view_menu();
-#if 0
 	demo_view_listctrl();
 	demo_view_combobox();
 	demo_view_slider();
+#if 0
 	demo_view_notebook();
 	demo_view_mywidget();
 #if defined(RTGUI_USING_DFS_FILERW) || defined(RTGUI_USING_STDIO_FILERW)

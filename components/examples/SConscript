@@ -10,10 +10,7 @@ demo_view_box.c
 demo_view_image.c
 demo_view_module.c
 demo_view_mywidget.c
-demo_view_slider.c
 demo_view_notebook.c
-demo_view_combobox.c
-demo_view_listctrl.c
 mywidget.c
 '''
 
@@ -37,6 +34,9 @@ demo_view_radiobox.c
 demo_view_textbox.c
 demo_view_listbox.c
 demo_view_menu.c
+demo_view_listctrl.c
+demo_view_combobox.c
+demo_view_slider.c
 """)
 
 
