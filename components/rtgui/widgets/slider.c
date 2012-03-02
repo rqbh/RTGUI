@@ -103,16 +103,31 @@ static rt_bool_t rtgui_slider_onkey(struct rtgui_slider* slider, struct rtgui_ev
 	if (!(RTGUI_KBD_IS_UP(event)))
 		return RT_TRUE;
 
-	if (event->key == RTGUIK_LEFT)
+	if (slider->orient == RTGUI_HORIZONTAL)
 	{
-		if (slider->value > slider->min)
-			slider->value++;
+		if (event->key == RTGUIK_RIGHT)
+		{
+			if (slider->value > slider->min)
+				slider->value++;
+		}
+		else if (event->key == RTGUIK_LEFT)
+		{
+			if (slider->value < slider->max)
+				slider->value--;
+		}
 	}
-
-	if (event->key == RTGUIK_RIGHT)
+	else
 	{
-		if (slider->value < slider->max)
-			slider->value--;
+		if (event->key == RTGUIK_UP)
+		{
+			if (slider->value > slider->min)
+				slider->value--;
+		}
+		else if (event->key == RTGUIK_DOWN)
+		{
+			if (slider->value < slider->max)
+				slider->value++;
+		}
 	}
 
 	/* update widget */
@@ -234,7 +249,7 @@ void rtgui_slider_set_orientation(struct rtgui_slider* slider, int orientation)
 		rtgui_widget_set_miniheight(RTGUI_WIDGET(slider), RTGUI_SLIDER_DEFAULT_HEIGHT);
 		rtgui_widget_set_miniwidth(RTGUI_WIDGET(slider), RTGUI_SLIDER_DEFAULT_WIDTH);
 	}
-	else 
+	else
 	{
 		/* VERTICAL */
 		rtgui_widget_set_miniwidth(RTGUI_WIDGET(slider), RTGUI_SLIDER_DEFAULT_HEIGHT);

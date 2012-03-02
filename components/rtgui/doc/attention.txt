@@ -8,3 +8,8 @@ RTGUI_WIN_STYLE_DESTROY_ON_CLOSE，close 窗口之后不要再去销毁窗口。
 
 4, 在 widget 中添加了 on_show 和 on_hide 事件回调函数。他们会在控件显示/隐藏的
 时候被调用。
+
+5, slider 控件改为左键减小数值，右键增加数值。横向的 slider 处理左右键，纵向的
+slider 处理上下键，上面的值小，下面的值大。
+
+
