@@ -44,8 +44,9 @@ struct rtgui_filelist_view
 };
 typedef struct rtgui_filelist_view rtgui_filelist_view_t;
 
-rtgui_filelist_view_t* rtgui_filelist_view_create(rtgui_workbench_t* workbench, 
-	const char* directory, const char* pattern, const rtgui_rect_t* rect);
+rtgui_filelist_view_t* rtgui_filelist_view_create(const char* directory,
+												  const char* pattern,
+												  const rtgui_rect_t* rect);
 void rtgui_filelist_view_destroy(rtgui_filelist_view_t* view);
 
 rt_bool_t rtgui_filelist_view_event_handler(struct rtgui_widget* widget, struct rtgui_event* event);
