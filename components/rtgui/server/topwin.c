@@ -206,18 +206,15 @@ static rt_bool_t _rtgui_topwin_could_show(struct rtgui_topwin *topwin)
 	return RT_TRUE;
 }
 
-static void _rtgui_topwin_remove_tree(struct rtgui_topwin *topwin,
-									  struct rtgui_region *region)
+static void _rtgui_topwin_union_region_tree(struct rtgui_topwin *topwin,
+											struct rtgui_region *region)
 {
 	struct rtgui_dlist_node *node;
 
 	RT_ASSERT(topwin != RT_NULL);
 
 	rtgui_dlist_foreach(node, &topwin->child_list, next)
-		_rtgui_topwin_remove_tree(get_topwin_from_list(node), region);
-
-	/* remove node from list */
-	rtgui_dlist_remove(&(topwin->list));
+		_rtgui_topwin_union_region_tree(get_topwin_from_list(node), region);
 
 	if (topwin->title != RT_NULL)
 		rtgui_region_union_rect(region, region, &RTGUI_WIDGET(topwin->title)->extent);
@@ -266,7 +263,7 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 
 	old_focus = rtgui_topwin_get_focus();
 
-	_rtgui_topwin_remove_tree(topwin, &region);
+	_rtgui_topwin_union_region_tree(topwin, &region);
 	if (topwin->flag & WINTITLE_SHOWN)
 		rtgui_topwin_update_clip();
 
@@ -277,6 +274,10 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 
 	/* redraw the old rect */
 	rtgui_topwin_redraw(rtgui_region_extents(&region));
+
+	/* remove the root from _rtgui_topwin_list will remove the whole tree from
+	 * _rtgui_topwin_list. */
+	rtgui_dlist_remove(&topwin->list);
 
 	_rtgui_topwin_free_tree(topwin);
 
