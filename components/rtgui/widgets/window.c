@@ -420,7 +420,15 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 	case RTGUI_EVENT_WIN_DEACTIVATE:
 		if (win->flag & RTGUI_WIN_FLAG_MODAL)
 		{
-			rt_kprintf("RTGUI error: server try to deactivate a modal window\n");
+			/* FIXME: make modal concept clear and easy. See the comment of
+			 * rtgui_topwin_modal_enter. */
+			/* There are various reason that a modal window got deactivated:
+			 *     1, it has child windows and the user activate one of them.
+			 *     2, the application has more than one root window and the
+			 *     user switched to one of the others.
+			 *
+			 * In any of the cases, we have nothing to do here.
+			 */
 		}
 		else
 		{
