@@ -232,6 +232,7 @@ static void _rtgui_application_constructor(struct rtgui_application *app)
 	app->name           = RT_NULL;
 	/* set EXITED so we can destroy an application that just created */
 	app->state_flag     = RTGUI_APPLICATION_FLAG_EXITED;
+	app->ref_count      = 0;
 	app->exit_code      = 0;
 	app->tid            = RT_NULL;
 	app->server         = RT_NULL;
@@ -616,10 +617,10 @@ rt_bool_t rtgui_application_event_handler(struct rtgui_object* object, rtgui_eve
 	return RT_TRUE;
 }
 
-rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
-										rt_bool_t *loop_guard)
+rt_inline void _rtgui_application_event_loop(struct rtgui_application *app)
 {
 	rt_err_t result;
+	rt_uint16_t current_ref;
 	struct rtgui_event *event;
 
 	_rtgui_application_check(app);
@@ -627,9 +628,12 @@ rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 	/* point to event buffer */
 	event = (struct rtgui_event*)app->event_buffer;
 
-	while (!(app->state_flag & RTGUI_APPLICATION_FLAG_CLOSED) &&
-			 *loop_guard)
+	current_ref = ++app->ref_count;
+
+	while (current_ref <= app->ref_count)
 	{
+		RT_ASSERT(current_ref == app->ref_count);
+
 		if (app->on_idle != RT_NULL)
 		{
 			result = rtgui_application_recv_nosuspend(event, sizeof(union rtgui_event_generic));
@@ -645,29 +649,24 @@ rt_base_t _rtgui_application_event_loop(struct rtgui_application *app,
 				RTGUI_OBJECT(app)->event_handler(RTGUI_OBJECT(app), event);
 		}
 	}
-
-	return app->exit_code;
 }
 
 rt_base_t rtgui_application_run(struct rtgui_application *app)
 {
-	rt_bool_t loop = 1;
-
 	_rtgui_application_check(app);
 
-	/* cleanup */
-	app->exit_code = 0;
-	app->state_flag &= ~RTGUI_APPLICATION_FLAG_CLOSED;
-
 	app->state_flag &= ~RTGUI_APPLICATION_FLAG_EXITED;
-	_rtgui_application_event_loop(app, &loop);
-	app->state_flag |= RTGUI_APPLICATION_FLAG_EXITED;
+
+	_rtgui_application_event_loop(app);
+
+	if (app->ref_count == 0)
+		app->state_flag |= RTGUI_APPLICATION_FLAG_EXITED;
 
 	return app->exit_code;
 }
 
-void rtgui_application_exit(struct rtgui_application* app, rt_base_t code)
+void rtgui_application_exit(struct rtgui_application* app, rt_uint16_t code)
 {
-	app->state_flag |= RTGUI_APPLICATION_FLAG_CLOSED;
+	--app->ref_count;
 	app->exit_code = code;
 }

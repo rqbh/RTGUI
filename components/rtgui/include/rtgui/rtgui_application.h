@@ -30,12 +30,7 @@ DECLARE_CLASS_TYPE(application);
 
 enum rtgui_application_flag
 {
-	/* use this flag to exit from the event loop. It's different from the
-	 * EXITED flag in that when it marked as closed, it's not guarantee that
-	 * the event loop is exited already. But EXITED do.*/
-	RTGUI_APPLICATION_FLAG_CLOSED  = 0x02,
 	RTGUI_APPLICATION_FLAG_EXITED  = 0x04,
-
 	RTGUI_APPLICATION_FLAG_SHOWN   = 0x08
 };
 
@@ -50,7 +45,8 @@ struct rtgui_application
 
 	enum rtgui_application_flag state_flag;
 
-	rt_base_t exit_code;
+	rt_uint16_t ref_count;
+	rt_uint16_t exit_code;
 
 	/* the thread id */
 	rt_thread_t tid;
@@ -80,7 +76,7 @@ rt_err_t rtgui_application_show(struct rtgui_application *app);
 rt_err_t rtgui_application_hide(struct rtgui_application *app);
 
 rt_base_t rtgui_application_run(struct rtgui_application *app);
-void rtgui_application_exit(struct rtgui_application *app, rt_base_t code);
+void rtgui_application_exit(struct rtgui_application *app, rt_uint16_t code);
 
 void rtgui_application_set_onidle(rtgui_idle_func onidle);
 rtgui_idle_func rtgui_application_get_onidle(void);

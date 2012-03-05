@@ -21,8 +21,6 @@
 #include <rtgui/widgets/window.h>
 #include <rtgui/widgets/button.h>
 
-#include "../server/rtgui_application_prv.h"
-
 static void _rtgui_win_constructor(rtgui_win_t *win)
 {
 	RTGUI_WIDGET(win)->flag |= RTGUI_WIDGET_FLAG_FOCUSABLE;
@@ -34,7 +32,6 @@ static void _rtgui_win_constructor(rtgui_win_t *win)
 	win->on_key        = RT_NULL;
 	win->title         = RT_NULL;
 	win->modal_code    = RTGUI_MODAL_OK;
-	win->in_modal      = RT_FALSE;
 
 	/* initialize last mouse event handled widget */
 	win->last_mevent_widget = RT_NULL;
@@ -241,15 +238,13 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 		win->flag |= RTGUI_WIN_FLAG_MODAL;
 
-		win->in_modal = RT_TRUE;
-
 		if (rtgui_server_post_event_sync((struct rtgui_event*)&emodal,
 										 sizeof(emodal)) != RT_EOK)
 			return exit_code;
 
 		app->modal_object = RTGUI_OBJECT(win);
 
-		exit_code = _rtgui_application_event_loop(app, &(win->in_modal));
+		exit_code = rtgui_application_run(app);
 
 		app->modal_object = RT_NULL;
 		win->flag &= ~RTGUI_WIN_FLAG_MODAL;
@@ -265,11 +260,10 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 
 void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 {
-	if (win == RT_NULL)
+	if (win == RT_NULL || !(win->flag & RTGUI_WIN_FLAG_MODAL))
 		return;
 
-	RTGUI_OBJECT(win)->flag |= RTGUI_OBJECT_FLAG_DISABLED;
-	win->in_modal = 0;
+	rtgui_application_exit(rtgui_application_self(), modal_code);
 
 	/* remove modal mode */
 	win->flag &= ~RTGUI_WIN_FLAG_MODAL;
