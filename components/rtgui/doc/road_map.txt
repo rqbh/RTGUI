@@ -48,6 +48,8 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 11, 添加 EVENT_WIN_MODAL_ENTER 和 EVENT_WIN_MODAL_EXIT 事件，用来通知窗口管理器
 (topwin)一个窗口进入模态。窗口管理器根据这个进行相应的设置。
 
+12, rtgui_filelist_view 不必继承自 container。
+
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
 的控件。实现这样的功能有一个就好，container 可以担当这个责任。其他需要放多个控
