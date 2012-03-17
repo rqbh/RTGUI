@@ -13,7 +13,8 @@ exe_dir = 'executables'
 # list of targets, list item format in:
 #     ['executable_name', 'path_to_SConscript']
 TARGETS = [['demo', 'demo'],
-           ['swin', path_join('test_cases', 'simple_win')]
+           ['swin', path_join('test_cases', 'simple_win')],
+	   ['realtouch', 'realtouch']
           ]
 
 env = Environment()
