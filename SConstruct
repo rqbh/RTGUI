@@ -13,9 +13,7 @@ exe_dir = 'executables'
 # list of targets, list item format in:
 #     ['executable_name', 'path_to_SConscript']
 TARGETS = [['demo', 'demo'],
-           ['swin', path_join('test_cases', 'simple_win')],
-	   ['realtouch', 'realtouch']
-          ]
+	       ['realtouch', 'realtouch']]
 
 env = Environment()
 
@@ -34,3 +32,18 @@ for exe_name, src_path in TARGETS:
 
     # end building
     EndBuilding(exe_name)
+
+# build for testcases 
+list = os.listdir(os.path.join(str(Dir('#')), 'test_cases'))
+for d in list:
+    src_path = os.path.join(str(Dir('#')), 'test_cases', d)
+    if os.path.isfile(os.path.join(src_path, 'SConscript')):
+        exe_name = os.path.basename(src_path)
+        objs = base_objs + SConscript(dirs=[src_path],
+                                       variant_dir=path_join('build', src_path),
+                                       duplicate=0)
+        # build program
+        env.Program(path_join(exe_dir, exe_name), objs)
+
+        # end building
+        EndBuilding(exe_name)
