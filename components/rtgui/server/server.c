@@ -219,15 +219,24 @@ static rt_bool_t rtgui_server_event_handler(struct rtgui_object *object,
         break;
 
     case RTGUI_EVENT_WIN_SHOW:
-        rtgui_topwin_show((struct rtgui_event_win*)event);
+        if (rtgui_topwin_show((struct rtgui_event_win*)event) == RT_EOK)
+            rtgui_application_ack(event, RTGUI_STATUS_OK);
+        else
+            rtgui_application_ack(event, RTGUI_STATUS_ERROR);
         break;
 
     case RTGUI_EVENT_WIN_HIDE:
-        rtgui_topwin_hide((struct rtgui_event_win*)event);
+        if (rtgui_topwin_hide((struct rtgui_event_win*)event) == RT_EOK)
+            rtgui_application_ack(event, RTGUI_STATUS_OK);
+        else
+            rtgui_application_ack(event, RTGUI_STATUS_ERROR);
         break;
 
     case RTGUI_EVENT_WIN_MOVE:
-        rtgui_topwin_move((struct rtgui_event_win_move*)event);
+        if (rtgui_topwin_move((struct rtgui_event_win_move*)event) == RT_EOK)
+            rtgui_application_ack(event, RTGUI_STATUS_OK);
+        else
+            rtgui_application_ack(event, RTGUI_STATUS_ERROR);
         break;
 
 	case RTGUI_EVENT_WIN_MODAL_ENTER:

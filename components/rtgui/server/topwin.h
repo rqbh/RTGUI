@@ -27,11 +27,11 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid);
 void rtgui_topwin_activate_win(struct rtgui_topwin* win);
 
 /* show a window */
-void rtgui_topwin_show(struct rtgui_event_win* event);
+rt_err_t rtgui_topwin_show(struct rtgui_event_win* event);
 /* hide a window */
-void rtgui_topwin_hide(struct rtgui_event_win* event);
+rt_err_t rtgui_topwin_hide(struct rtgui_event_win* event);
 /* move a window */
-void rtgui_topwin_move(struct rtgui_event_win_move* event);
+rt_err_t rtgui_topwin_move(struct rtgui_event_win_move* event);
 /* resize a window */
 void rtgui_topwin_resize(struct rtgui_win* wid, rtgui_rect_t* r);
 /* a window is entering modal mode */

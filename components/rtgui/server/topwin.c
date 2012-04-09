@@ -499,7 +499,7 @@ static void _rtgui_topwin_show_tree(struct rtgui_topwin *topwin, struct rtgui_ev
  *
  * Top level window(parent == RT_NULL) can always be shown.
  */
-void rtgui_topwin_show(struct rtgui_event_win* event)
+rt_err_t rtgui_topwin_show(struct rtgui_event_win* event)
 {
 	struct rtgui_topwin *topwin, *old_focus;
 	struct rtgui_win* wid = event->wid;
@@ -511,10 +511,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 	topwin = rtgui_topwin_search_in_list(wid, &_rtgui_topwin_list);
 	if (topwin == RT_NULL ||
 		!_rtgui_topwin_could_show(topwin))
-	{
-		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
-		return;
-	}
+		return -RT_ERROR;
 
 	old_focus = rtgui_topwin_get_focus();
 
@@ -530,7 +527,7 @@ void rtgui_topwin_show(struct rtgui_event_win* event)
 		_rtgui_topwin_only_activate(topwin);
 	}
 
-	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+	return RT_EOK;
 }
 
 static void _rtgui_topwin_clear_modal_tree(struct rtgui_topwin *topwin)
@@ -551,7 +548,7 @@ static void _rtgui_topwin_clear_modal_tree(struct rtgui_topwin *topwin)
 }
 
 /* hide a window */
-void rtgui_topwin_hide(struct rtgui_event_win* event)
+rt_err_t rtgui_topwin_hide(struct rtgui_event_win* event)
 {
 	struct rtgui_topwin *topwin;
 	struct rtgui_topwin *old_focus_topwin = rtgui_topwin_get_focus();
@@ -562,13 +559,11 @@ void rtgui_topwin_hide(struct rtgui_event_win* event)
 	topwin = rtgui_topwin_search_in_list(wid, &_rtgui_topwin_list);
 	if (topwin == RT_NULL)
 	{
-		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
-		return;
+		return -RT_ERROR;
 	}
 	if (!(topwin->flag & WINTITLE_SHOWN))
 	{
-		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
-		return;
+		return RT_EOK;
 	}
 
 	old_focus_topwin = rtgui_topwin_get_focus();
@@ -600,11 +595,11 @@ void rtgui_topwin_hide(struct rtgui_event_win* event)
 		_rtgui_topwin_activate_next();
 	}
 
-	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+	return RT_EOK;
 }
 
 /* move top window */
-void rtgui_topwin_move(struct rtgui_event_win_move* event)
+rt_err_t rtgui_topwin_move(struct rtgui_event_win_move* event)
 {
 	struct rtgui_topwin* topwin;
 	int dx, dy;
@@ -616,7 +611,7 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 	if (topwin == RT_NULL ||
 		!(topwin->flag & WINTITLE_SHOWN))
 	{
-		rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_ERROR);
+		return -RT_ERROR;
 	}
 
 	/* get the delta move x, y */
@@ -664,8 +659,7 @@ void rtgui_topwin_move(struct rtgui_event_win_move* event)
 		rtgui_application_send(topwin->tid, &(epaint.parent), sizeof(epaint));
 	}
 
-	/* send status ok */
-	rtgui_application_ack(RTGUI_EVENT(event), RTGUI_STATUS_OK);
+	return RT_EOK;
 }
 
 /*
