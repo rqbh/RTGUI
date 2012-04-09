@@ -109,10 +109,18 @@ DEFINE_CLASS_TYPE(win, "win",
 	_rtgui_win_destructor,
 	sizeof(struct rtgui_win));
 
-rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
-		                      const char* title,
-							  rtgui_rect_t *rect,
-							  rt_uint16_t style)
+/*
+ * Danling window is the window that has not connected to the server.
+ * This is a internal API that used by server, where calling
+ * _rtgui_win_create_in_server would hang up the server thread.
+ */
+#ifndef RTGUI_USING_DESKTOP_WINDOW
+static
+#endif
+struct rtgui_win* rtgui_win_create_danling(struct rtgui_win* parent_window,
+		                                   const char* title,
+							               rtgui_rect_t *rect,
+							               rt_uint16_t style)
 {
 	struct rtgui_win* win;
 
@@ -132,16 +140,26 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
 
 	rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 	win->style = style;
+}
 
-	if (_rtgui_win_create_in_server(parent_window, win) == RT_FALSE)
+rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
+		                      const char* title,
+							  rtgui_rect_t *rect,
+							  rt_uint16_t style)
+{
+	struct rtgui_win *win;
+
+	win = rtgui_win_create_danling(parent_window, title, rect, style);
+
+	if (_rtgui_win_create_in_server(parent_window, win) == RT_TRUE)
 	{
-		goto __on_err;
+		return win;
 	}
-	return win;
-
-__on_err:
-	rtgui_widget_destroy(RTGUI_WIDGET(win));
-	return RT_NULL;
+	else
+	{
+		rtgui_widget_destroy(RTGUI_WIDGET(win));
+		return RT_NULL;
+	}
 }
 
 void rtgui_win_destroy(struct rtgui_win* win)
