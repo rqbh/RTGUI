@@ -41,6 +41,13 @@ static struct rtgui_dlist_node _rtgui_topwin_list;
 #define get_topwin_from_list(list_entry) \
 	(rtgui_dlist_entry((list_entry), struct rtgui_topwin, list))
 
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+static struct rtgui_topwin *the_desktop_topwin;
+#define IS_ROOT_WIN(topwin) ((topwin)->parent == the_desktop_topwin)
+#else
+#define IS_ROOT_WIN(topwin) ((topwin)->parent == RT_NULL)
+#endif
+
 static struct rt_semaphore _rtgui_topwin_lock;
 
 static void rtgui_topwin_update_clip(void);
@@ -105,6 +112,11 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 	{
 		topwin->parent = RT_NULL;
 		rtgui_dlist_insert_before(&_rtgui_topwin_list, &topwin->list);
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+		RT_ASSERT(the_desktop_topwin == RT_NULL);
+		RT_ASSERT(event->parent.user & RTGUI_WIN_STYLE_DESKTOP);
+		the_desktop_topwin = topwin;
+#endif
 	}
 	else
 	{
@@ -160,14 +172,14 @@ rt_err_t rtgui_topwin_add(struct rtgui_event_win_create* event)
 	return RT_EOK;
 }
 
-static struct rtgui_topwin* _rtgui_topwin_get_top_parent(struct rtgui_topwin *topwin)
+static struct rtgui_topwin* _rtgui_topwin_get_root_win(struct rtgui_topwin *topwin)
 {
 	struct rtgui_topwin *topparent;
 
 	RT_ASSERT(topwin != RT_NULL);
 
 	topparent = topwin;
-	while (topparent->parent != RT_NULL)
+	while (!IS_ROOT_WIN(topparent))
 		topparent = topparent->parent;
 	return topparent;
 }
@@ -352,12 +364,16 @@ static void _rtgui_topwin_move_whole_tree2top(struct rtgui_topwin *topwin)
 	RT_ASSERT(topwin != RT_NULL);
 
 	/* move the whole tree */
-	topparent = _rtgui_topwin_get_top_parent(topwin);
+	topparent = _rtgui_topwin_get_root_win(topwin);
 
 	/* remove node from hidden list */
 	rtgui_dlist_remove(&(topparent->list));
 	/* add node to show list */
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+	rtgui_dlist_insert_after(&the_desktop_topwin->child_list, &(topparent->list));
+#else
 	rtgui_dlist_insert_after(&_rtgui_topwin_list, &(topparent->list));
+#endif
 }
 
 static void _rtgui_topwin_raise_topwin_in_tree(struct rtgui_topwin *topwin)
@@ -537,7 +553,7 @@ static void _rtgui_topwin_clear_modal_tree(struct rtgui_topwin *topwin)
 	RT_ASSERT(topwin != RT_NULL);
 	RT_ASSERT(topwin->parent != RT_NULL);
 
-	while (topwin->parent != RT_NULL)
+	while (!IS_ROOT_WIN(topwin))
 	{
 		rtgui_dlist_foreach(node, &topwin->parent->child_list, next)
 			get_topwin_from_list(node)->flag &= ~WINTITLE_MODALED;
@@ -737,7 +753,7 @@ struct rtgui_topwin* rtgui_topwin_get_focus(void)
 
 	if (topwin != RT_NULL)
 		RT_ASSERT(get_topwin_from_list(_rtgui_topwin_list.next) ==
-				  _rtgui_topwin_get_top_parent(topwin));
+				  _rtgui_topwin_get_root_win(topwin));
 
 	return topwin;
 #else
@@ -915,8 +931,8 @@ static void rtgui_topwin_redraw(struct rtgui_rect* rect)
 }
 
 /* a window enter modal mode will modal all the sibling window and parent
- * window all along to the root window(which parent is RT_NULL). If a root
- * window modals, there is nothing to do here.*/
+ * window all along to the root window(which parent is RT_NULL or the desktop
+ * window if there is). If a root window modals, there is nothing to do here.*/
 rt_err_t rtgui_topwin_modal_enter(struct rtgui_event_win_modal_enter* event)
 {
 	struct rtgui_topwin *topwin, *parent_top;
@@ -927,7 +943,7 @@ rt_err_t rtgui_topwin_modal_enter(struct rtgui_event_win_modal_enter* event)
 	if (topwin == RT_NULL)
 		return -RT_ERROR;
 
-	if (topwin->parent == RT_NULL)
+	if (IS_ROOT_WIN(topwin))
 		return RT_EOK;
 
 	parent_top = topwin->parent;
@@ -935,7 +951,7 @@ rt_err_t rtgui_topwin_modal_enter(struct rtgui_event_win_modal_enter* event)
 	/* modal window should be on top already */
 	RT_ASSERT(get_topwin_from_list(parent_top->child_list.next) == topwin);
 
-	while (parent_top != RT_NULL)
+	while (!IS_ROOT_WIN(parent_top))
 	{
 		rtgui_dlist_foreach(node, &parent_top->child_list, next)
 			get_topwin_from_list(node)->flag |= WINTITLE_MODALED;
