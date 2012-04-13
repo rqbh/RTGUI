@@ -72,8 +72,7 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 	rt_free(win->title);
 }
 
-static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *parent_window,
-											 struct rtgui_win *win)
+static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
 {
 	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
@@ -81,7 +80,7 @@ static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *parent_window,
 		RTGUI_EVENT_WIN_CREATE_INIT(&ecreate);
 
 		/* send win create event to server */
-		ecreate.parent_window = parent_window;
+		ecreate.parent_window = win->parent_window;
 		ecreate.wid           = win;
 		ecreate.parent.user	  = win->style;
 #ifndef RTGUI_USING_SMALL_SIZE
@@ -153,7 +152,7 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
 	rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 	win->style = style;
 
-	if (_rtgui_win_create_in_server(parent_window, win) == RT_FALSE)
+	if (_rtgui_win_create_in_server(win) == RT_FALSE)
 	{
 		goto __on_err;
 	}
@@ -227,7 +226,7 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 	/* if it does not register into server, create it in server */
 	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
-		if (_rtgui_win_create_in_server(win->parent_window, win) == RT_FALSE)
+		if (_rtgui_win_create_in_server(win) == RT_FALSE)
 			return exit_code;
 	}
 
