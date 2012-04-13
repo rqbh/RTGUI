@@ -43,7 +43,10 @@ static struct rtgui_dlist_node _rtgui_topwin_list;
 
 #ifdef RTGUI_USING_DESKTOP_WINDOW
 static struct rtgui_topwin *the_desktop_topwin;
-#define IS_ROOT_WIN(topwin) ((topwin)->parent == the_desktop_topwin)
+rt_inline rt_bool_t IS_ROOT_WIN(struct rtgui_topwin *topwin)
+{
+	return (topwin->parent == RT_NULL) || (topwin->parent == the_desktop_topwin);
+}
 #else
 #define IS_ROOT_WIN(topwin) ((topwin)->parent == RT_NULL)
 #endif
