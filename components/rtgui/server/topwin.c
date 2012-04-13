@@ -875,7 +875,13 @@ static void rtgui_topwin_update_clip(void)
 		rtgui_application_send(top->tid, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
 
 		/* iterate to next topwin */
-		if (top->list.next != &top->parent->child_list &&
+		if (top->parent == RT_NULL)
+			if (top->list.next != &_rtgui_topwin_list &&
+					get_topwin_from_list(top->list.next)->flag & WINTITLE_SHOWN)
+				top = get_topwin_from_list(top->list.next);
+			else
+				top = RT_NULL;
+		else if (top->list.next != &top->parent->child_list &&
 			get_topwin_from_list(top->list.next)->flag & WINTITLE_SHOWN)
 			top = get_topwin_from_list(top->list.next);
 		else
