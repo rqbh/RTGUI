@@ -755,8 +755,14 @@ struct rtgui_topwin* rtgui_topwin_get_focus(void)
 	struct rtgui_topwin *topwin = _rtgui_topwin_get_focus_from_list(&_rtgui_topwin_list);
 
 	if (topwin != RT_NULL)
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+		RT_ASSERT(topwin == the_desktop_topwin ||\
+				  get_topwin_from_list(the_desktop_topwin->child_list.next) ==
+				  _rtgui_topwin_get_root_win(topwin));
+#else
 		RT_ASSERT(get_topwin_from_list(_rtgui_topwin_list.next) ==
 				  _rtgui_topwin_get_root_win(topwin));
+#endif
 
 	return topwin;
 #else
