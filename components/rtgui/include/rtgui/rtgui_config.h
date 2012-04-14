@@ -74,4 +74,6 @@
 
 #define RTGUI_USING_CAST_CHECK
 
+#define RTGUI_USING_DESKTOP_WINDOW
+
 #endif

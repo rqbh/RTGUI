@@ -24,7 +24,17 @@ void create_wins(void)
 {
 	struct rtgui_win *win1, *win2;
 	struct rtgui_label *label;
-	struct rtgui_rect rect = {40, 40, 200, 80};
+	struct rtgui_rect rect;
+
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+	struct rtgui_win *dsk;
+
+	rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &rect);
+	dsk = rtgui_win_create(RT_NULL, "desktop", &rect, RTGUI_WIN_STYLE_DESKTOP_DEFAULT);
+	rtgui_win_show(dsk, RT_FALSE);
+#endif
+
+	rect.x1 = 40, rect.y1 = 40, rect.x2 = 200, rect.y2 = 80;
 
 	win1 = rtgui_win_create(RT_NULL,
 		"test window", &rect, RTGUI_WIN_STYLE_DEFAULT);
@@ -49,14 +59,14 @@ void create_wins(void)
 	rect.y1 = 80;
 	rect.x2 = 180;
 	rect.y2 = 90;
-	win2 = rtgui_win_create(RT_NULL,
+	win2 = rtgui_win_create(win1,
 		"test window2", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rtgui_win_set_onclose(win2, on_window_close);
-	rtgui_win_show(win2, RT_FALSE);
-	rtgui_win_show(win1, RT_FALSE);
+	rtgui_win_show(win1, RT_TRUE);
+	/*rtgui_win_show(win2, RT_TRUE);*/
 
-	rtgui_application_run(app);
+	/*rtgui_application_run(app);*/
 
 	rtgui_win_destroy(win1);
 	rtgui_win_destroy(win2);

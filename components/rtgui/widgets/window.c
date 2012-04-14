@@ -72,8 +72,7 @@ static void _rtgui_win_destructor(rtgui_win_t* win)
 	rt_free(win->title);
 }
 
-static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *parent_window,
-											 struct rtgui_win *win)
+static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *win)
 {
 	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
@@ -81,7 +80,7 @@ static rt_bool_t _rtgui_win_create_in_server(struct rtgui_win *parent_window,
 		RTGUI_EVENT_WIN_CREATE_INIT(&ecreate);
 
 		/* send win create event to server */
-		ecreate.parent_window = parent_window;
+		ecreate.parent_window = win->parent_window;
 		ecreate.wid           = win;
 		ecreate.parent.user	  = win->style;
 #ifndef RTGUI_USING_SMALL_SIZE
@@ -109,6 +108,10 @@ DEFINE_CLASS_TYPE(win, "win",
 	_rtgui_win_destructor,
 	sizeof(struct rtgui_win));
 
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+static struct rtgui_win *the_desktop_window;
+#endif
+
 rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
 		                      const char* title,
 							  rtgui_rect_t *rect,
@@ -122,7 +125,23 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
 		return RT_NULL;
 
 	/* set parent toplevel */
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+	if (style & RTGUI_WIN_STYLE_DESKTOP)
+	{
+		RT_ASSERT(the_desktop_window == RT_NULL);
+		win->parent_window = RT_NULL;
+		the_desktop_window = win;
+	}
+	else if (parent_window == RT_NULL)
+	{
+		RT_ASSERT(the_desktop_window != RT_NULL);
+		win->parent_window = the_desktop_window;
+	}
+	else
+		win->parent_window = parent_window;
+#else
 	win->parent_window = parent_window;
+#endif
 
 	/* set title, rect and style */
 	if (title != RT_NULL)
@@ -133,7 +152,7 @@ rtgui_win_t* rtgui_win_create(struct rtgui_win* parent_window,
 	rtgui_widget_set_rect(RTGUI_WIDGET(win), rect);
 	win->style = style;
 
-	if (_rtgui_win_create_in_server(parent_window, win) == RT_FALSE)
+	if (_rtgui_win_create_in_server(win) == RT_FALSE)
 	{
 		goto __on_err;
 	}
@@ -207,7 +226,7 @@ rt_base_t rtgui_win_show(struct rtgui_win* win, rt_bool_t is_modal)
 	/* if it does not register into server, create it in server */
 	if (!(win->flag & RTGUI_WIN_FLAG_CONNECTED))
 	{
-		if (_rtgui_win_create_in_server(win->parent_window, win) == RT_FALSE)
+		if (_rtgui_win_create_in_server(win) == RT_FALSE)
 			return exit_code;
 	}
 
@@ -272,6 +291,7 @@ void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 void rtgui_win_hiden(struct rtgui_win* win)
 {
 	RT_ASSERT(win != RT_NULL);
+	RT_ASSERT(win != the_desktop_window);
 
 	if (!RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)) &&
 		win->flag & RTGUI_WIN_FLAG_CONNECTED)
