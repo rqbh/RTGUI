@@ -1079,3 +1079,42 @@ void rtgui_topwin_remove_monitor_rect(struct rtgui_win* wid, rtgui_rect_t* rect)
 	rtgui_mouse_monitor_remove(&(win->monitor_list), rect);
 }
 
+static void _rtgui_topwin_dump(struct rtgui_topwin *topwin)
+{
+	rt_kprintf("0x%p:%s,0x%x", topwin, topwin->wid->title, topwin->flag);
+}
+
+static void _rtgui_topwin_dump_tree(struct rtgui_topwin *topwin)
+{
+	struct rtgui_dlist_node *node;
+
+	_rtgui_topwin_dump(topwin);
+
+	rt_kprintf("(");
+	rtgui_dlist_foreach(node, &topwin->child_list, next)
+	{
+		_rtgui_topwin_dump_tree(get_topwin_from_list(node));
+	}
+	rt_kprintf(")");
+}
+
+void rtgui_topwin_dump_tree(void)
+{
+	struct rtgui_dlist_node *node;
+
+#ifdef RTGUI_USING_DESKTOP_WINDOW
+	_rtgui_topwin_dump(the_desktop_topwin);
+	rt_kprintf("\n");
+	rtgui_dlist_foreach(node, &the_desktop_topwin->child_list, next)
+	{
+		_rtgui_topwin_dump_tree(get_topwin_from_list(node));
+		rt_kprintf("\n");
+	}
+#else
+	rtgui_dlist_foreach(node, _rtgui_topwin_list, next)
+	{
+		_rtgui_topwin_dump_tree(get_topwin_from_list(node));
+		rt_kprintf("\n");
+	}
+#endif
+}
