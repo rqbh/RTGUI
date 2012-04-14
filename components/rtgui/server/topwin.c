@@ -237,14 +237,23 @@ static void _rtgui_topwin_union_region_tree(struct rtgui_topwin *topwin,
 		rtgui_region_union_rect(region, region, &topwin->extent);
 }
 
-static void _rtgui_topwin_free_tree(struct rtgui_topwin *topwin)
+/* The return value of this function is the next node in tree.
+ *
+ * As we freed the node in this function, it would be a null reference error of
+ * the caller iterate the tree normally.
+ */
+static struct rtgui_dlist_node* _rtgui_topwin_free_tree(struct rtgui_topwin *topwin)
 {
-	struct rtgui_dlist_node *node;
+	struct rtgui_dlist_node *node, *next_node;
 
 	RT_ASSERT(topwin != RT_NULL);
 
-	rtgui_dlist_foreach(node, &topwin->child_list, next)
-		_rtgui_topwin_free_tree(get_topwin_from_list(node));
+	node = topwin->child_list.next;
+	while (node != &topwin->child_list)
+		node = _rtgui_topwin_free_tree(get_topwin_from_list(node));
+
+	next_node = topwin->list.next;
+	rtgui_dlist_remove(&topwin->list);
 
 	/* free the monitor rect list, topwin node and title */
 	while (topwin->monitor_list.next != RT_NULL)
@@ -261,6 +270,7 @@ static void _rtgui_topwin_free_tree(struct rtgui_topwin *topwin)
 	topwin->title = RT_NULL;
 
 	rtgui_free(topwin);
+	return next_node;
 }
 
 rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
@@ -278,6 +288,8 @@ rt_err_t rtgui_topwin_remove(struct rtgui_win* wid)
 
 	old_focus = rtgui_topwin_get_focus();
 
+	// TODO: if the window is hidden, there is no need to update the window
+	// region
 	_rtgui_topwin_union_region_tree(topwin, &region);
 	if (topwin->flag & WINTITLE_SHOWN)
 		rtgui_topwin_update_clip();
