@@ -50,6 +50,18 @@ mq 的模式。rtgui_application 记录当前依附的 panel，和 panel 的 ext
 
 12, rtgui_filelist_view 不必继承自 container。
 
+13, 添加 desktop window 支持。(Done)
+    概念与名词：
+		13.1 desktop window：最底层的桌面窗口。它会在所有窗口下面显示，并且不会被它
+			上面的窗口模态掉。它的子窗口是 root window。(继承关系由 RTGUI 管理，不
+			用用户管理)它只有在启用 RTGUI_USING_DESKTOP_WINDOW 时才有此特性。
+		13.2 root window：创建时父窗口为 RT_NULL 的窗口。是用户空间窗口继承树的根。
+		13.3 normal window：创建时父窗口不为 RT_NULL 的窗口。它始终会在父窗口之上显
+			示(它会 clip 父窗口)。normal windows 和 root window 组成一个窗口树。
+		13.4 模态：当一个 normal window 模态显示时会会模态自己所在树的同级窗口
+			和所有父级窗口，但不会影响别的窗口树。被模态的窗口不会接受到用户事
+			件(按键，触摸等)
+
 ----
 [note1] 我们至少需要一种容器控件来盛放其他的控件，并且能把上层事件传递给被包含
 的控件。实现这样的功能有一个就好，container 可以担当这个责任。其他需要放多个控
