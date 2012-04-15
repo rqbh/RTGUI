@@ -10,8 +10,6 @@
 
 /*#include "test_cases.h"*/
 
-struct rtgui_application* app;
-
 rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event)
 {
 	rt_kprintf("win %s(%p) closing\n",
@@ -20,7 +18,7 @@ rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event
 	return RT_TRUE;
 }
 
-void create_wins(void)
+void create_wins(struct rtgui_application *app, void *parameter)
 {
 	struct rtgui_win *win1, *win2, *win3, *win4;
 	struct rtgui_label *label;
@@ -29,9 +27,12 @@ void create_wins(void)
 #ifdef RTGUI_USING_DESKTOP_WINDOW
 	struct rtgui_win *dsk;
 
-	rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &rect);
-	dsk = rtgui_win_create(RT_NULL, "desktop", &rect, RTGUI_WIN_STYLE_DESKTOP_DEFAULT);
-	rtgui_win_show(dsk, RT_FALSE);
+	if (parameter)
+	{
+		rtgui_graphic_driver_get_rect(rtgui_graphic_driver_get_default(), &rect);
+		dsk = rtgui_win_create(RT_NULL, "desktop", &rect, RTGUI_WIN_STYLE_DESKTOP_DEFAULT);
+		rtgui_win_show(dsk, RT_FALSE);
+	}
 #endif
 
 	rect.x1 = 40, rect.y1 = 40, rect.x2 = 200, rect.y2 = 80;
@@ -109,13 +110,16 @@ void rt_init_thread_entry(void* parameter)
     extern void rt_hw_lcd_init();
     extern void rtgui_touch_hw_init(void);
 
+	struct rtgui_application* app;
+
+
 	app = rtgui_application_create(
 			rt_thread_self(),
 			"guiapp");
 
 	RT_ASSERT(app != RT_NULL);
 
-	create_wins();
+	create_wins(app, parameter);
 
 	window_focus();
 
@@ -127,22 +131,31 @@ void rt_init_thread_entry(void* parameter)
 
 int rt_application_init()
 {
-	rt_thread_t init_thread;
+	rt_thread_t init_thread, init_thread2;
 
 	rt_err_t result;
 
 #if (RT_THREAD_PRIORITY_MAX == 32)
 	init_thread = rt_thread_create("init",
-								rt_init_thread_entry, RT_NULL,
+								rt_init_thread_entry, 1,
+								2048, 20, 20);
+	init_thread2 = rt_thread_create("init2",
+								rt_init_thread_entry, 0,
 								2048, 20, 20);
 #else
 	init_thread = rt_thread_create("init",
-								rt_init_thread_entry, RT_NULL,
+								rt_init_thread_entry, 1,
+								2048, 80, 20);
+	init_thread2 = rt_thread_create("init2",
+								rt_init_thread_entry, 0,
 								2048, 80, 20);
 #endif
 
 	if (init_thread != RT_NULL)
 		rt_thread_startup(init_thread);
+	if (init_thread2 != RT_NULL)
+		rt_thread_startup(init_thread2);
 
 	return 0;
+
 }
