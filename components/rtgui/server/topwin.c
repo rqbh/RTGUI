@@ -891,6 +891,12 @@ static void rtgui_topwin_update_clip(void)
 	{
 		/* clip the topwin */
 		_rtgui_topwin_clip_to_region(&region_available, top);
+#if 0
+		/* debug window clipping */
+		rt_kprintf("clip %s ", top->wid->title);
+		rtgui_region_dump(&region_available);
+		rt_kprintf("\n");
+#endif
 
 		/* update available region */
 		if (top->title != RT_NULL)
@@ -902,18 +908,18 @@ static void rtgui_topwin_update_clip(void)
 		eclip.wid = top->wid;
 		rtgui_application_send(top->tid, &(eclip.parent), sizeof(struct rtgui_event_clip_info));
 
-		/* iterate to next topwin */
+		/* move to next sibling tree */
 		if (top->parent == RT_NULL)
 			if (top->list.next != &_rtgui_topwin_list &&
 					get_topwin_from_list(top->list.next)->flag & WINTITLE_SHOWN)
-				top = get_topwin_from_list(top->list.next);
+				top = _rtgui_topwin_get_topmost_child_shown(get_topwin_from_list(top->list.next));
 			else
-				top = RT_NULL;
+				break;
 		else if (top->list.next != &top->parent->child_list &&
 			get_topwin_from_list(top->list.next)->flag & WINTITLE_SHOWN)
-			top = get_topwin_from_list(top->list.next);
+			top = _rtgui_topwin_get_topmost_child_shown(get_topwin_from_list(top->list.next));
+		/* level up */
 		else
-			/* level up */
 			top = top->parent;
 	}
 }
