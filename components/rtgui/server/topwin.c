@@ -1129,7 +1129,7 @@ void rtgui_topwin_dump_tree(void)
 		rt_kprintf("\n");
 	}
 #else
-	rtgui_dlist_foreach(node, _rtgui_topwin_list, next)
+	rtgui_dlist_foreach(node, &_rtgui_topwin_list, next)
 	{
 		_rtgui_topwin_dump_tree(get_topwin_from_list(node));
 		rt_kprintf("\n");

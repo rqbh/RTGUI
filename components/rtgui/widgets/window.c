@@ -291,7 +291,9 @@ void rtgui_win_end_modal(struct rtgui_win* win, rtgui_modal_code_t modal_code)
 void rtgui_win_hiden(struct rtgui_win* win)
 {
 	RT_ASSERT(win != RT_NULL);
+#ifdef RTGUI_USING_DESKTOP_WINDOW
 	RT_ASSERT(win != the_desktop_window);
+#endif
 
 	if (!RTGUI_WIDGET_IS_HIDE(RTGUI_WIDGET(win)) &&
 		win->flag & RTGUI_WIN_FLAG_CONNECTED)
