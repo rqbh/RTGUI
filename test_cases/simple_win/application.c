@@ -22,7 +22,7 @@ rt_bool_t on_window_close(struct rtgui_object* object, struct rtgui_event* event
 
 void create_wins(void)
 {
-	struct rtgui_win *win1, *win2;
+	struct rtgui_win *win1, *win2, *win3, *win4;
 	struct rtgui_label *label;
 	struct rtgui_rect rect;
 
@@ -63,13 +63,44 @@ void create_wins(void)
 		"test window2", &rect, RTGUI_WIN_STYLE_DEFAULT);
 
 	rtgui_win_set_onclose(win2, on_window_close);
-	rtgui_win_show(win1, RT_TRUE);
+	rtgui_win_show(win1, RT_FALSE);
 	/*rtgui_win_show(win2, RT_TRUE);*/
 
-	/*rtgui_application_run(app);*/
+	/* create second window tree */
+	rect.y1 = 150;
+	rect.y2 = rect.y1 + 50;
+	win3 = rtgui_win_create(RT_NULL,
+		"test tree2", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rtgui_win_set_onclose(win3, on_window_close);
+
+	rect.x1 += 20;
+	rect.x2 -= 5;
+	rect.y1 += 5;
+	rect.y2 = rect.y1 + 20;
+
+	label = rtgui_label_create("window in modal mode");
+	rtgui_widget_set_rect(RTGUI_WIDGET(label), &rect);
+	rtgui_container_add_child(RTGUI_CONTAINER(win3), RTGUI_WIDGET(label));
+
+	rect.x1 = 20;
+	rect.y1 = 180;
+	rect.x2 = 180;
+	rect.y2 = 190;
+	win4 = rtgui_win_create(win3,
+		"test tree2.1", &rect, RTGUI_WIN_STYLE_DEFAULT);
+
+	rtgui_win_set_onclose(win4, on_window_close);
+	rtgui_win_show(win3, RT_FALSE);
+	rtgui_topwin_dump_tree();
+	/*rtgui_win_show(win4, RT_TRUE);*/
+
+	rtgui_application_run(app);
 
 	rtgui_win_destroy(win1);
 	rtgui_win_destroy(win2);
+	rtgui_win_destroy(win3);
+	rtgui_win_destroy(win4);
 }
 
 void rt_init_thread_entry(void* parameter)
