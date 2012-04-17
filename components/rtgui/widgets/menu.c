@@ -37,9 +37,10 @@ static void _rtgui_menu_destructor(rtgui_menu_t* menu)
 	menu->items_list = RT_NULL;
 }
 
-static void _rtgui_menu_onitem(struct rtgui_widget* widget, struct rtgui_event* event)
+static rt_bool_t _rtgui_menu_onitem(struct rtgui_object* object, struct rtgui_event* event)
 {
 	struct rtgui_menu* menu;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
 	/* get menu */
 	menu = RTGUI_MENU(rtgui_widget_get_toplevel(widget));
@@ -59,13 +60,13 @@ static void _rtgui_menu_onitem(struct rtgui_widget* widget, struct rtgui_event* 
 				{
 					/* hide this sub menu */
 					rtgui_win_hiden(RTGUI_WIN(menu->sub_menu));
-					return;
+					return RT_FALSE;
 				}
 
 				/* show this sub menu */
 				rtgui_listctrl_get_item_rect(menu->items_list, menu->items_list->current_item, &item_rect);
 				rtgui_menu_pop(menu->sub_menu, item_rect.x2, item_rect.y1);
-				return;
+				return RT_FALSE;
 			}
 
 			/* delete sub menu */
@@ -92,6 +93,7 @@ static void _rtgui_menu_onitem(struct rtgui_widget* widget, struct rtgui_event* 
 		}
 		rtgui_menu_hiden(menu);
 	}
+	return RT_FALSE;
 }
 
 static void _rtgui_menu_item_ondraw(struct rtgui_listctrl *list,

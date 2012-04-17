@@ -30,7 +30,7 @@ static void _rtgui_combobox_destructor(rtgui_combobox_t *box)
 	box->pd_win    = RT_NULL;
 }
 
-void rtgui_combobox_pdwin_onitem(struct rtgui_object* object, struct rtgui_event* event)
+rt_bool_t rtgui_combobox_pdwin_onitem(struct rtgui_object* object, struct rtgui_event* event)
 {
 	struct rtgui_widget *widget;
 	rtgui_win_t* pd_win;
@@ -47,12 +47,12 @@ void rtgui_combobox_pdwin_onitem(struct rtgui_object* object, struct rtgui_event
 	combo->current_item = list->current_item;
 
 	if (combo->on_selected != RT_NULL)
-		combo->on_selected(RTGUI_WIDGET(combo), RT_NULL);
+		combo->on_selected(RTGUI_OBJECT(combo), RT_NULL);
 
 	rtgui_win_hiden(pd_win);
 	rtgui_widget_update(RTGUI_WIDGET(combo));
 
-	return ;
+	return RT_FALSE;
 }
 
 rt_bool_t rtgui_combobox_pdwin_ondeactive(struct rtgui_object* object, struct rtgui_event* event)
@@ -270,7 +270,7 @@ struct rtgui_listbox_item* rtgui_combox_get_select(struct rtgui_combobox* box)
 	return RT_NULL;
 }
 
-void rtgui_combobox_set_onselected(struct rtgui_combobox* box, rtgui_onitem_func_t func)
+void rtgui_combobox_set_onselected(struct rtgui_combobox* box, rtgui_event_handler_ptr func)
 {
 	box->on_selected = func;
 }

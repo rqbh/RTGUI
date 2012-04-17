@@ -34,7 +34,7 @@ struct rtgui_combobox
 	rt_uint16_t current_item;
 
 	/* call back */
-	void (*on_selected) (struct rtgui_widget* widget, struct rtgui_event* event);
+	rtgui_event_handler_ptr on_selected;
 };
 typedef struct rtgui_combobox rtgui_combobox_t;
 
@@ -44,6 +44,6 @@ void rtgui_combobox_destroy(rtgui_combobox_t* box);
 rt_bool_t rtgui_combobox_event_handler(struct rtgui_object* object, struct rtgui_event* event);
 struct rtgui_listbox_item* rtgui_combox_get_select(struct rtgui_combobox* box);
 
-void rtgui_combobox_set_onselected(struct rtgui_combobox* box, rtgui_onitem_func_t func);
+void rtgui_combobox_set_onselected(struct rtgui_combobox* box, rtgui_event_handler_ptr func);
 
 #endif
