@@ -482,10 +482,6 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 		/* check whether has widget which handled mouse event before */
 		if (win->last_mevent_widget != RT_NULL)
 		{
-			struct rtgui_event_mouse* emouse;
-
-			emouse = (struct rtgui_event_mouse*)event;
-
 			RTGUI_OBJECT(win->last_mevent_widget)->event_handler(
 					RTGUI_OBJECT(win->last_mevent_widget),
 					event);
@@ -550,8 +546,6 @@ rt_bool_t rtgui_win_event_handler(struct rtgui_object* object, struct rtgui_even
 			 * win->focused_widget->event_handler call) */
 			if (win->on_key != RT_NULL)
 				return win->on_key(RTGUI_OBJECT(win), event);
-			else
-				return RT_FALSE;
 		}
 		break;
 
