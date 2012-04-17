@@ -25,10 +25,13 @@ DEFINE_CLASS_TYPE(progressbar, "progressbar",
 	RT_NULL,
 	sizeof(struct rtgui_progressbar));
 
-rt_bool_t rtgui_progressbar_event_handler(struct rtgui_widget* widget,
+rt_bool_t rtgui_progressbar_event_handler(struct rtgui_object* object,
                                             struct rtgui_event* event)
 {
-	struct rtgui_progressbar* bar = (struct rtgui_progressbar*)widget;
+	struct rtgui_progressbar* bar;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
+
+	bar = RTGUI_PROGRESSBAR(object);
 
 	switch (event->type)
 	{

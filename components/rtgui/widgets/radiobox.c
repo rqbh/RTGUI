@@ -76,10 +76,12 @@ static void rtgui_radiobox_onmouse(struct rtgui_radiobox* radiobox, struct rtgui
 	}
 }
 
-rt_bool_t rtgui_radiobox_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_radiobox_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_radiobox* radiobox = (struct rtgui_radiobox*)widget;
+	struct rtgui_radiobox* radiobox;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
+	radiobox = RTGUI_RADIOBOX(object);
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:

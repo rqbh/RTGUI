@@ -206,11 +206,12 @@ void rtgui_listctrl_update_current(struct rtgui_listctrl* ctrl, rt_uint16_t old_
 	rtgui_dc_end_drawing(dc);
 }
 
-rt_bool_t rtgui_listctrl_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_listctrl_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_listctrl* ctrl = RT_NULL;
+	struct rtgui_listctrl* ctrl;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
-	ctrl = RTGUI_LISTCTRL(widget);
+	ctrl = RTGUI_LISTCTRL(object);
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:

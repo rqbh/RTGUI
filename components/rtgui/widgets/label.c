@@ -38,13 +38,12 @@ DEFINE_CLASS_TYPE(label, "label",
 	_rtgui_label_destructor,
 	sizeof(struct rtgui_label));
 
-rt_bool_t rtgui_label_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_label_event_handler(struct rtgui_object *object, struct rtgui_event* event)
 {
-	struct rtgui_label* label;
+	struct rtgui_label *label;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
-	RT_ASSERT(widget != RT_NULL);
-
-	label = (struct rtgui_label*) widget;
+	label = RTGUI_LABEL(object);
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:

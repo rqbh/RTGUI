@@ -240,25 +240,24 @@ static void _rtgui_textview_destructor(rtgui_textview_t *textview)
 	textview->lines = RT_NULL;
 }
 
-DEFINE_CLASS_TYPE(textview, "textview", 
+DEFINE_CLASS_TYPE(textview, "textview",
 	RTGUI_WIDGET_TYPE,
 	_rtgui_textview_constructor,
 	_rtgui_textview_destructor,
 	sizeof(struct rtgui_textview));
 
-rt_bool_t rtgui_textview_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_textview_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
 	struct rtgui_textview* textview;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
-	RT_ASSERT(widget != RT_NULL);
-
-	textview = (struct rtgui_textview*) widget;
+	textview = RTGUI_TEXTVIEW(object);
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:
 		_draw_textview(textview);
 		break;
-	
+
 	case RTGUI_EVENT_KBD:
 		{
 		struct rtgui_event_kbd* ekbd = (struct rtgui_event_kbd*)event;

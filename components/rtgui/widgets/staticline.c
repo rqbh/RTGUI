@@ -20,12 +20,12 @@ DEFINE_CLASS_TYPE(staticline, "staticline",
 	RT_NULL,
 	sizeof(struct rtgui_staticline));
 
-rt_bool_t rtgui_staticline_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_staticline_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
 	struct rtgui_staticline* staticline;
-	RT_ASSERT(widget != RT_NULL);
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
-	staticline = (struct rtgui_staticline*) widget;
+	staticline = RTGUI_STATICLINE(object);
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:

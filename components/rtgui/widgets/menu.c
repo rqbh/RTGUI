@@ -2,7 +2,7 @@
 #include <rtgui/widgets/menu.h>
 #include <rtgui/rtgui_theme.h>
 
-static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t* event);
+static rt_bool_t rtgui_menu_on_deactivate(struct rtgui_object* object, rtgui_event_t* event);
 const static rt_uint8_t right_arrow[] = {0x80, 0xc0, 0xe0, 0xf0, 0xe0, 0xc0, 0x80};
 
 static void _rtgui_menu_constructor(rtgui_menu_t *menu)
@@ -151,10 +151,12 @@ DEFINE_CLASS_TYPE(menu, "menu",
 	_rtgui_menu_destructor,
 	sizeof(struct rtgui_menu));
 
-static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t* event)
+static rt_bool_t rtgui_menu_on_deactivate(struct rtgui_object *object, rtgui_event_t* event)
 {
-	rtgui_menu_t* menu = (rtgui_menu_t*) widget;
+	rtgui_menu_t* menu;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
 
+	menu = RTGUI_MENU(object);
 	if (menu->parent_menu != RT_NULL)
 	{
 		/* whether click on parent menu */
@@ -179,7 +181,7 @@ static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t*
 	rtgui_win_hiden(RTGUI_WIN(menu));
 	if (menu->on_menuhide != RT_NULL)
 	{
-		menu->on_menuhide(RTGUI_WIDGET(menu), RT_NULL);
+		menu->on_menuhide(RTGUI_OBJECT(menu), RT_NULL);
 	}
 
 	/* un-select item */
@@ -189,7 +191,7 @@ static rt_bool_t rtgui_menu_on_deactivate(rtgui_widget_t* widget, rtgui_event_t*
 	if (menu->parent_menu != RT_NULL &&
 		rtgui_win_is_activated(RTGUI_WIN(menu->parent_menu)) == RT_FALSE)
 	{
-		rtgui_menu_on_deactivate(RTGUI_WIDGET(menu->parent_menu), event);
+		rtgui_menu_on_deactivate(RTGUI_OBJECT(menu->parent_menu), event);
 	}
 
 	return RT_TRUE;
@@ -259,12 +261,12 @@ void rtgui_menu_pop(struct rtgui_menu* menu, int x, int y)
 	eresize.parent.type = RTGUI_EVENT_RESIZE;
 	eresize.x = rect.x1; eresize.y = rect.y1;
 	eresize.h = rect.y2 - rect.y1; eresize.w = rect.x2 - rect.x1;
-	rtgui_listctrl_event_handler(RTGUI_WIDGET(menu->items_list), &(eresize.parent));
+	rtgui_listctrl_event_handler(RTGUI_OBJECT(menu->items_list), &(eresize.parent));
 
 	/* on menu pop handler */
 	if (menu->on_menupop != RT_NULL)
 	{
-		menu->on_menupop(RTGUI_WIDGET(menu), RT_NULL);
+		menu->on_menupop(RTGUI_OBJECT(menu), RT_NULL);
 	}
 
 	/* show menu window */

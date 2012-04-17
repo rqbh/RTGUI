@@ -145,7 +145,7 @@ static void _rtgui_scrollbar_on_mouseclick(struct rtgui_widget * widget, struct 
 				if (mouse->y < bar_rect.y1 + thumb_position)
 				{
 					bar->thumb_position -= bar->page_step;
-					if (bar->thumb_position < bar->min_position)					
+					if (bar->thumb_position < bar->min_position)
 						bar->thumb_position = bar->min_position;
 				}
 				else if (mouse->y > thumb_position + bar->thumb_size)
@@ -216,7 +216,7 @@ static void _rtgui_scrollbar_on_mouseclick(struct rtgui_widget * widget, struct 
 				if (mouse->x <  bar_rect.x1 + thumb_position)
 				{
 					bar->thumb_position -= bar->page_step;
-					if (bar->thumb_position < bar->min_position)					
+					if (bar->thumb_position < bar->min_position)
 						bar->thumb_position = bar->min_position;
 				}
 				else if (mouse->x > thumb_position + bar->thumb_size)
@@ -257,14 +257,18 @@ __exit:
 	if ((mouse->button & (RTGUI_MOUSE_BUTTON_LEFT | RTGUI_MOUSE_BUTTON_DOWN)) ==
 		(RTGUI_MOUSE_BUTTON_LEFT | RTGUI_MOUSE_BUTTON_DOWN))
 	{
-		if (bar->on_scroll != RT_NULL) bar->on_scroll(widget, RT_NULL);
+		if (bar->on_scroll != RT_NULL)
+			bar->on_scroll(RTGUI_OBJECT(widget), RT_NULL);
 	}
 }
 
-rt_bool_t rtgui_scrollbar_event_handler(struct rtgui_widget * widget,
-	struct rtgui_event * event)
+rt_bool_t rtgui_scrollbar_event_handler(struct rtgui_object *object,
+										struct rtgui_event *event)
 {
-	struct rtgui_scrollbar* bar = (struct rtgui_scrollbar*)widget;
+	struct rtgui_scrollbar* bar;
+	RTGUI_WIDGET_EVENT_HANDLER_PREPARE
+
+	bar = RTGUI_SCROLLBAR(object);
 
 	switch (event->type)
 	{
