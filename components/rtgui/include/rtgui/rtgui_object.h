@@ -113,9 +113,17 @@ rtgui_object_t *rtgui_object_create(rtgui_type_t *object_type);
 void         rtgui_object_destroy(rtgui_object_t *object);
 
 /* set the event handler of object */
-void rtgui_object_set_event_handler(struct rtgui_object *widget, rtgui_event_handler_ptr handler);
+void rtgui_object_set_event_handler(struct rtgui_object *object, rtgui_event_handler_ptr handler);
 /* object default event handler */
-rt_bool_t rtgui_object_event_handler(struct rtgui_object *widget, struct rtgui_event* event);
+rt_bool_t rtgui_object_event_handler(struct rtgui_object *object, struct rtgui_event* event);
+/* helper micro. widget event handlers could use this. */
+#define RTGUI_WIDGET_EVENT_HANDLER_PREPARE \
+	struct rtgui_widget *widget;  \
+	RT_ASSERT(object != RT_NULL); \
+	RT_ASSERT(event != RT_NULL);  \
+	widget = RTGUI_WIDGET(object); \
+	/* supress compiler warning */ \
+	widget = widget;
 
 void       rtgui_object_name_set(rtgui_object_t *object, const char *name);
 const char *rtgui_object_name_get(rtgui_object_t *object);
