@@ -530,6 +530,7 @@ rt_inline rt_bool_t _rtgui_application_dest_handle(
 		struct rtgui_event *event)
 {
 	struct rtgui_event_win* wevent = (struct rtgui_event_win*)event;
+
 	struct rtgui_object* dest_object = RTGUI_OBJECT(wevent->wid);
 
 	if (dest_object != RT_NULL)

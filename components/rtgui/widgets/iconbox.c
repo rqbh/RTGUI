@@ -46,9 +46,14 @@ DEFINE_CLASS_TYPE(iconbox, "iconbox",
 	_rtgui_iconbox_destructor,
 	sizeof(struct rtgui_iconbox));
 
-rt_bool_t rtgui_iconbox_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_iconbox_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_iconbox* iconbox = (struct rtgui_iconbox*)widget;
+	struct rtgui_iconbox* iconbox;
+
+	RT_ASSERT(object != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	iconbox = RTGUI_ICONBOX(object);
 
 	switch (event->type)
 	{

@@ -57,13 +57,16 @@ DEFINE_CLASS_TYPE(button, "button",
 	_rtgui_button_destructor,
 	sizeof(struct rtgui_button));
 
-rt_bool_t rtgui_button_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_button_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_button* btn;
+	struct rtgui_widget *widget;
+	struct rtgui_button *btn;
 
 	RT_ASSERT(widget != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
 
-	btn = (struct rtgui_button*) widget;
+	widget = RTGUI_WIDGET(object);
+	btn = RTGUI_BUTTON(widget);
 	switch (event->type)
 	{
 	case RTGUI_EVENT_PAINT:

@@ -29,9 +29,16 @@ void rtgui_checkbox_set_onbutton(rtgui_checkbox_t* checkbox, rtgui_onbutton_func
 	checkbox->on_button = func;
 }
 
-rt_bool_t rtgui_checkbox_event_handler(struct rtgui_widget* widget, struct rtgui_event* event)
+rt_bool_t rtgui_checkbox_event_handler(struct rtgui_object* object, struct rtgui_event* event)
 {
-	struct rtgui_checkbox* box = (struct rtgui_checkbox*)widget;
+	struct rtgui_widget *widget;
+	struct rtgui_checkbox *box = (struct rtgui_checkbox*)widget;
+
+	RT_ASSERT(widget != RT_NULL);
+	RT_ASSERT(event != RT_NULL);
+
+	widget = RTGUI_WIDGET(object);
+	box = RTGUI_CHECKBOX(object);
 
 	switch (event->type)
 	{

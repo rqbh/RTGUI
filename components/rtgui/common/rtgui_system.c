@@ -16,6 +16,7 @@
 #include <rtgui/image.h>
 #include <rtgui/font.h>
 #include <rtgui/event.h>
+#include <rtgui/rtgui_application.h>
 #include <rtgui/rtgui_server.h>
 #include <rtgui/rtgui_system.h>
 #include <rtgui/widgets/window.h>
